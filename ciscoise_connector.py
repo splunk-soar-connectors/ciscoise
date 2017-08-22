@@ -49,6 +49,7 @@ class CiscoISEConnector(BaseConnector):
         config = self.get_config()
 
         self._auth = HTTPBasicAuth(config[phantom.APP_JSON_USERNAME], config[phantom.APP_JSON_PASSWORD])
+        self._ers_auth = HTTPBasicAuth(config["ers_user"], config["ers_password"])
         self._base_url = 'https://{0}'.format(config[phantom.APP_JSON_DEVICE])
 
         return phantom.APP_SUCCESS
@@ -62,11 +63,16 @@ class CiscoISEConnector(BaseConnector):
 
         config = self.get_config()
         verify = config[phantom.APP_JSON_VERIFY]
-
-        try:
-            resp = requests.get(url, verify=verify, auth=self._auth)
-        except Exception as e:
-            return (action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data)
+        if endpoint == ERS_ENDPOINT_REST:
+            try:
+                resp = requests.get(url, verify=verify, auth=self._ers_auth)
+            except:
+                return (action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data)
+        else:
+            try:
+                resp = requests.get(url, verify=verify, auth=self._auth)
+            except Exception as e:
+                return (action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data)
 
         self.debug_print("status_code", resp.status_code)
 
@@ -74,7 +80,6 @@ class CiscoISEConnector(BaseConnector):
             return (action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API_ERR_CODE, code=resp.status_code, message=resp.text), ret_data)
 
         action_result.add_debug_data(resp.text)
-
         xml = resp.text
 
         try:
@@ -146,6 +151,32 @@ class CiscoISEConnector(BaseConnector):
         summary.update({CISCOISE_JSON_TOTAL_SESSIONS: len(active_sessions)})
 
         return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _list_endpoints(self, param):
+
+        ret_val = phantom.APP_SUCCESS
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_data = None
+        endpoint = ERS_ENDPOINT_REST
+
+        ret_val, ret_data = self._call_rest_api(endpoint, action_result, QUARANTINE_RESP_SCHEMA)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        action_result.add_data(ret_data)
+
+        if ((failure_type is not None) or (failure_msg is not None)):
+            action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_ACTION_FAILED, error_code=ret_data['EPS_RESULT']['errorCode'])
+            if (failure_type is not None):
+                action_result.append_to_message(failure_type)
+            if (failure_msg is not None):
+                action_result.append_to_message(failure_msg)
+            return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS, CISCOISE_SUCC_SYSTEM_QUARANTINED)
 
     def _quarantine_system(self, param):
 
