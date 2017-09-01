@@ -49,6 +49,9 @@ CISCOISE_ERR_MAC_AND_IP_NOT_SPECIFIED = "Please specify a valid mac or ip addres
 CISCOISE_ERR_ACTION_FAILED = "Action failed with error code: {error_code}"
 CISCOISE_SUCC_SYSTEM_QUARANTINED = "System Quarantined"
 CISCOISE_SUCC_SYSTEM_UNQUARANTINED = "System unquarantined"
+CISCOISE_SUCC_LIST_ENDPOINTS = "{0} Endpoints found"
+CISCOISE_SUCC_GET_ENDPOINT = "Endpoint found"
+CISCOISE_SUCC_UPDATE_ENDPOINT = "Endpoint updated"
 
 # Json reply schema
 IS_MAC_QUARAN_RESP_SCHEMA = {"EPS_RESULT": {"type": "dict", "schema": {"status": {"type": "string"}, "userData": {"type": "string"}}}}

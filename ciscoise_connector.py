@@ -35,6 +35,9 @@ class CiscoISEConnector(BaseConnector):
     ACTION_ID_LOGOFF_SYSTEM = "logoff_system"
     ACTION_ID_QUARANTINE_SYSTEM = "quarantine_device"
     ACTION_ID_UNQUARANTINE_SYSTEM = "unquarantine_device"
+    ACTION_ID_LIST_ENDPOINTS = "list_endpoints"
+    ACTION_ID_GET_ENDPOINT = "get_endpoint"
+    ACTION_ID_UPDATE_ENDPOINT = "update_endpoint"
 
     def __init__(self):
 
@@ -49,23 +52,30 @@ class CiscoISEConnector(BaseConnector):
         config = self.get_config()
 
         self._auth = HTTPBasicAuth(config[phantom.APP_JSON_USERNAME], config[phantom.APP_JSON_PASSWORD])
-        self._ers_auth = HTTPBasicAuth(config["ers_user"], config["ers_password"])
+        ers_user = config.get("ers_user", None)
+        if ers_user is not None:
+            self._ers_auth = HTTPBasicAuth(config["ers_user"], config["ers_password"])
         self._base_url = 'https://{0}'.format(config[phantom.APP_JSON_DEVICE])
 
         return phantom.APP_SUCCESS
 
-    def _call_rest_api(self, endpoint, action_result, schema=None, allow_unknown=True):
+    def _call_rest_api(self, endpoint, action_result, schema=None, data=None, allow_unknown=True):
 
         url = '{0}{1}'.format(self._base_url, endpoint)
         ret_data = None
-
+        action = self.get_action_identifier()
         self.debug_print("REST Endpoint: ", url)
 
         config = self.get_config()
         verify = config[phantom.APP_JSON_VERIFY]
-        if endpoint == ERS_ENDPOINT_REST:
+        if (action == self.ACTION_ID_LIST_ENDPOINTS) or (action == self.ACTION_ID_GET_ENDPOINT) or (action == self.ACTION_ID_UPDATE_ENDPOINT):
             try:
-                resp = requests.get(url, verify=verify, auth=self._ers_auth)
+                headers = {"Content-Type": "application/vnd.com.cisco.ise.identity.endpoint.1.0+xml; charset=utf-8",
+                                 "ACCEPT": "application/vnd.com.cisco.ise.identity.endpoint.1.0+xml; charset=utf-8"}
+                if data is not None:
+                    resp = requests.put(url, data=xmltodict.unparse(data, pretty=True), verify=verify, headers=headers, auth=self._ers_auth)
+                else:
+                    resp = requests.get(url, verify=verify, headers=headers, auth=self._ers_auth)
             except:
                 return (action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data)
         else:
@@ -166,15 +176,71 @@ class CiscoISEConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
+        total = ret_data["ns2:searchResult"]["@total"]
+        action_result.update_summary({"Endpoints found": total})
+
         action_result.add_data(ret_data)
 
-        if ((failure_type is not None) or (failure_msg is not None)):
-            action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_ACTION_FAILED, error_code=ret_data['EPS_RESULT']['errorCode'])
-            if (failure_type is not None):
-                action_result.append_to_message(failure_type)
-            if (failure_msg is not None):
-                action_result.append_to_message(failure_msg)
+        return action_result.set_status(phantom.APP_SUCCESS, CISCOISE_SUCC_LIST_ENDPOINTS.format(total))
+
+    def _get_endpoint(self, param):
+
+        ret_val = phantom.APP_SUCCESS
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_data = None
+        endpoint = ERS_ENDPOINT_REST + "/" + param["endpoint_id"]
+
+        ret_val, ret_data = self._call_rest_api(endpoint, action_result, QUARANTINE_RESP_SCHEMA)
+
+        if (phantom.is_fail(ret_val)):
             return action_result.get_status()
+
+        # total = ret_data["ns2:searchResult"]["@total"]
+        # action_result.update_summary({"Endpoints found": total})
+
+        action_result.add_data(ret_data)
+
+        return action_result.set_status(phantom.APP_SUCCESS, CISCOISE_SUCC_GET_ENDPOINT)
+
+    def _update_endpoint(self, param):
+
+        ret_val = phantom.APP_SUCCESS
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_data = None
+        endpoint = ERS_ENDPOINT_REST + "/" + param["endpoint_id"]
+
+        ret_val, ret_data = self._call_rest_api(endpoint, action_result, QUARANTINE_RESP_SCHEMA)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        attribute_dict = ret_data
+
+        attribute_dict["ns3:endpoint"]["customAttributes"] = {
+                                        "customAttributes": {
+                                            "entry": {
+                                                "key": param["attribute"],
+                                                "value": param["attribute_value"]
+                                            }
+                                        }
+                                       }
+
+        ret_data = None
+        endpoint = ERS_ENDPOINT_REST + "/" + param["endpoint_id"]
+
+        ret_val, ret_data = self._call_rest_api(endpoint, action_result, schema=QUARANTINE_RESP_SCHEMA, data=attribute_dict)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        # total = ret_data["ns2:searchResult"]["@total"]
+        # action_result.update_summary({"Endpoints found": total})
+
+        action_result.add_data(ret_data)
 
         return action_result.set_status(phantom.APP_SUCCESS, CISCOISE_SUCC_SYSTEM_QUARANTINED)
 
@@ -385,8 +451,15 @@ class CiscoISEConnector(BaseConnector):
             result = self._quarantine_system(param)
         elif (action == self.ACTION_ID_UNQUARANTINE_SYSTEM):
             result = self._unquarantine_system(param)
+        elif (action == self.ACTION_ID_LIST_ENDPOINTS):
+            result = self._list_endpoints(param)
+        elif (action == self.ACTION_ID_GET_ENDPOINT):
+            result = self._get_endpoint(param)
+        elif (action == self.ACTION_ID_UPDATE_ENDPOINT):
+            result = self._update_endpoint(param)
 
         return result
+
 
 if __name__ == '__main__':
 
