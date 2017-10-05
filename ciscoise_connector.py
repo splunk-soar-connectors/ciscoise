@@ -73,7 +73,9 @@ class CiscoISEConnector(BaseConnector):
                 headers = {"Content-Type": "application/vnd.com.cisco.ise.identity.endpoint.1.0+xml; charset=utf-8",
                                  "ACCEPT": "application/vnd.com.cisco.ise.identity.endpoint.1.0+xml; charset=utf-8"}
                 if data is not None:
-                    resp = requests.put(url, data=xmltodict.unparse(data, pretty=True), verify=verify, headers=headers, auth=self._ers_auth)
+                    xml_data = xmltodict.unparse(data, pretty=True)
+                    self.debug_print("xml_data: ", xml_data)
+                    resp = requests.put(url, data=xml_data, verify=verify, headers=headers, auth=self._ers_auth)
                 else:
                     resp = requests.get(url, verify=verify, headers=headers, auth=self._ers_auth)
             except:
@@ -171,12 +173,19 @@ class CiscoISEConnector(BaseConnector):
         ret_data = None
         endpoint = ERS_ENDPOINT_REST
 
+        mac_filter = param.get("mac_address", None)
+        if mac_filter is not None:
+            endpoint = ERS_ENDPOINT_REST + "?filter=mac.EQ." + mac_filter
+
         ret_val, ret_data = self._call_rest_api(endpoint, action_result, QUARANTINE_RESP_SCHEMA)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
-        total = ret_data["ns2:searchResult"]["@total"]
+        if "ns2:searchResult" in ret_data:
+            total = ret_data["ns2:searchResult"]["@total"]
+        elif "ns3:searchResult" in ret_data:
+            total = ret_data["ns3:searchResult"]["@total"]
         action_result.update_summary({"Endpoints found": total})
 
         action_result.add_data(ret_data)
@@ -218,16 +227,38 @@ class CiscoISEConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
-        attribute_dict = ret_data
-
-        attribute_dict["ns3:endpoint"]["customAttributes"] = {
-                                        "customAttributes": {
-                                            "entry": {
-                                                "key": param["attribute"],
-                                                "value": param["attribute_value"]
-                                            }
-                                        }
-                                       }
+        if "ns3:endpoint" in ret_data:
+            attribute_dict = {"ns3:endpoint":
+                                {"@description": "", "@id": ret_data["ns3:endpoint"]["@id"],
+                                "@xmlns:ns3": "identity.ers.ise", "groupId": ret_data["ns3:endpoint"]["groupId"],
+                                "staticGroupAssignment": ret_data["ns3:endpoint"]["staticGroupAssignment"],
+                                "staticProfileAssignment": ret_data["ns3:endpoint"]["staticProfileAssignment"],
+                                "customAttributes": {
+                                                "customAttributes": {
+                                                                   "entry": {
+                                                                        "key": param["attribute"],
+                                                                        "value": param["attribute_value"]
+                                                                            }
+                                                                    }
+                                                    }
+                                 }
+                              }
+        elif "ns4:endpoint" in ret_data:
+            attribute_dict = {"ns4:endpoint":
+                                {"@description": "", "@id": ret_data["ns4:endpoint"]["@id"],
+                                "@xmlns:ns4": "identity.ers.ise", "groupId": ret_data["ns4:endpoint"]["groupId"],
+                                "staticGroupAssignment": ret_data["ns4:endpoint"]["staticGroupAssignment"],
+                                "staticProfileAssignment": ret_data["ns4:endpoint"]["staticProfileAssignment"],
+                                "customAttributes": {
+                                                "customAttributes": {
+                                                                   "entry": {
+                                                                        "key": param["attribute"],
+                                                                        "value": param["attribute_value"]
+                                                                            }
+                                                                    }
+                                                    }
+                                 }
+                              }
 
         ret_data = None
         endpoint = ERS_ENDPOINT_REST + "/" + param["endpoint_id"]
@@ -242,7 +273,7 @@ class CiscoISEConnector(BaseConnector):
 
         action_result.add_data(ret_data)
 
-        return action_result.set_status(phantom.APP_SUCCESS, CISCOISE_SUCC_SYSTEM_QUARANTINED)
+        return action_result.set_status(phantom.APP_SUCCESS, "Endpoint Updated")
 
     def _quarantine_system(self, param):
 

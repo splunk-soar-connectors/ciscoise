@@ -70,7 +70,18 @@
             "type": "investigate",
             "identifier": "list_endpoints",
             "read_only": true,
-            "parameters": {},
+            "parameters": {
+                "mac_address": {
+                    "description": "Mac Address to filter on - colon separated",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "mac address"
+                    ],
+                    "primary": false,
+                    "required": false
+                }
+            },
             "render": {
                 "type": "table",
                 "width": 12,
@@ -93,21 +104,21 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns2:searchResult.@total",
+                    "data_path": "action_result.data.*.ns3:searchResult.@total",
                     "data_type": "string",
                     "example_values": [
                         "9"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns2:searchResult.@xmlns:ns2",
+                    "data_path": "action_result.data.*.ns3:searchResult.@xmlns:ns3",
                     "data_type": "string",
                     "example_values": [
                         "ers.ise.cisco.com"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns2:searchResult.resources.resource.*.@id",
+                    "data_path": "action_result.data.*.ns3:searchResult.resources.resource.*.@id",
                     "data_type": "string",
                     "column_name": "ISE Endpoint ID",
                     "column_order": 1,
@@ -119,7 +130,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns2:searchResult.resources.resource.*.@name",
+                    "data_path": "action_result.data.*.ns3:searchResult.resources.resource.*.@name",
                     "data_type": "string",
                     "column_name": "Endpoint Name",
                     "column_order": 0,
@@ -128,14 +139,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns2:searchResult.resources.resource.*.link.@rel",
+                    "data_path": "action_result.data.*.ns3:searchResult.resources.resource.*.link.@rel",
                     "data_type": "string",
                     "example_values": [
                         "self"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns2:searchResult.resources.resource.*.link.@href",
+                    "data_path": "action_result.data.*.ns3:searchResult.resources.resource.*.link.@href",
                     "data_type": "string",
                     "column_name": "Link to ISE Endpoint",
                     "column_order": 2,
@@ -147,7 +158,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns2:searchResult.resources.resource.*.link.@type",
+                    "data_path": "action_result.data.*.ns3:searchResult.resources.resource.*.link.@type",
                     "data_type": "string",
                     "example_values": [
                         "application/xml"
@@ -217,14 +228,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns3:endpoint.@description",
+                    "data_path": "action_result.data.*.ns4:endpoint.@description",
                     "data_type": "string",
                     "example_values": [
                         ""
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns3:endpoint.@name",
+                    "data_path": "action_result.data.*.ns4:endpoint.@name",
                     "data_type": "string",
                     "column_name": "Name",
                     "column_order": 0,
@@ -233,7 +244,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns3:endpoint.@id",
+                    "data_path": "action_result.data.*.ns4:endpoint.@id",
                     "data_type": "string",
                     "column_name": "ISE Endpoint ID",
                     "column_order": 2,
@@ -245,35 +256,35 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns3:endpoint.@xmlns:ns3",
+                    "data_path": "action_result.data.*.ns4:endpoint.@xmlns:ns4",
                     "data_type": "string",
                     "example_values": [
                         "identity.ers.ise.cisco.com"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns3:endpoint.@xmlns:ns2",
+                    "data_path": "action_result.data.*.ns4:endpoint.@xmlns:ns4",
                     "data_type": "string",
                     "example_values": [
                         "ers.ise.cisco.com"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns3:endpoint.profileId",
+                    "data_path": "action_result.data.*.ns4:endpoint.profileId",
                     "data_type": "string",
                     "example_values": [
                         "319be2f0-5e4d-11e4-b905-005056bf2f0a"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns3:endpoint.staticProfileAssignment",
+                    "data_path": "action_result.data.*.ns4:endpoint.staticProfileAssignment",
                     "data_type": "string",
                     "example_values": [
                         "false"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns3:endpoint.mac",
+                    "data_path": "action_result.data.*.ns4:endpoint.mac",
                     "data_type": "string",
                     "column_name": "Mac Address",
                     "column_order": 1,
@@ -285,14 +296,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns3:endpoint.link.@rel",
+                    "data_path": "action_result.data.*.ns4:endpoint.link.@rel",
                     "data_type": "string",
                     "example_values": [
                         "self"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns3:endpoint.link.@href",
+                    "data_path": "action_result.data.*.ns4:endpoint.link.@href",
                     "data_type": "string",
                     "column_name": "Link to ISE Endpoint",
                     "column_order": 3,
@@ -304,21 +315,21 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns3:endpoint.link.@type",
+                    "data_path": "action_result.data.*.ns4:endpoint.link.@type",
                     "data_type": "string",
                     "example_values": [
                         "application/xml"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns3:endpoint.staticGroupAssignment",
+                    "data_path": "action_result.data.*.ns4:endpoint.staticGroupAssignment",
                     "data_type": "string",
                     "example_values": [
                         "true"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ns3:endpoint.groupId",
+                    "data_path": "action_result.data.*.ns4:endpoint.groupId",
                     "data_type": "string",
                     "example_values": [
                         "c804ca00-5e4c-11e4-b905-005056bf2f0a"
