@@ -59,32 +59,46 @@ class CiscoISEConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
-    def _call_rest_api(self, endpoint, action_result, schema=None, data=None, allow_unknown=True):
+    def _call_ers_api(self, endpoint, action_result, data=None, allow_unknown=True):
 
         url = '{0}{1}'.format(self._base_url, endpoint)
         ret_data = None
-        action = self.get_action_identifier()
         self.debug_print("REST Endpoint: ", url)
 
         config = self.get_config()
         verify = config[phantom.APP_JSON_VERIFY]
-        if (action == self.ACTION_ID_LIST_ENDPOINTS) or (action == self.ACTION_ID_GET_ENDPOINT) or (action == self.ACTION_ID_UPDATE_ENDPOINT):
-            try:
-                headers = {"Content-Type": "application/vnd.com.cisco.ise.identity.endpoint.1.0+xml; charset=utf-8",
-                                 "ACCEPT": "application/vnd.com.cisco.ise.identity.endpoint.1.0+xml; charset=utf-8"}
-                if data is not None:
-                    xml_data = xmltodict.unparse(data, pretty=True)
-                    self.debug_print("xml_data: ", xml_data)
-                    resp = requests.put(url, data=xml_data, verify=verify, headers=headers, auth=self._ers_auth)
-                else:
-                    resp = requests.get(url, verify=verify, headers=headers, auth=self._ers_auth)
-            except:
-                return (action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data)
-        else:
-            try:
-                resp = requests.get(url, verify=verify, auth=self._auth)
-            except Exception as e:
-                return (action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data)
+        try:
+            headers = {"Content-Type": "application/json",
+                        "ACCEPT": "application/json"}
+            if data is not None:
+                resp = requests.put(url, json=data, verify=verify, headers=headers, auth=self._ers_auth)
+            else:
+                resp = requests.get(url, verify=verify, headers=headers, auth=self._ers_auth)
+        except:
+            return (action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data)
+
+        self.debug_print("status_code", resp.status_code)
+
+        if (resp.status_code != 200):
+            return (action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API_ERR_CODE, code=resp.status_code, message=resp.text), ret_data)
+
+        ret_data = resp.json()
+
+        return (phantom.APP_SUCCESS, ret_data)
+
+    def _call_rest_api(self, endpoint, action_result, schema=None, data=None, allow_unknown=True):
+
+        url = '{0}{1}'.format(self._base_url, endpoint)
+        ret_data = None
+        self.debug_print("REST Endpoint: ", url)
+
+        config = self.get_config()
+        verify = config[phantom.APP_JSON_VERIFY]
+
+        try:
+            resp = requests.get(url, verify=verify, auth=self._auth)
+        except Exception as e:
+            return (action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data)
 
         self.debug_print("status_code", resp.status_code)
 
@@ -177,15 +191,13 @@ class CiscoISEConnector(BaseConnector):
         if mac_filter is not None:
             endpoint = ERS_ENDPOINT_REST + "?filter=mac.EQ." + mac_filter
 
-        ret_val, ret_data = self._call_rest_api(endpoint, action_result, QUARANTINE_RESP_SCHEMA)
+        ret_val, ret_data = self._call_ers_api(endpoint, action_result)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
-        if "ns2:searchResult" in ret_data:
-            total = ret_data["ns2:searchResult"]["@total"]
-        elif "ns3:searchResult" in ret_data:
-            total = ret_data["ns3:searchResult"]["@total"]
+        total = ret_data["SearchResult"]["total"]
+
         action_result.update_summary({"Endpoints found": total})
 
         action_result.add_data(ret_data)
@@ -201,7 +213,7 @@ class CiscoISEConnector(BaseConnector):
         ret_data = None
         endpoint = ERS_ENDPOINT_REST + "/" + param["endpoint_id"]
 
-        ret_val, ret_data = self._call_rest_api(endpoint, action_result, QUARANTINE_RESP_SCHEMA)
+        ret_val, ret_data = self._call_ers_api(endpoint, action_result)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
@@ -222,48 +234,39 @@ class CiscoISEConnector(BaseConnector):
         ret_data = None
         endpoint = ERS_ENDPOINT_REST + "/" + param["endpoint_id"]
 
-        ret_val, ret_data = self._call_rest_api(endpoint, action_result, QUARANTINE_RESP_SCHEMA)
+        ret_val, ret_data = self._call_ers_api(endpoint, action_result)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
-        if "ns3:endpoint" in ret_data:
-            attribute_dict = {"ns3:endpoint":
-                                {"@description": "", "@id": ret_data["ns3:endpoint"]["@id"],
-                                "@xmlns:ns3": "identity.ers.ise", "groupId": ret_data["ns3:endpoint"]["groupId"],
-                                "staticGroupAssignment": ret_data["ns3:endpoint"]["staticGroupAssignment"],
-                                "staticProfileAssignment": ret_data["ns3:endpoint"]["staticProfileAssignment"],
-                                "customAttributes": {
+        '''
+        endpoint_data = ret_data["ERSEndPoint"]
+        attribute_dict = {
+                            "ERSEndPoint": {
+                                    "id": endpoint_data["id"],
+                                    "name": endpoint_data["name"],
+                                    "description": endpoint_data["description"],
+                                    "mac": endpoint_data["mac"],
+                                    "profileId": endpoint_data["profileId"],
+                                    "groupId": endpoint_data["groupId"],
+                                    "staticProfileAssignment": endpoint_data["staticProfileAssignment"],
+                                    "staticGroupAssignment": endpoint_data["staticGroupAssignment"],
+                                    "customAttributes": {
                                                 "customAttributes": {
-                                                                   "entry": {
-                                                                        "key": param["attribute"],
-                                                                        "value": param["attribute_value"]
-                                                                            }
-                                                                    }
-                                                    }
-                                 }
-                              }
-        elif "ns4:endpoint" in ret_data:
-            attribute_dict = {"ns4:endpoint":
-                                {"@description": "", "@id": ret_data["ns4:endpoint"]["@id"],
-                                "@xmlns:ns4": "identity.ers.ise", "groupId": ret_data["ns4:endpoint"]["groupId"],
-                                "staticGroupAssignment": ret_data["ns4:endpoint"]["staticGroupAssignment"],
-                                "staticProfileAssignment": ret_data["ns4:endpoint"]["staticProfileAssignment"],
-                                "customAttributes": {
-                                                "customAttributes": {
-                                                                   "entry": {
-                                                                        "key": param["attribute"],
-                                                                        "value": param["attribute_value"]
-                                                                            }
-                                                                    }
-                                                    }
-                                 }
-                              }
+                                                                    param["attribute"]: param["attribute_value"]
+                                                                     }
+                                                         }
+                                            }
+                           }
+        '''
+        attribute_dict = ret_data
+        attribute_dict["ERSEndPoint"].pop("link")
+        attribute_dict["ERSEndPoint"]["customAttributes"]["customAttributes"].update({param["attribute"]: param["attribute_value"]})
 
         ret_data = None
         endpoint = ERS_ENDPOINT_REST + "/" + param["endpoint_id"]
 
-        ret_val, ret_data = self._call_rest_api(endpoint, action_result, schema=QUARANTINE_RESP_SCHEMA, data=attribute_dict)
+        ret_val, ret_data = self._call_ers_api(endpoint, action_result, data=attribute_dict)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
