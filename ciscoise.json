@@ -1,7 +1,7 @@
 {
-    "appid": "85232924-4776-4896-88fa-b982b304af7d",
-    "name": "Cisco ISE - SLB",
-    "description": "This app implements investigative and containment actions like 'quarantine device', 'terminate session' and 'list sessions' etc. on a Cisco ISE device.",
+    "appid": "85232924-4776-4896-88fa-b982b304af7c",
+    "name": "Cisco ISE",
+    "description": "This app implements investigative and containment actions on a Cisco ISE device.",
     "publisher": "Phantom",
     "type": "network access control",
     "main_module": "ciscoise_connector.pyc",
@@ -9,7 +9,7 @@
     "utctime_updated": "2017-08-10T00:31:00.000000Z",
     "package_name": "phantom_ciscoise",
     "product_vendor": "Cisco Systems",
-    "product_name": "Cisco ISE - SLB",
+    "product_name": "Cisco ISE",
     "product_version_regex": "2.2",
     "min_phantom_version": "3.0.190",
     "logo": "cisco.png",
@@ -72,7 +72,7 @@
             "read_only": true,
             "parameters": {
                 "mac_address": {
-                    "description": "Mac Address to filter on - colon separated",
+                    "description": "Mac Address to filter on (6 bytes, colon separated)",
                     "data_type": "string",
                     "order": 0,
                     "contains": [
@@ -184,7 +184,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "get endpoint",
+            "action": "get device info",
             "description": "Get informaton about a specific endpoint",
             "type": "investigate",
             "identifier": "get_endpoint",
@@ -372,7 +372,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "update endpoint",
+            "action": "update device info",
             "description": "Update informaton or attributes for a specific endpoint",
             "type": "contain",
             "identifier": "update_endpoint",
