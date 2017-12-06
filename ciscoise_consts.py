@@ -32,6 +32,7 @@ QUARANTINE_IP_REST = "/ise/eps/QuarantineByIP_S"
 UNQUARANTINE_MAC_REST = "/ise/eps/UnQuarantineByMAC_S"
 UNQUARANTINE_IP_REST = "/ise/eps/UnQuarantineByIP_S"
 MAC_SESSION_DETAILS_REST = "/ise/mnt/Session/MACAddress"
+ERS_ENDPOINT_REST = ":9060/ers/config/endpoint"
 
 # Error/Success
 CISCOISE_ERR_TEST_CONNECTIVITY_FAILED = "Test connectivity failed"
@@ -48,9 +49,13 @@ CISCOISE_ERR_MAC_AND_IP_NOT_SPECIFIED = "Please specify a valid mac or ip addres
 CISCOISE_ERR_ACTION_FAILED = "Action failed with error code: {error_code}"
 CISCOISE_SUCC_SYSTEM_QUARANTINED = "System Quarantined"
 CISCOISE_SUCC_SYSTEM_UNQUARANTINED = "System unquarantined"
+CISCOISE_SUCC_LIST_ENDPOINTS = "{0} Endpoints found"
+CISCOISE_SUCC_GET_ENDPOINT = "Endpoint found"
+CISCOISE_SUCC_UPDATE_ENDPOINT = "Endpoint updated"
 
 # Json reply schema
 IS_MAC_QUARAN_RESP_SCHEMA = {"EPS_RESULT": {"type": "dict", "schema": {"status": {"type": "string"}, "userData": {"type": "string"}}}}
 QUARANTINE_RESP_SCHEMA = {"EPS_RESULT": {"type": "dict", "schema": {"status": {"type": "string"}, "errorCode": {"type": "string"}}}}
 MAC_SESSION_RESP_SCHEMA = {"sessionParameters": {"type": "dict", "schema": {"acs_server": {"type": "string"}}}}
 DISCONNECT_MAC_SESS_RESP_SCHEMA = {"remoteCoA": {"type": "dict", "schema": {"results": {"type": "string"}}}}
+ERS_UPDATE_ENDPOINT_SCHEMA = {"updatedField": {"type": "dict", "schema": {"newValue": {"type": "string"}, "oldValue": {"type": "string"}}}}
