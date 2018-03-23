@@ -62,23 +62,7 @@
             "identifier": "test_asset_connectivity",
             "read_only": true,
             "parameters": {},
-            "output": [
-                {
-                    "data_path": "action_result.status",
-                    "example_values": [
-                        "success"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                }
-            ],
+            "output": [],
             "versions": "EQ(*)"
         },
         {
