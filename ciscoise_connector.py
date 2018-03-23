@@ -1,7 +1,7 @@
 # --
 # File: ciscoise_connector.py
 #
-# Copyright (c) Phantom Cyber Corporation, 2014-2016
+# Copyright (c) Phantom Cyber Corporation, 2014-2018
 #
 # This unpublished material is proprietary to Phantom Cyber.
 # All rights reserved. The methods and
@@ -74,7 +74,7 @@ class CiscoISEConnector(BaseConnector):
                 resp = requests.put(url, json=data, verify=verify, headers=headers, auth=self._ers_auth)
             else:
                 resp = requests.get(url, verify=verify, headers=headers, auth=self._ers_auth)
-        except:
+        except Exception as e:
             return (action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data)
 
         self.debug_print("status_code", resp.status_code)
