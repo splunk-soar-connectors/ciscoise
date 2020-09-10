@@ -24,6 +24,7 @@ from cerberus import Validator
 
 import xmltodict
 import requests
+import json
 from requests.auth import HTTPBasicAuth
 
 
@@ -38,6 +39,9 @@ class CiscoISEConnector(BaseConnector):
     ACTION_ID_LIST_ENDPOINTS = "list_endpoints"
     ACTION_ID_GET_ENDPOINT = "get_endpoint"
     ACTION_ID_UPDATE_ENDPOINT = "update_endpoint"
+    ACTION_ID_APPLY_POLICY = "apply_policy"
+    ACTION_ID_CLEAR_POLICY = "clear_policy"
+
 
     def __init__(self):
 
@@ -77,12 +81,14 @@ class CiscoISEConnector(BaseConnector):
         except Exception as e:
             return (action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data)
 
-        self.debug_print("status_code", resp.status_code)
+        self.save_progress("status_code: {}".format(resp.status_code))
 
-        if (resp.status_code != 200):
+        if (resp.status_code > 204):
             return (action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API_ERR_CODE, code=resp.status_code, message=resp.text), ret_data)
-
-        ret_data = resp.json()
+        if resp.status_code == 204:
+            ret_data = json.loads("{}")
+        else:
+            ret_data = resp.json()
 
         return (phantom.APP_SUCCESS, ret_data)
 
@@ -203,6 +209,105 @@ class CiscoISEConnector(BaseConnector):
         action_result.add_data(ret_data)
 
         return action_result.set_status(phantom.APP_SUCCESS, CISCOISE_SUCC_LIST_ENDPOINTS.format(total))
+
+    def _apply_policy(self, param):
+
+        ret_val = phantom.APP_SUCCESS
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_data = None
+        # endpoint = ERS_ENDPOINT_REST
+
+        mac = param.get("mac_address", None)
+        ip = param.get("ip_address", None)
+        policy = param.get("policy_name", None)
+
+        payload = {
+            "OperationAdditionalData" : {
+                "additionalData" : [ {
+                "name" : "policyName",
+                "value" : policy
+                } ]
+            }
+        }
+
+
+        if mac is not None:
+            payload['OperationAdditionalData']['additionalData'].append(
+                {
+                    "name" : "macAddress",
+                    "value": mac
+                }
+            )
+        if ip is not None:
+            payload['OperationAdditionalData']['additionalData'].append(
+                {
+                    "name" : "ipAddress",
+                    "value": ip
+                }
+            )
+
+        ret_val, ret_data = self._call_ers_api(ERS_ENDPOINT_ANC_APPLY, action_result, data=payload)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        # total = ret_data["SearchResult"]["total"]
+
+        # action_result.update_summary({"Endpoints found": total})
+
+        action_result.add_data(ret_data)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Policy applied")
+
+    def _clear_policy(self, param):
+
+        ret_val = phantom.APP_SUCCESS
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_data = None
+        # endpoint = ERS_ENDPOINT_REST
+
+        mac = param.get("mac_address", None)
+        ip = param.get("ip_address", None)
+
+        payload = {
+            "OperationAdditionalData" : {
+                "additionalData" : []
+            }
+        }
+
+        if mac is not None:
+            payload['OperationAdditionalData']['additionalData'].append(
+                {
+                    "name" : "macAddress",
+                    "value": mac
+                }
+            )
+        if ip is not None:
+            payload['OperationAdditionalData']['additionalData'].append(
+                {
+                    "name" : "ipAddress",
+                    "value": ip
+                }
+            )
+
+        ret_val, ret_data = self._call_ers_api(ERS_ENDPOINT_ANC_CLEAR, action_result, data=payload)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        # total = ret_data["SearchResult"]["total"]
+
+        # action_result.update_summary({"Endpoints found": total})
+
+        action_result.add_data(ret_data)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Policy cleared")
+
+
 
     def _get_endpoint(self, param):
 
@@ -491,6 +596,10 @@ class CiscoISEConnector(BaseConnector):
             result = self._get_endpoint(param)
         elif (action == self.ACTION_ID_UPDATE_ENDPOINT):
             result = self._update_endpoint(param)
+        elif (action == self.ACTION_ID_APPLY_POLICY):
+            result = self._apply_policy(param)
+        elif (action == self.ACTION_ID_CLEAR_POLICY):
+            result = self._clear_policy(param)
 
         return result
 

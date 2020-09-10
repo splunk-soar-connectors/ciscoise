@@ -33,6 +33,9 @@ UNQUARANTINE_MAC_REST = "/ise/eps/UnQuarantineByMAC_S"
 UNQUARANTINE_IP_REST = "/ise/eps/UnQuarantineByIP_S"
 MAC_SESSION_DETAILS_REST = "/ise/mnt/Session/MACAddress"
 ERS_ENDPOINT_REST = ":9060/ers/config/endpoint"
+ERS_ENDPOINT_ANC_APPLY= ":9060/ers/config/ancendpoint/apply"
+ERS_ENDPOINT_ANC_CLEAR = ":9060/ers/config/ancendpoint/clear"
+
 
 # Error/Success
 CISCOISE_ERR_TEST_CONNECTIVITY_FAILED = "Test connectivity failed"
