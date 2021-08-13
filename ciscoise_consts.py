@@ -13,12 +13,9 @@
 # --
 
 # Jsons
-CISCOISE_JSON_TYPE = "type"
 CISCOISE_JSON_SERVER = "server"
 CISCOISE_JSON_MACADDR = "mac_address"
 CISCOISE_JSON_TOTAL_SESSIONS = "sessions_found"
-CISCOISE_JSON_ENDPOINT_IP = "endpoint_ip"
-CISCOISE_JSON_NAS_IP = "nas_ip"
 
 # REST endpoint Consts
 ACTIVE_COUNT_REST_ENDPOINT = "/admin/API/mnt/Session/ActiveCount"
