@@ -826,6 +826,149 @@
                 }
             ],
             "versions": "EQ(*)"
+        },
+        {
+            "action": "list resources",
+            "description": "Lists all the resources configured on the system of a particular resource",
+            "type": "investigate",
+            "identifier": "list_resources",
+            "read_only": true,
+            "parameters": {
+                "resource": {
+                    "description": "Resources of the resource to be fetched",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "value_list": [
+                        "Endpoints",
+                        "Endpoint identity groups",
+                        "Guest users",
+                        "User identity groups",
+                        "Internal users",
+                        "Portals",
+                        "Network devices",
+                        "Network device groups",
+                        "Security groups"
+                    ]
+                },
+                "max_results": {
+                    "description": "Total number of observables to return",
+                    "data_type": "numeric",
+                    "required": false,
+                    "default": 1000,
+                    "order": 1
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Results"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.link.href",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://10.1.16.169:9060/ers/config/portal/40963c00-2e02-11e8-ba71-005056872c7f"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.link.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/xml"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.link.rel",
+                    "data_type": "string",
+                    "example_values": [
+                        "self"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Default portal used by sponsors to create and manage accounts for authorized visitors to securely access the network"
+                    ],
+                    "column_name": "Resource Description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Sponsor Portal (default)"
+                    ],
+                    "column_name": "Resource Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "40963c00-2e02-11e8-ba71-005056872c7f"
+                    ],
+                    "column_name": "Resource ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Resources returned: 5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource",
+                    "data_type": "string",
+                    "example_values": [
+                        "Portals"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.resources_returned",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
         }
     ]
 }

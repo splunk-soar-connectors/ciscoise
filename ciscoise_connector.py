@@ -38,6 +38,8 @@ class CiscoISEConnector(BaseConnector):
     ACTION_ID_LIST_ENDPOINTS = "list_endpoints"
     ACTION_ID_GET_ENDPOINT = "get_endpoint"
     ACTION_ID_UPDATE_ENDPOINT = "update_endpoint"
+    ACTION_ID_LIST_RESOURCES = "list_resources"
+
 
     def __init__(self):
 
@@ -59,7 +61,7 @@ class CiscoISEConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
-    def _call_ers_api(self, endpoint, action_result, data=None, allow_unknown=True):
+    def _call_ers_api(self, endpoint, action_result, data=None, allow_unknown=True, method="get"):
 
         url = '{0}{1}'.format(self._base_url, endpoint)
         ret_data = None
@@ -68,11 +70,12 @@ class CiscoISEConnector(BaseConnector):
         config = self.get_config()
         verify = config[phantom.APP_JSON_VERIFY]
         try:
+            request_func = getattr(requests, method)
+        except AttributeError as e:
+            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data
+        try:
             headers = {"Content-Type": "application/json", "ACCEPT": "application/json"}
-            if data is not None:
-                resp = requests.put(url, json=data, verify=verify, headers=headers, auth=self._ers_auth)
-            else:
-                resp = requests.get(url, verify=verify, headers=headers, auth=self._ers_auth)
+            resp = request_func(url, json=data, verify=verify, headers=headers, auth=self._ers_auth)
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data
 
@@ -82,7 +85,6 @@ class CiscoISEConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API_ERR_CODE, code=resp.status_code, message=resp.text), ret_data
 
         ret_data = resp.json()
-        self.debug_print(ret_data)
 
         return phantom.APP_SUCCESS, ret_data
 
@@ -218,9 +220,6 @@ class CiscoISEConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # total = ret_data["ns2:searchResult"]["@total"]
-        # action_result.update_summary({"Endpoints found": total})
-
         action_result.add_data(ret_data)
 
         return action_result.set_status(phantom.APP_SUCCESS, CISCOISE_SUCC_GET_ENDPOINT)
@@ -244,7 +243,7 @@ class CiscoISEConnector(BaseConnector):
             custom_attribute_dict = {"customAttributes": {custom_attribute: custom_attribute_value}}
             final_data["ERSEndPoint"]["customAttributes"] = custom_attribute_dict
 
-        ret_val, ret_data = self._call_ers_api(endpoint, action_result, data=final_data)
+        ret_val, ret_data = self._call_ers_api(endpoint, action_result, data=final_data, method="put")
         action_result.add_data(ret_data)
 
         if phantom.is_fail(ret_val):
@@ -422,6 +421,76 @@ class CiscoISEConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, CISCOISE_SUCC_SESSION_TERMINATED)
 
+    def _paginator(self, endpoint, action_result, payload=None, limit=None):
+
+        items_list = list()
+        f = open("/tmp/paginator_check_1.txt", "w")
+        f.write("hello \n")
+        f.write(str(items_list))
+
+        if not payload:
+            payload = {}
+
+        page = 1
+        payload['size'] = DEFAULT_MAX_RESULTS
+        payload['page'] = page
+
+        f.write("\n")
+        f.write(str(payload))
+        f.close()
+
+        while True:
+            ret_val, items = self._call_ers_api(endpoint, action_result, data=payload)
+
+            if phantom.is_fail(ret_val):
+                return None
+
+            items_list.extend(items.get("SearchResult", {}).get("resources"))
+
+            if limit and len(items_list) >= limit:
+                return items_list[:limit]
+
+            if len(items.get("SearchResult", {}).get("resources")) < DEFAULT_MAX_RESULTS:
+                break
+
+            if len(items_list) == items.get("SearchResult", {}).get("total"):
+                break
+
+            page = page + 1
+            payload['page'] = page
+
+        return items_list
+
+    def _list_resources(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        resource = MAP_RESOURCE[param["resource"]][0]
+        max_result = param.get("max_results")
+        endpoint = ERS_RESOURCE_REST.format(resource=resource)
+
+        try:
+            if max_result:
+                max_result = int(max_result)
+        except ValueError:
+            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_INVALID_PARAM.format(param="max_result"))
+
+        if max_result is not None and max_result <= 0:
+            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_INVALID_PARAM.format(param="max_result"))
+
+        resources = self._paginator(endpoint, action_result, limit=max_result)
+
+        if resources is None:
+            return action_result.get_status()
+
+        for resource in resources:
+            action_result.add_data(resource)
+
+        summary = action_result.update_summary({})
+        summary['resources_returned'] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def _test_connectivity(self, param):
 
         rest_endpoint = '{0}/{1}'.format(self._base_url, ACTIVE_COUNT_REST_ENDPOINT)
@@ -464,6 +533,8 @@ class CiscoISEConnector(BaseConnector):
             result = self._get_endpoint(param)
         elif action == self.ACTION_ID_UPDATE_ENDPOINT:
             result = self._update_endpoint(param)
+        elif action == self.ACTION_ID_LIST_RESOURCES:
+            result = self._list_resources(param)
 
         return result
 

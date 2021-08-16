@@ -30,6 +30,7 @@ UNQUARANTINE_MAC_REST = "/ise/eps/UnQuarantineByMAC_S"
 UNQUARANTINE_IP_REST = "/ise/eps/UnQuarantineByIP_S"
 MAC_SESSION_DETAILS_REST = "/ise/mnt/Session/MACAddress"
 ERS_ENDPOINT_REST = ":9060/ers/config/endpoint"
+ERS_RESOURCE_REST = ":9060/ers/config/{resource}"
 
 # Error/Success
 CISCOISE_ERR_TEST_CONNECTIVITY_FAILED = "Test connectivity failed"
@@ -49,6 +50,8 @@ CISCOISE_SUCC_SYSTEM_UNQUARANTINED = "System unquarantined"
 CISCOISE_SUCC_LIST_ENDPOINTS = "{0} Endpoints found"
 CISCOISE_SUCC_GET_ENDPOINT = "Endpoint found"
 CISCOISE_SUCC_UPDATE_ENDPOINT = "Endpoint updated"
+CISCOISE_ERR_INVALID_PARAM = "Please provide non-zero positive integer in {param}"
+DEFAULT_MAX_RESULTS = 7
 
 # Json reply schema
 IS_MAC_QUARAN_RESP_SCHEMA = {"EPS_RESULT": {"type": "dict", "schema": {"status": {"type": "string"}, "userData": {"type": "string"}}}}
@@ -56,3 +59,15 @@ QUARANTINE_RESP_SCHEMA = {"EPS_RESULT": {"type": "dict", "schema": {"status": {"
 MAC_SESSION_RESP_SCHEMA = {"sessionParameters": {"type": "dict", "schema": {"acs_server": {"type": "string"}}}}
 DISCONNECT_MAC_SESS_RESP_SCHEMA = {"remoteCoA": {"type": "dict", "schema": {"results": {"type": "string"}}}}
 ERS_UPDATE_ENDPOINT_SCHEMA = {"updatedField": {"type": "dict", "schema": {"newValue": {"type": "string"}, "oldValue": {"type": "string"}}}}
+
+MAP_RESOURCE = {
+    "Endpoints": ["endpoint", "ERSEndPoint"],
+    "Endpoint identity groups": ["endpointgroup", "ERSEndPoint"],
+    "Guest users": ["guestuser", ""],
+    "User identity groups": ["identitygroup", "IdentityGroup"],
+    "Internal users": ["internaluser", "InternalUser"],
+    "Portals": ["portal", "ERSPortal"],
+    "Network devices": ["networkdevice", "NetworkDevice"],
+    "Network device groups": ["networkdevicegroup", "NetworkDeviceGroup"],
+    "Security groups": ["sgt", "Sgt"]
+}
