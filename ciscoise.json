@@ -412,17 +412,30 @@
                     "primary": true,
                     "required": true
                 },
+                "ph_0": {
+                    "description": "Placeholder",
+                    "data_type": "ph",
+                    "order": 1
+                },
                 "attribute": {
                     "description": "Attribute to update for the Endpoint",
                     "data_type": "string",
-                    "order": 1,
-                    "required": true
+                    "order": 2
                 },
                 "attribute_value": {
                     "description": "Value to put in the attribute for the Endpoint",
                     "data_type": "string",
-                    "order": 2,
-                    "required": true
+                    "order": 3
+                },
+                "custom_attribute": {
+                    "description": "Custom attribute to update for the Endpoint",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "custom_attribute_value": {
+                    "description": "Value to put in the custom attribute for the Endpoint",
+                    "data_type": "string",
+                    "order": 5
                 }
             },
             "render": {

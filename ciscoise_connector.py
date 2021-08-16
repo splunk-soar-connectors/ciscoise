@@ -82,6 +82,7 @@ class CiscoISEConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API_ERR_CODE, code=resp.status_code, message=resp.text), ret_data
 
         ret_data = resp.json()
+        self.debug_print(ret_data)
 
         return phantom.APP_SUCCESS, ret_data
 
@@ -226,34 +227,28 @@ class CiscoISEConnector(BaseConnector):
 
     def _update_endpoint(self, param):
 
-        ret_val = phantom.APP_SUCCESS
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ret_data = None
         endpoint = ERS_ENDPOINT_REST + "/" + param["endpoint_id"]
+        attribute = param.get('attribute', None)
+        attribute_value = param.get('attribute_value', None)
+        custom_attribute = param.get('custom_attribute', None)
+        custom_attribute_value = param.get('custom_attribute_value', None)
 
-        ret_val, ret_data = self._call_ers_api(endpoint, action_result)
+        final_data = {"ERSEndPoint": {}}
 
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
+        if attribute is not None and attribute_value is not None:
+            final_data['ERSEndPoint'][attribute] = attribute_value
 
-        attribute_dict = ret_data
-        attribute_dict["ERSEndPoint"].pop("link")
-        attribute_dict["ERSEndPoint"]["customAttributes"]["customAttributes"].update({param["attribute"]: param["attribute_value"]})
+        if custom_attribute is not None and custom_attribute_value is not None:
+            custom_attribute_dict = {"customAttributes": {custom_attribute: custom_attribute_value}}
+            final_data["ERSEndPoint"]["customAttributes"] = custom_attribute_dict
 
-        ret_data = None
-        endpoint = ERS_ENDPOINT_REST + "/" + param["endpoint_id"]
-
-        ret_val, ret_data = self._call_ers_api(endpoint, action_result, data=attribute_dict)
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        # total = ret_data["ns2:searchResult"]["@total"]
-        # action_result.update_summary({"Endpoints found": total})
-
+        ret_val, ret_data = self._call_ers_api(endpoint, action_result, data=final_data)
         action_result.add_data(ret_data)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         return action_result.set_status(phantom.APP_SUCCESS, "Endpoint Updated")
 
