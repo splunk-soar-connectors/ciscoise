@@ -39,7 +39,7 @@ class CiscoISEConnector(BaseConnector):
     ACTION_ID_GET_ENDPOINT = "get_endpoint"
     ACTION_ID_UPDATE_ENDPOINT = "update_endpoint"
     ACTION_ID_LIST_RESOURCES = "list_resources"
-
+    ACTION_ID_GET_RESOURCE = "get_resource"
 
     def __init__(self):
 
@@ -491,6 +491,67 @@ class CiscoISEConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _get_resource(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        resource = MAP_RESOURCE[param["resource"]][0]
+        resource_id = param.get("resource_id")
+        keys = param.get("key", [])
+        values = param.get("value", [])
+
+        if keys:
+            keys = [x.strip() for x in keys.split(',')]
+            keys = list(filter(None, keys))
+
+        if values:
+            values = [x.strip() for x in values.split(',')]
+            values = list(filter(None, values))
+
+        if not resource_id and not (keys and values):
+            return action_result.set_status(phantom.APP_ERROR, "Please enter either 'resource id' or 'key' and 'value' to get the details of a particular resource")
+
+        if not resource_id and (keys and values):
+
+            if len(keys) != len(values):
+                return action_result.set_status(phantom.APP_ERROR, "Length of keys and values should be same")
+
+            filter_param = []
+
+            for i, v in enumerate(keys):
+                temp_filter = "filter={0}.EQ.{1}".format(keys[i], values[i])
+                filter_param.append(temp_filter)
+
+            endpoint = "{0}?{1}".format(ERS_RESOURCE_REST.format(resource=resource), "&".join(filter_param))
+
+            ret_val, resp = self._call_ers_api(endpoint, action_result)
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            num_results = resp.get("SearchResult", {}).get("total")
+
+            if num_results == 0:
+                return action_result.set_status(phantom.APP_ERROR, "No resource found for provided keys and values")
+
+            if num_results > 1:
+                return action_result.set_status(phantom.APP_ERROR, "More than one resource found for the provided keys and values")
+
+            resource_id = resp.get("SearchResult", {}).get("resources")[0].get("id")
+
+        endpoint = "{0}/{1}".format(ERS_RESOURCE_REST.format(resource=resource), resource_id)
+
+        ret_val, resp = self._call_ers_api(endpoint, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        summary = action_result.update_summary({})
+        summary['resource_id'] = resource_id
+
+        action_result.add_data(resp.get(MAP_RESOURCE[param["resource"]][1]))
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def _test_connectivity(self, param):
 
         rest_endpoint = '{0}/{1}'.format(self._base_url, ACTIVE_COUNT_REST_ENDPOINT)
@@ -535,6 +596,8 @@ class CiscoISEConnector(BaseConnector):
             result = self._update_endpoint(param)
         elif action == self.ACTION_ID_LIST_RESOURCES:
             result = self._list_resources(param)
+        elif action == self.ACTION_ID_GET_RESOURCE:
+            result = self._get_resource(param)
 
         return result
 

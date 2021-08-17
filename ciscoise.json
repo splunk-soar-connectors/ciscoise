@@ -969,6 +969,232 @@
                 }
             ],
             "versions": "EQ(*)"
+        },
+        {
+            "action": "get resource",
+            "description": "Get details of a resource",
+            "type": "investigate",
+            "identifier": "get_resource",
+            "read_only": true,
+            "parameters": {
+                "resource": {
+                    "description": "Resources of the resource to be fetched",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "value_list": [
+                        "Endpoints",
+                        "Endpoint identity groups",
+                        "Guest users",
+                        "User identity groups",
+                        "Internal users",
+                        "Portals",
+                        "Network devices",
+                        "Network device groups",
+                        "Security groups"
+                    ]
+                },
+                "resource_id": {
+                    "description": "Resource ID",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 1
+                },
+                "key": {
+                    "description": "Comma-separated keys",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 2
+                },
+                "value": {
+                    "description": "Comma-separated values",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "00:00:00:00:00:00"
+                    ],
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "This endpoint for test"
+                    ],
+                    "column_name": "Description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.profileId",
+                    "data_type": "string",
+                    "example_values": [
+                        "44031480-8c00-11e6-996c-525400b48521"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.staticProfileAssignment",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.mac",
+                    "data_type": "string",
+                    "example_values": [
+                        "00:00:00:00:00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.link.href",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://10.1.16.169:9060/ers/config/endpoint/d335f970-10e0-11ea-8f06-ce112ec9f8fa"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.link.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/xml"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.link.rel",
+                    "data_type": "string",
+                    "example_values": [
+                        "self"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.portalUser",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "d335f970-10e0-11ea-8f06-ce112ec9f8fa"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.staticGroupAssignment",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.identityStore",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.groupId",
+                    "data_type": "string",
+                    "example_values": [
+                        "aa10ae00-8bff-11e6-996c-525400b48521"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.identityStoreId",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Resource id: d335f970-10e0-11ea-8f06-ce112ec9f8fa"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.key",
+                    "data_type": "string",
+                    "example_values": [
+                        "mac, profileId"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource",
+                    "data_type": "string",
+                    "example_values": [
+                        "Endpoints"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "2e9cf1c0-30b6-11ea-8f06-ce112ec9f8fa"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "00:00:00:00:00:00, 44031480-8c00-11e6-996c-525400b48521"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.resource_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "d335f970-10e0-11ea-8f06-ce112ec9f8fa"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Results"
+            },
+            "versions": "EQ(*)"
         }
     ]
 }
