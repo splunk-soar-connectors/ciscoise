@@ -66,7 +66,6 @@ MAP_RESOURCE = {
     "Guest users": ["guestuser", "GuestUser"],
     "User identity groups": ["identitygroup", "IdentityGroup"],
     "Internal users": ["internaluser", "InternalUser"],
-    "Portals": ["portal", "ERSPortal"],
     "Network devices": ["networkdevice", "NetworkDevice"],
     "Network device groups": ["networkdevicegroup", "NetworkDeviceGroup"],
     "Security groups": ["sgt", "Sgt"]

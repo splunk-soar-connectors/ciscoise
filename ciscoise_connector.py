@@ -43,6 +43,7 @@ class CiscoISEConnector(BaseConnector):
     ACTION_ID_GET_RESOURCE = "get_resource"
     ACTION_ID_DELETE_RESOURCE = "delete_resource"
     ACTION_ID_CREATE_RESOURCE = "create_resource"
+    ACTION_ID_UPDATE_RESOURCE = "update_resource"
 
     def __init__(self):
 
@@ -588,6 +589,26 @@ class CiscoISEConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Resource created successfully")
 
+    def _update_resource(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        resource = MAP_RESOURCE[param["resource"]][0]
+        resource_key = MAP_RESOURCE[param["resource"]][1]
+        resource_id = param['resource_id']
+        key = param['key']
+        value = param['value']
+
+        endpoint = "{0}/{1}".format(ERS_RESOURCE_REST.format(resource=resource), resource_id)
+
+        data_dict = {resource_key: {}}
+        data_dict[resource_key][key] = value
+        ret_val, resp = self._call_ers_api(endpoint, action_result, data=data_dict, method="put")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Resource updated successfully")
+
     def _test_connectivity(self, param):
 
         rest_endpoint = '{0}/{1}'.format(self._base_url, ACTIVE_COUNT_REST_ENDPOINT)
@@ -638,6 +659,8 @@ class CiscoISEConnector(BaseConnector):
             result = self._delete_resource(param)
         elif action == self.ACTION_ID_CREATE_RESOURCE:
             result = self._create_resource(param)
+        elif action == self.ACTION_ID_UPDATE_RESOURCE:
+            result = self._update_resource(param)
 
         return result
 
