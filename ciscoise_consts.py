@@ -62,8 +62,8 @@ ERS_UPDATE_ENDPOINT_SCHEMA = {"updatedField": {"type": "dict", "schema": {"newVa
 
 MAP_RESOURCE = {
     "Endpoints": ["endpoint", "ERSEndPoint"],
-    "Endpoint identity groups": ["endpointgroup", "ERSEndPoint"],
-    "Guest users": ["guestuser", ""],
+    "Endpoint identity groups": ["endpointgroup", "EndPointGroup"],
+    "Guest users": ["guestuser", "GuestUser"],
     "User identity groups": ["identitygroup", "IdentityGroup"],
     "Internal users": ["internaluser", "InternalUser"],
     "Portals": ["portal", "ERSPortal"],

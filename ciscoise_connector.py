@@ -22,6 +22,7 @@ from phantom.action_result import ActionResult
 from ciscoise_consts import *
 from cerberus import Validator
 
+import json
 import xmltodict
 import requests
 from requests.auth import HTTPBasicAuth
@@ -41,6 +42,7 @@ class CiscoISEConnector(BaseConnector):
     ACTION_ID_LIST_RESOURCES = "list_resources"
     ACTION_ID_GET_RESOURCE = "get_resource"
     ACTION_ID_DELETE_RESOURCE = "delete_resource"
+    ACTION_ID_CREATE_RESOURCE = "create_resource"
 
     def __init__(self):
 
@@ -82,10 +84,13 @@ class CiscoISEConnector(BaseConnector):
 
         self.debug_print("status_code", resp.status_code)
 
-        if resp.status_code != 200:
+        if not (200 <= resp.status_code < 399):
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API_ERR_CODE, code=resp.status_code, message=resp.text), ret_data
 
-        ret_data = resp.json()
+        if not resp.text:
+            return action_result.set_status(phantom.APP_SUCCESS, "Empty response and no information in the header"), None
+
+        ret_data = json.loads(resp.text)
 
         return phantom.APP_SUCCESS, ret_data
 
@@ -568,6 +573,21 @@ class CiscoISEConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Resource deleted successfully")
 
+    def _create_resource(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        resource = MAP_RESOURCE[param["resource"]][0]
+        resource_json = json.loads(param["resource_json"])
+
+        endpoint = "{0}".format(ERS_RESOURCE_REST.format(resource=resource))
+
+        ret_val, resp = self._call_ers_api(endpoint, action_result, data=resource_json, method="post")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Resource created successfully")
+
     def _test_connectivity(self, param):
 
         rest_endpoint = '{0}/{1}'.format(self._base_url, ACTIVE_COUNT_REST_ENDPOINT)
@@ -616,6 +636,8 @@ class CiscoISEConnector(BaseConnector):
             result = self._get_resource(param)
         elif action == self.ACTION_ID_DELETE_RESOURCE:
             result = self._delete_resource(param)
+        elif action == self.ACTION_ID_CREATE_RESOURCE:
+            result = self._create_resource(param)
 
         return result
 
