@@ -467,6 +467,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.custom_attribute",
+                    "data_type": "string",
+                    "example_values": [
+                        "True"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.custom_attribute_value",
+                    "data_type": "string",
+                    "example_values": [
+                        "True"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.endpoint_id",
                     "data_type": "string",
                     "example_values": [
@@ -971,10 +985,10 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "get resource",
+            "action": "describe resource",
             "description": "Get details of a resource",
             "type": "investigate",
-            "identifier": "get_resource",
+            "identifier": "describe_resource",
             "read_only": true,
             "parameters": {
                 "resource": {
