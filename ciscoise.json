@@ -985,10 +985,10 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "describe resource",
-            "description": "Get details of a resource",
+            "action": "Get resources",
+            "description": "Search for resources",
             "type": "investigate",
-            "identifier": "describe_resource",
+            "identifier": "get_resources",
             "read_only": true,
             "parameters": {
                 "resource": {
