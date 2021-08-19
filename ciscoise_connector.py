@@ -634,7 +634,6 @@ class CiscoISEConnector(BaseConnector):
 if __name__ == '__main__':
 
     import sys
-    import json
     import pudb
     pudb.set_trace()
 

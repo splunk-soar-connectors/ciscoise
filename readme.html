@@ -1,0 +1,22 @@
+<!-- File: readme.html
+  Copyright (c) 2016-2021 Splunk Inc.
+
+  SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+  without a valid written license from Splunk Inc. is PROHIBITED.
+-->
+
+<h2>Getting ERS credentials</h2>
+<ol>
+    <li>
+        <h3>Enable Ers</h3>
+        <p>ERS uses on HTTPS port 9060 which is by default closed. Clients trying to access this port without enabling ERS first, will face a timeout from the server.
+        Therefore, the first requirement is to enable ERS from the Cisco ISE admin UI. Go to <b>Administration > Settings > ERS Settings</b> and enable the Enable ERS
+        for Read/Write radio button</p>
+    </li>
+    <li>
+        <h3>Creating ERS Admin</h3>
+        <p>Go to <b>Administration > Settings > ERS Settings</b> and then from the panel on the left select <b>Admin Users</b> under administrators.
+            Now add an account by clicking <b>Add > Create an admin user</b>. Then enter name and password and select <b>ERS Admin</b> in Admin Group and then press saves</p>
+    </li>
+</ol>
+
