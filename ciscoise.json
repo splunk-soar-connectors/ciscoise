@@ -14,7 +14,7 @@
     "min_phantom_version": "4.9.39220",
     "logo": "logo_cisco.svg",
     "logo_dark": "logo_cisco_dark.svg",
-    "license": "Copyright (c) 2019-2021 Splunk Inc.",
+    "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "python_version": "3",
     "latest_tested_version":  [
         "TODO"
@@ -57,19 +57,19 @@
             "data_type": "string",
             "order": 4,
             "description": "Username for ERS APIs",
-            "required": false
+            "required": true
         },
         "ers_password": {
             "data_type": "password",
             "order": 5,
             "description": "Password for ERS APIs",
-            "required": false
+            "required": true
         }
     },
     "actions": [
         {
             "action": "test connectivity",
-            "description": "Validate the asset configuration for connectivity. This action logs into the device using a REST API call to check the connection and credentials.",
+            "description": "Validate the asset configuration for connectivity. This action logs into the device using a REST API call to check the connection and credentials",
             "type": "test",
             "identifier": "test_asset_connectivity",
             "read_only": true,
@@ -547,7 +547,7 @@
         },
         {
             "action": "list sessions",
-            "description": "List the sessions currently available on the Monitoring node.",
+            "description": "List the sessions currently available on the Monitoring node",
             "type": "investigate",
             "identifier": "list_sessions",
             "read_only": true,

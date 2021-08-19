@@ -1,6 +1,6 @@
 # --
 # File: ciscoise_connector.py
-# Copyright (c) 2019-2021 Splunk Inc.
+# Copyright (c) 2016-2021 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -56,12 +56,6 @@ class CiscoISEConnector(BaseConnector):
         self._base_url = 'https://{0}'.format(config[phantom.APP_JSON_DEVICE])
 
         return phantom.APP_SUCCESS
-
-    def _process_json_response(self, resp, action_result):
-        pass
-
-    def _process_json_response(self, resp, action_result):
-        pass
 
     def _call_ers_api(self, endpoint, action_result, data=None, allow_unknown=True, method="get"):
 
@@ -432,9 +426,6 @@ class CiscoISEConnector(BaseConnector):
     def _paginator(self, endpoint, action_result, payload=None, limit=None):
 
         items_list = list()
-        f = open("/tmp/paginator_check_1.txt", "w")
-        f.write("hello \n")
-        f.write(str(items_list))
 
         if not payload:
             payload = {}
@@ -442,10 +433,6 @@ class CiscoISEConnector(BaseConnector):
         page = 1
         payload['size'] = DEFAULT_MAX_RESULTS
         payload['page'] = page
-
-        f.write("\n")
-        f.write(str(payload))
-        f.close()
 
         while True:
             ret_val, items = self._call_ers_api(endpoint, action_result, data=payload)
