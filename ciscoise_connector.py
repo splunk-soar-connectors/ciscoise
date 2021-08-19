@@ -65,6 +65,12 @@ class CiscoISEConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
+    def _process_json_response(self, resp, action_result):
+        pass
+
+    def _process_json_response(self, resp, action_result):
+        pass
+
     def _call_ers_api(self, endpoint, action_result, data=None, allow_unknown=True, method="get"):
 
         url = '{0}{1}'.format(self._base_url, endpoint)
@@ -83,10 +89,13 @@ class CiscoISEConnector(BaseConnector):
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data
 
-        self.debug_print("status_code", resp.status_code)
-
         if not (200 <= resp.status_code < 399):
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API_ERR_CODE, code=resp.status_code, message=resp.text), ret_data
+            error_message = resp.text
+            if resp.status_code == 401:
+                error_message = "The request has not been applied because it lacks valid authentication credentials for the target resource."
+            elif resp.status_code == 404:
+                error_message = "Resource not found"
+            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API_ERR_CODE, code=resp.status_code, message=error_message), ret_data
 
         if not resp.text:
             return action_result.set_status(phantom.APP_SUCCESS, "Empty response and no information in the header"), None

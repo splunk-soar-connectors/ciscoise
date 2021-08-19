@@ -985,7 +985,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "Get resources",
+            "action": "get resources",
             "description": "Search for resources",
             "type": "investigate",
             "identifier": "get_resources",
