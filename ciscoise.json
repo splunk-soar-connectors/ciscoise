@@ -1253,7 +1253,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Resource deleted successfully"
-                    ]
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.resource",
@@ -1344,7 +1346,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Resource created successfully"
-                    ]
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data",
@@ -1435,8 +1439,10 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Resource created successfully"
-                    ]
+                        "Resource updated successfully"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data",

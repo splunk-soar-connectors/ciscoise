@@ -196,7 +196,7 @@ class CiscoISEConnector(BaseConnector):
 
         total = ret_data["SearchResult"]["total"]
 
-        action_result.update_summary({"Endpoints found": total})
+        action_result.update_summary({"endpoints_found": total})
 
         action_result.add_data(ret_data)
 
@@ -497,6 +497,9 @@ class CiscoISEConnector(BaseConnector):
             endpoint = "{0}?{1}".format(ERS_RESOURCE_REST.format(resource=resource), resource_filter)
 
             resources = self._paginator(endpoint, action_result)
+
+            if resources is None:
+                return action_result.get_status()
 
             for resource in resources:
                 action_result.add_data(resource)
