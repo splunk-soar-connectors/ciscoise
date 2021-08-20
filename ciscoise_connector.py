@@ -61,7 +61,6 @@ class CiscoISEConnector(BaseConnector):
 
         url = '{0}{1}'.format(self._base_url, endpoint)
         ret_data = None
-        self.debug_print("REST Endpoint: ", url)
 
         config = self.get_config()
         verify = config[phantom.APP_JSON_VERIFY]
@@ -94,7 +93,6 @@ class CiscoISEConnector(BaseConnector):
 
         url = '{0}{1}'.format(self._base_url, endpoint)
         ret_data = None
-        self.debug_print("REST Endpoint: ", url)
 
         config = self.get_config()
         verify = config[phantom.APP_JSON_VERIFY]
@@ -103,8 +101,6 @@ class CiscoISEConnector(BaseConnector):
             resp = requests.get(url, verify=verify, auth=self._auth)
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data
-
-        self.debug_print("status_code", resp.status_code)
 
         if resp.status_code != 200:
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API_ERR_CODE, code=resp.status_code, message=resp.text), ret_data
@@ -142,8 +138,6 @@ class CiscoISEConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
-
-        self.debug_print("ret_data", ret_data)
 
         if 'activeList' not in ret_data:
             return action_result.set_status(phantom.APP_SUCCESS)
@@ -545,7 +539,10 @@ class CiscoISEConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         resource = MAP_RESOURCE[param["resource"]][0]
-        resource_json = json.loads(param["resource_json"])
+        try:
+            resource_json = json.loads(param["resource_json"])
+        except Exception as ex:
+            return action_result.set_status(phantom.APP_ERROR, "Error parsing json")
 
         endpoint = "{0}".format(ERS_RESOURCE_REST.format(resource=resource))
 
