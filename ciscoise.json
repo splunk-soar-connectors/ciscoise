@@ -1,7 +1,7 @@
 {
     "appid": "85232924-4776-4896-88fa-b982b304af7c",
     "name": "Cisco ISE",
-    "description": "This app implements investigative and containment actions on a Cisco ISE device.",
+    "description": "This app implements investigative and containment actions on a Cisco ISE device",
     "publisher": "Phantom",
     "type": "network access control",
     "main_module": "ciscoise_connector.py",
@@ -859,7 +859,6 @@
                         "Guest users",
                         "User identity groups",
                         "Internal users",
-                        "Portals",
                         "Network devices",
                         "Network device groups",
                         "Security groups"
@@ -957,7 +956,7 @@
                     "data_path": "action_result.parameter.resource",
                     "data_type": "string",
                     "example_values": [
-                        "Portals"
+                        "Endpoints"
                     ]
                 },
                 {

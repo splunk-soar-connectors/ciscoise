@@ -124,6 +124,12 @@ class CiscoISEConnector(BaseConnector):
 
         return phantom.APP_SUCCESS, ret_data
 
+    def _map_resource_type(self, resource_type, action_result, *args):
+        try:
+            return MAP_RESOURCE[resource_type][0]
+        except Exception as ex:
+            return action_result.set_status(phantom.APP_ERROR, 'Invalid resource type')
+
     def _list_sessions(self, param):
 
         ret_val = phantom.APP_SUCCESS
@@ -453,8 +459,7 @@ class CiscoISEConnector(BaseConnector):
     def _list_resources(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        resource = MAP_RESOURCE[param["resource"]][0]
+        resource = self._map_resource_type(param['resource'], action_result)
         max_result = param.get("max_results")
         endpoint = ERS_RESOURCE_REST.format(resource=resource)
 
@@ -545,6 +550,7 @@ class CiscoISEConnector(BaseConnector):
         try:
             resource_json = json.loads(param["resource_json"])
         except Exception as ex:
+            self.debug_print("Exception in _create_resource: {}".format(ex))
             return action_result.set_status(phantom.APP_ERROR, "Error parsing json")
 
         endpoint = "{0}".format(ERS_RESOURCE_REST.format(resource=resource))
