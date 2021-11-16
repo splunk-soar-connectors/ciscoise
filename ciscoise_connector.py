@@ -32,10 +32,12 @@ class CiscoISEConnector(BaseConnector):
     ACTION_ID_GET_ENDPOINT = "get_endpoint"
     ACTION_ID_UPDATE_ENDPOINT = "update_endpoint"
     ACTION_ID_LIST_RESOURCES = "list_resources"
-    ACTION_ID_GET_RESOURCES = "get_resources"
+    ACTION_ID_DESCRIBE_RESOURCE = "describe_resource"
     ACTION_ID_DELETE_RESOURCE = "delete_resource"
     ACTION_ID_CREATE_RESOURCE = "create_resource"
     ACTION_ID_UPDATE_RESOURCE = "update_resource"
+    ACTION_ID_APPLY_POLICY = "apply_policy"
+    ACTION_ID_CLEAR_POLICY = "clear_policy"
 
     def __init__(self):
 
@@ -485,7 +487,7 @@ class CiscoISEConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _get_resources(self, param):
+    def _describe_resource(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -550,7 +552,6 @@ class CiscoISEConnector(BaseConnector):
         try:
             resource_json = json.loads(param["resource_json"])
         except Exception as ex:
-            self.debug_print("Exception in _create_resource: {}".format(ex))
             return action_result.set_status(phantom.APP_ERROR, "Error parsing json")
 
         endpoint = "{0}".format(ERS_RESOURCE_REST.format(resource=resource))
@@ -580,6 +581,96 @@ class CiscoISEConnector(BaseConnector):
             return action_result.get_status()
 
         return action_result.set_status(phantom.APP_SUCCESS, "Resource updated successfully")
+
+    def _apply_policy(self, param):
+
+        ret_val = phantom.APP_SUCCESS
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_data = None
+
+        mac = param.get("mac_address", None)
+        ip = param.get("ip_address", None)
+        policy = param.get("policy_name", None)
+
+        payload = {
+            "OperationAdditionalData": {
+                "additionalData": [{
+                    "name": "policyName",
+                    "value": policy
+                }]
+            }
+        }
+
+        if mac:
+            payload['OperationAdditionalData']['additionalData'].append(
+                {
+                    "name": "macAddress",
+                    "value": mac
+                }
+            )
+        if ip:
+            payload['OperationAdditionalData']['additionalData'].append(
+                {
+                    "name": "ipAddress",
+                    "value": ip
+                }
+            )
+
+        ret_val, ret_data = self._call_ers_api(ERS_ENDPOINT_ANC_APPLY, action_result, data=payload, method="put")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(ret_data)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Policy applied")
+
+    def _clear_policy(self, param):
+
+        ret_val = phantom.APP_SUCCESS
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_data = None
+
+        mac = param.get("mac_address", None)
+        ip = param.get("ip_address", None)
+        policy = param.get("policy_name", None)
+
+        payload = {
+            "OperationAdditionalData": {
+                "additionalData": [{
+                    "name": "policyName",
+                    "value": policy
+                }]
+            }
+        }
+
+        if mac:
+            payload['OperationAdditionalData']['additionalData'].append(
+                {
+                    "name": "macAddress",
+                    "value": mac
+                }
+            )
+        if ip:
+            payload['OperationAdditionalData']['additionalData'].append(
+                {
+                    "name": "ipAddress",
+                    "value": ip
+                }
+            )
+
+        ret_val, ret_data = self._call_ers_api(ERS_ENDPOINT_ANC_CLEAR, action_result, data=payload, method="put")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(ret_data)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Policy cleared")
 
     def _test_connectivity(self, param):
 
@@ -625,14 +716,18 @@ class CiscoISEConnector(BaseConnector):
             result = self._update_endpoint(param)
         elif action == self.ACTION_ID_LIST_RESOURCES:
             result = self._list_resources(param)
-        elif action == self.ACTION_ID_GET_RESOURCES:
-            result = self._get_resources(param)
+        elif action == self.ACTION_ID_DESCRIBE_RESOURCE:
+            result = self._describe_resource(param)
         elif action == self.ACTION_ID_DELETE_RESOURCE:
             result = self._delete_resource(param)
         elif action == self.ACTION_ID_CREATE_RESOURCE:
             result = self._create_resource(param)
         elif action == self.ACTION_ID_UPDATE_RESOURCE:
             result = self._update_resource(param)
+        elif action == self.ACTION_ID_APPLY_POLICY:
+            result = self._apply_policy(param)
+        elif action == self.ACTION_ID_CLEAR_POLICY:
+            result = self._clear_policy(param)
 
         return result
 

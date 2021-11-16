@@ -11,7 +11,7 @@
     "product_vendor": "Cisco Systems",
     "product_name": "Cisco ISE",
     "product_version_regex": "2.2",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "logo": "logo_cisco.svg",
     "logo_dark": "logo_cisco_dark.svg",
     "license": "Copyright (c) 2016-2021 Splunk Inc.",
@@ -984,10 +984,10 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "get resources",
+            "action": "describe resource",
             "description": "Search for resources",
             "type": "investigate",
-            "identifier": "get_resources",
+            "identifier": "describe_resource",
             "read_only": true,
             "parameters": {
                 "resource": {
@@ -1489,6 +1489,302 @@
                 "height": 5,
                 "title": "Results"
             },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "apply policy",
+            "description": "Apply policy on selected Ip address or MAC address",
+            "type": "investigate",
+            "identifier": "apply_policy",
+            "read_only": false,
+            "parameters": {
+                "policy_name": {
+                    "description": "Policy Name",
+                    "data_type": "string",
+                    "order": 0,
+                    "primary": false,
+                    "required": false
+                },
+                "ip_address": {
+                    "description": "IP Address",
+                    "data_type": "string",
+                    "order": 1,
+                    "primary": false,
+                    "required": false
+                },
+                "mac_address": {
+                    "description": "MAC Address",
+                    "data_type": "string",
+                    "order": 2,
+                    "contains": [
+                        "mac address"
+                    ],
+                    "primary": false,
+                    "required": false
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Endpoints"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.policy_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ip_address",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.mac_address",
+                    "data_type": "string",
+                    "contains": [
+                        "mac address"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SearchResult.resources.*.id",
+                    "data_type": "string",
+                    "column_name": "ISE Endpoint ID",
+                    "column_order": 1,
+                    "example_values": [
+                        "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                    ],
+                    "contains": [
+                        "ise endpoint id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SearchResult.resources.*.link.href",
+                    "data_type": "string",
+                    "column_name": "Link to ISE Endpoint",
+                    "column_order": 2,
+                    "example_values": [
+                        "https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SearchResult.resources.*.link.rel",
+                    "data_type": "string",
+                    "example_values": [
+                        "self"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SearchResult.resources.*.link.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/xml"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SearchResult.resources.*.name",
+                    "data_type": "string",
+                    "column_name": "Endpoint Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "8C:85:90:17:D6:39"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SearchResult.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.Endpoints found",
+                    "data_type": "string",
+                    "example_values": [
+                        "9",
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "9 Endpoints found",
+                        "1 Endpoints found"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "clear policy",
+            "description": "Clear policy on selected Ip address or MAC address",
+            "type": "investigate",
+            "identifier": "clear_policy",
+            "read_only": false,
+            "parameters": {
+                "ip_address": {
+                    "description": "IP Address",
+                    "data_type": "string",
+                    "order": 0,
+                    "primary": false,
+                    "required": false
+                },
+                "mac_address": {
+                    "description": "MAC Address",
+                    "data_type": "string",
+                    "order": 1,
+                    "contains": [
+                        "mac address"
+                    ],
+                    "primary": false,
+                    "required": false
+                },
+                "policy_name": {
+                    "description": "Policy Name",
+                    "data_type": "string",
+                    "order": 0,
+                    "primary": false,
+                    "required": false
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Endpoints"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.mac_address",
+                    "data_type": "string",
+                    "contains": [
+                        "mac address"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip_address",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.policy_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.SearchResult.resources.*.id",
+                    "data_type": "string",
+                    "column_name": "ISE Endpoint ID",
+                    "column_order": 1,
+                    "example_values": [
+                        "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                    ],
+                    "contains": [
+                        "ise endpoint id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SearchResult.resources.*.link.href",
+                    "data_type": "string",
+                    "column_name": "Link to ISE Endpoint",
+                    "column_order": 2,
+                    "example_values": [
+                        "https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SearchResult.resources.*.link.rel",
+                    "data_type": "string",
+                    "example_values": [
+                        "self"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SearchResult.resources.*.link.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/xml"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SearchResult.resources.*.name",
+                    "data_type": "string",
+                    "column_name": "Endpoint Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "8C:85:90:17:D6:39"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SearchResult.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.Endpoints found",
+                    "data_type": "string",
+                    "example_values": [
+                        "9",
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "9 Endpoints found",
+                        "1 Endpoints found"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
             "versions": "EQ(*)"
         }
     ]
