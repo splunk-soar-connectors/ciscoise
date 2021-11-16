@@ -1666,7 +1666,7 @@
                 "policy_name": {
                     "description": "Policy Name",
                     "data_type": "string",
-                    "order": 0,
+                    "order": 2,
                     "primary": false,
                     "required": false
                 }
