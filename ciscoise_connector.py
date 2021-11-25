@@ -32,7 +32,7 @@ class CiscoISEConnector(BaseConnector):
     ACTION_ID_GET_ENDPOINT = "get_endpoint"
     ACTION_ID_UPDATE_ENDPOINT = "update_endpoint"
     ACTION_ID_LIST_RESOURCES = "list_resources"
-    ACTION_ID_DESCRIBE_RESOURCE = "describe_resource"
+    ACTION_ID_GET_RESOURCES = "get_resources"
     ACTION_ID_DELETE_RESOURCE = "delete_resource"
     ACTION_ID_CREATE_RESOURCE = "create_resource"
     ACTION_ID_UPDATE_RESOURCE = "update_resource"
@@ -240,12 +240,19 @@ class CiscoISEConnector(BaseConnector):
 
         final_data = {"ERSEndPoint": {}}
 
+        if not (attribute or custom_attribute):
+            return action_result.set_status(phantom.APP_ERROR, "Please specify attribute or custom attribute")
+
         if attribute is not None and attribute_value is not None:
             final_data['ERSEndPoint'][attribute] = attribute_value
+        else:
+            return action_result.set_status(phantom.APP_ERROR, "Please specify both attribute and attribute value")
 
         if custom_attribute is not None and custom_attribute_value is not None:
             custom_attribute_dict = {"customAttributes": {custom_attribute: custom_attribute_value}}
             final_data["ERSEndPoint"]["customAttributes"] = custom_attribute_dict
+        else:
+            return action_result.set_status(phantom.APP_ERROR, "Please specify both custom attribute and custom attribute value")
 
         ret_val, ret_data = self._call_ers_api(endpoint, action_result, data=final_data, method="put")
         action_result.add_data(ret_data)
@@ -487,7 +494,7 @@ class CiscoISEConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _describe_resource(self, param):
+    def _get_resources(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -496,9 +503,10 @@ class CiscoISEConnector(BaseConnector):
         key = param.get("key")
         value = param.get("value")
 
-        if not resource_id and not (key and value):
+        if not resource_id and not key:
             return action_result.set_status(phantom.APP_ERROR, "Please enter either 'resource id' or 'key' and 'value' to get the details of a particular resource")
-
+        elif key and not value:
+            return action_result.set_status(phantom.APP_ERROR, "Please enter value for the key")
         if not resource_id and (key and value):
             resource_filter = "filter={0}.EQ.{1}".format(key, value)
             endpoint = "{0}?{1}".format(ERS_RESOURCE_REST.format(resource=resource), resource_filter)
@@ -582,94 +590,62 @@ class CiscoISEConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Resource updated successfully")
 
-    def _apply_policy(self, param):
-
-        ret_val = phantom.APP_SUCCESS
-
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
+    def _handle_policy_change(self, action_result, param, change_type="apply"):
         ret_data = None
-
-        mac = param.get("mac_address", None)
-        ip = param.get("ip_address", None)
-        policy = param.get("policy_name", None)
+        policy_name = param.get("policy_name", None)
+        ip_mac_address = param.get("ip_mac_address", None)
 
         payload = {
             "OperationAdditionalData": {
-                "additionalData": [{
-                    "name": "policyName",
-                    "value": policy
-                }]
+                "additionalData": [
+                    {
+                        "name": "macAddress",
+                        "value": ip_mac_address
+                    },
+                    {
+                        "name": "policyName",
+                        "value": policy_name
+                    }
+                ]
             }
         }
 
-        if mac:
-            payload['OperationAdditionalData']['additionalData'].append(
-                {
-                    "name": "macAddress",
-                    "value": mac
-                }
-            )
-        if ip:
-            payload['OperationAdditionalData']['additionalData'].append(
-                {
-                    "name": "ipAddress",
-                    "value": ip
-                }
-            )
+        if phantom.is_mac(ip_mac_address):
+            payload['OperationAdditionalData']['additionalData'][0]["name"] = "macAddress"
+        elif phantom.is_ip(ip_mac_address):
+            payload['OperationAdditionalData']['additionalData'][0]["name"] = "ipAddress"
+        else:
+            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_MAC_AND_IP_NOT_SPECIFIED), ret_data
 
-        ret_val, ret_data = self._call_ers_api(ERS_ENDPOINT_ANC_APPLY, action_result, data=payload, method="put")
+        endpoint = ERS_ENDPOINT_ANC_APPLY
+        if change_type == "clear":
+            endpoint = ERS_ENDPOINT_ANC_CLEAR
+
+        ret_val, ret_data = self._call_ers_api(endpoint, action_result, data=payload, method="put")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status(), ret_data
+
+        return action_result.set_status(phantom.APP_SUCCESS), ret_data
+
+    def _apply_policy(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        ret_val, ret_data = self._handle_policy_change(action_result, param, "apply")
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(ret_data)
-
         return action_result.set_status(phantom.APP_SUCCESS, "Policy applied")
 
     def _clear_policy(self, param):
-
-        ret_val = phantom.APP_SUCCESS
-
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        ret_data = None
-
-        mac = param.get("mac_address", None)
-        ip = param.get("ip_address", None)
-        policy = param.get("policy_name", None)
-
-        payload = {
-            "OperationAdditionalData": {
-                "additionalData": [{
-                    "name": "policyName",
-                    "value": policy
-                }]
-            }
-        }
-
-        if mac:
-            payload['OperationAdditionalData']['additionalData'].append(
-                {
-                    "name": "macAddress",
-                    "value": mac
-                }
-            )
-        if ip:
-            payload['OperationAdditionalData']['additionalData'].append(
-                {
-                    "name": "ipAddress",
-                    "value": ip
-                }
-            )
-
-        ret_val, ret_data = self._call_ers_api(ERS_ENDPOINT_ANC_CLEAR, action_result, data=payload, method="put")
+        ret_val, ret_data = self._handle_policy_change(action_result, param, "clear")
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(ret_data)
-
         return action_result.set_status(phantom.APP_SUCCESS, "Policy cleared")
 
     def _test_connectivity(self, param):
@@ -716,8 +692,8 @@ class CiscoISEConnector(BaseConnector):
             result = self._update_endpoint(param)
         elif action == self.ACTION_ID_LIST_RESOURCES:
             result = self._list_resources(param)
-        elif action == self.ACTION_ID_DESCRIBE_RESOURCE:
-            result = self._describe_resource(param)
+        elif action == self.ACTION_ID_GET_RESOURCES:
+            result = self._get_resources(param)
         elif action == self.ACTION_ID_DELETE_RESOURCE:
             result = self._delete_resource(param)
         elif action == self.ACTION_ID_CREATE_RESOURCE:

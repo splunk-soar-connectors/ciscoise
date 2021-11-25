@@ -46,6 +46,7 @@ CISCOISE_SUCC_LIST_ENDPOINTS = "{0} Endpoints found"
 CISCOISE_SUCC_GET_ENDPOINT = "Endpoint found"
 CISCOISE_SUCC_UPDATE_ENDPOINT = "Endpoint updated"
 CISCOISE_ERR_INVALID_PARAM = "Please provide non-zero positive integer in {param}"
+CISCOISE_MAP_IP_ABSENT_ERROR = "Please provide either mac address or ip address"
 DEFAULT_MAX_RESULTS = 7
 
 # Json reply schema

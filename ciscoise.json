@@ -984,10 +984,10 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "describe resource",
+            "action": "get resources",
             "description": "Search for resources",
             "type": "investigate",
-            "identifier": "describe_resource",
+            "identifier": "get_resources",
             "read_only": true,
             "parameters": {
                 "resource": {
@@ -1496,6 +1496,7 @@
             "description": "Apply policy on selected Ip address or MAC address",
             "type": "investigate",
             "identifier": "apply_policy",
+            "undo": "clear policy",
             "read_only": false,
             "parameters": {
                 "policy_name": {
@@ -1503,24 +1504,17 @@
                     "data_type": "string",
                     "order": 0,
                     "primary": false,
-                    "required": false
+                    "required": true
                 },
-                "ip_address": {
-                    "description": "IP Address",
+                "ip_mac_address": {
+                    "description": "MAC or IP Address of the device",
                     "data_type": "string",
                     "order": 1,
-                    "primary": false,
-                    "required": false
-                },
-                "mac_address": {
-                    "description": "MAC Address",
-                    "data_type": "string",
-                    "order": 2,
+                    "required": true,
                     "contains": [
-                        "mac address"
-                    ],
-                    "primary": false,
-                    "required": false
+                        "mac address",
+                        "ip"
+                    ]
                 }
             },
             "render": {
@@ -1542,14 +1536,11 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.ip_address",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.mac_address",
+                    "data_path": "action_result.parameter.ip_mac_address",
                     "data_type": "string",
                     "contains": [
-                        "mac address"
+                        "mac address",
+                        "ip"
                     ]
                 },
                 {
@@ -1646,29 +1637,22 @@
             "identifier": "clear_policy",
             "read_only": false,
             "parameters": {
-                "ip_address": {
-                    "description": "IP Address",
-                    "data_type": "string",
-                    "order": 0,
-                    "primary": false,
-                    "required": false
-                },
-                "mac_address": {
-                    "description": "MAC Address",
-                    "data_type": "string",
-                    "order": 1,
-                    "contains": [
-                        "mac address"
-                    ],
-                    "primary": false,
-                    "required": false
-                },
                 "policy_name": {
                     "description": "Policy Name",
                     "data_type": "string",
-                    "order": 2,
+                    "order": 0,
                     "primary": false,
-                    "required": false
+                    "required": true
+                },
+                "ip_mac_address": {
+                    "description": "MAC or IP Address of the device",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": true,
+                    "contains": [
+                        "mac address",
+                        "ip"
+                    ]
                 }
             },
             "render": {
@@ -1686,15 +1670,12 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.mac_address",
+                    "data_path": "action_result.parameter.ip_mac_address",
                     "data_type": "string",
                     "contains": [
-                        "mac address"
+                        "mac address",
+                        "ip"
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.ip_address",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.policy_name",
