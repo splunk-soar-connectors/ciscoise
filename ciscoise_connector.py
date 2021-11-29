@@ -46,6 +46,8 @@ class CiscoISEConnector(BaseConnector):
 
         self._base_url = None
         self._auth = None
+        self._secondary_device = None
+        self._ers_auth = None
 
     def initialize(self):
 
@@ -53,15 +55,33 @@ class CiscoISEConnector(BaseConnector):
 
         self._auth = HTTPBasicAuth(config[phantom.APP_JSON_USERNAME], config[phantom.APP_JSON_PASSWORD])
         ers_user = config.get("ers_user", None)
+        self._secondary_device = config.get("secondary_device", None)
         if ers_user is not None:
             self._ers_auth = HTTPBasicAuth(config["ers_user"], config["ers_password"])
         self._base_url = 'https://{0}'.format(config[phantom.APP_JSON_DEVICE])
 
+        if self._secondary_device:
+            self._secondary_device = 'https://{0}'.format(self._secondary_device)
+            self._call_ers_api = self._secondary_device_wrapper(self._call_ers_api)
+            self._call_rest_api = self._secondary_device_wrapper(self._call_rest_api)
+
         return phantom.APP_SUCCESS
 
-    def _call_ers_api(self, endpoint, action_result, data=None, allow_unknown=True, method="get"):
+    def _secondary_device_wrapper(self, func):
+        def make_another_call(*args, **kwargs):
+            self.debug_print("Making first call")
+            ret_val, ret_data = func(*args, **kwargs)
+            if phantom.is_fail(ret_val) and self._secondary_node:
+                self.debug_print("Making second call")
+                ret_val, ret_data = func(try_secondary_device=True, *args, **kwargs)
+            return ret_val, ret_data
+        return make_another_call
 
+    def _call_ers_api(self, endpoint, action_result, data=None, allow_unknown=True, method="get", try_secondary_device=False):
         url = '{0}{1}'.format(self._base_url, endpoint)
+        if try_secondary_device:
+            url = '{0}{1}'.format(self._secondary_device, endpoint)
+
         ret_data = None
 
         config = self.get_config()
@@ -91,9 +111,11 @@ class CiscoISEConnector(BaseConnector):
 
         return phantom.APP_SUCCESS, ret_data
 
-    def _call_rest_api(self, endpoint, action_result, schema=None, data=None, allow_unknown=True):
+    def _call_rest_api(self, endpoint, action_result, schema=None, data=None, allow_unknown=True, try_secondary_device=False):
 
         url = '{0}{1}'.format(self._base_url, endpoint)
+        if try_secondary_device:
+            url = '{0}{1}'.format(self._secondary_device, endpoint)
         ret_data = None
 
         config = self.get_config()

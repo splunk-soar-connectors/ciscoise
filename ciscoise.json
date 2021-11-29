@@ -64,6 +64,11 @@
             "order": 5,
             "description": "Password for ERS APIs",
             "required": true
+        },
+        "secondary_device": {
+            "data_type": "string",
+            "order": 0,
+            "description": "Secondary Device IP/Hostname",
         }
     },
     "actions": [
