@@ -68,7 +68,7 @@
         "secondary_device": {
             "data_type": "string",
             "order": 0,
-            "description": "Secondary Device IP/Hostname",
+            "description": "Secondary Device IP/Hostname"
         }
     },
     "actions": [

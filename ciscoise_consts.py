@@ -11,7 +11,6 @@ CISCOISE_JSON_MACADDR = "mac_address"
 CISCOISE_JSON_TOTAL_SESSIONS = "sessions_found"
 
 # REST endpoint Consts
-ACTIVE_COUNT_REST_ENDPOINT = "/admin/API/mnt/Session/ActiveCount"
 ACTIVE_LIST_REST = "/admin/API/mnt/Session/ActiveList"
 AUTH_LIST_REST_ENDPOINT = "/ise/mnt/Session/AuthList/null/null"
 DISCONNECT_MAC_REST = "/ise/mnt/CoA/Disconnect"

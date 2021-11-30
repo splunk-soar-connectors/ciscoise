@@ -670,24 +670,34 @@ class CiscoISEConnector(BaseConnector):
         action_result.add_data(ret_data)
         return action_result.set_status(phantom.APP_SUCCESS, "Policy cleared")
 
-    def _test_connectivity(self, param):
-
-        rest_endpoint = '{0}/{1}'.format(self._base_url, ACTIVE_COUNT_REST_ENDPOINT)
-
-        config = self.get_config()
-
-        self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, config[phantom.APP_JSON_DEVICE])
-        verify = config[phantom.APP_JSON_VERIFY]
-
+    def _test_connectivity_to_device(self, device_domain, verify=True):
         try:
+            rest_endpoint = 'https://{0}{1}'.format(device_domain, ACTIVE_LIST_REST)
+            self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, device_domain)
             resp = requests.get(rest_endpoint, auth=self._auth, verify=verify)
         except Exception as e:
             return self.set_status(phantom.APP_ERROR, CISCOISE_ERR_TEST_CONNECTIVITY_FAILED, e)
 
-        if resp.status_code != 200:
+        if resp.status_code == 200:
+            return self.set_status_save_progress(phantom.APP_SUCCESS, CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED)
+        else:
             return self.set_status(phantom.APP_ERROR, CISCOISE_ERR_TEST_CONNECTIVITY_FAILED_ERR_CODE, code=resp.status_code)
 
-        return self.set_status_save_progress(phantom.APP_SUCCESS, CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED)
+    def _test_connectivity(self, param):
+
+        config = self.get_config()
+
+        first_device = config[phantom.APP_JSON_DEVICE]
+        verify = config[phantom.APP_JSON_VERIFY]
+        self.save_progress("Connecting to first device")
+        result = self._test_connectivity_to_device(first_device, verify)
+
+        secondary_device = config.get('secondary_device')
+        if secondary_device:
+            self.save_progress("Connecting to second device")
+            result = self._test_connectivity_to_device(secondary_device, verify)
+
+        return result
 
     def handle_action(self, param):
 
