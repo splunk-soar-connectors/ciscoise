@@ -69,10 +69,10 @@ class CiscoISEConnector(BaseConnector):
 
     def _secondary_device_wrapper(self, func):
         def make_another_call(*args, **kwargs):
-            self.debug_print("Making first call")
+            self.debug_print("Making call to first device")
             ret_val, ret_data = func(*args, **kwargs)
-            if phantom.is_fail(ret_val) and self._secondary_node:
-                self.debug_print("Making second call")
+            if phantom.is_fail(ret_val) and self._secondary_device:
+                self.debug_print("Making call to second device")
                 ret_val, ret_data = func(try_secondary_device=True, *args, **kwargs)
             return ret_val, ret_data
         return make_another_call
