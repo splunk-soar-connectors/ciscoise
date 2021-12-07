@@ -56,7 +56,7 @@ class CiscoISEConnector(BaseConnector):
 
         self._base_url = None
         self._auth = None
-        self._secondary_device = None
+        self._ha_device = None
         self._ers_auth = None
 
     def initialize(self):
@@ -65,33 +65,32 @@ class CiscoISEConnector(BaseConnector):
 
         self._auth = HTTPBasicAuth(config[phantom.APP_JSON_USERNAME], config[phantom.APP_JSON_PASSWORD])
         ers_user = config.get("ers_user", None)
-        self._secondary_device = config.get("secondary_device", None)
+        self._ha_device = config.get("secondary_device", None)
         if ers_user is not None:
             self._ers_auth = HTTPBasicAuth(config["ers_user"], config["ers_password"])
-        self._base_url = 'https://{0}'.format(config[phantom.APP_JSON_DEVICE])
+        self._base_url = "https://{0}".format(config[phantom.APP_JSON_DEVICE])
 
-        if self._secondary_device:
-            self._secondary_device = 'https://{0}'.format(self._secondary_device)
-            self._call_ers_api = self._secondary_device_wrapper(self._call_ers_api)
-            self._call_rest_api = self._secondary_device_wrapper(self._call_rest_api)
+        if self._ha_device:
+            self._ha_device_url = "https://{0}".format(self._ha_device)
+            self._call_ers_api = self._ha_device_wrapper(self._call_ers_api)
+            self._call_rest_api = self._ha_device_wrapper(self._call_rest_api)
 
         return phantom.APP_SUCCESS
 
-    def _secondary_device_wrapper(self, func):
+    def _ha_device_wrapper(self, func):
         def make_another_call(*args, **kwargs):
-            self.debug_print("Making call to first device")
-            ret_val, ret_data = func(*args, **kwargs)
-            if phantom.is_fail(ret_val) and self._secondary_device:
-                self.debug_print("Making call to second device")
-                ret_val, ret_data = func(try_secondary_device=True, *args, **kwargs)
+            self.debug_print("Making call to primary device")
+            ret_val, ret_data = func(base_url=self._base_url, *args, **kwargs)
+            if phantom.is_fail(ret_val) and self._ha_device:
+                self.debug_print("Call to first device failed. Data returned: {}".format(ret_data))
+                self.debug_print("Making call to secondary device")
+                ret_val, ret_data = func(base_url=self._ha_device_url, *args, **kwargs)
             return ret_val, ret_data
+
         return make_another_call
 
-    def _call_ers_api(self, endpoint, action_result, data=None, allow_unknown=True, method="get", try_secondary_device=False):
-        url = '{0}{1}'.format(self._base_url, endpoint)
-        if try_secondary_device:
-            url = '{0}{1}'.format(self._secondary_device, endpoint)
-
+    def _call_ers_api(self, endpoint, action_result, base_url, data=None, allow_unknown=True, method="get"):
+        url = "{0}{1}".format(base_url, endpoint)
         ret_data = None
 
         config = self.get_config()
@@ -112,20 +111,28 @@ class CiscoISEConnector(BaseConnector):
                 error_message = "The request has not been applied because it lacks valid authentication credentials for the target resource."
             elif resp.status_code == 404:
                 error_message = "Resource not found"
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API_ERR_CODE, code=resp.status_code, message=error_message), ret_data
+            return (
+                action_result.set_status(
+                    phantom.APP_ERROR,
+                    CISCOISE_ERR_REST_API_ERR_CODE,
+                    code=resp.status_code,
+                    message=error_message
+                ),
+                ret_data
+            )
 
         if not resp.text:
-            return action_result.set_status(phantom.APP_SUCCESS, "Empty response and no information in the header"), None
+            return (
+                action_result.set_status(phantom.APP_SUCCESS, "Empty response and no information in the header"),
+                None
+            )
 
         ret_data = json.loads(resp.text)
 
         return phantom.APP_SUCCESS, ret_data
 
-    def _call_rest_api(self, endpoint, action_result, schema=None, data=None, allow_unknown=True, try_secondary_device=False):
-
-        url = '{0}{1}'.format(self._base_url, endpoint)
-        if try_secondary_device:
-            url = '{0}{1}'.format(self._secondary_device, endpoint)
+    def _call_rest_api(self, endpoint, action_result, base_url, schema=None, data=None, allow_unknown=True):
+        url = "{0}{1}".format(base_url, endpoint)
         ret_data = None
 
         config = self.get_config()
@@ -137,7 +144,15 @@ class CiscoISEConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data
 
         if resp.status_code != 200:
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API_ERR_CODE, code=resp.status_code, message=resp.text), ret_data
+            return (
+                action_result.set_status(
+                    phantom.APP_ERROR,
+                    CISCOISE_ERR_REST_API_ERR_CODE,
+                    code=resp.status_code,
+                    message=resp.text,
+                ),
+                ret_data,
+            )
 
         action_result.add_debug_data(resp.text)
         xml = resp.text
@@ -161,8 +176,8 @@ class CiscoISEConnector(BaseConnector):
     def _map_resource_type(self, resource_type, action_result, *args):
         try:
             return MAP_RESOURCE[resource_type][0]
-        except Exception:
-            return action_result.set_status(phantom.APP_ERROR, 'Invalid resource type')
+        except Exception as ex:
+            return action_result.set_status(phantom.APP_ERROR, "Invalid resource type")
 
     def _list_sessions(self, param):
 
@@ -179,10 +194,10 @@ class CiscoISEConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        if 'activeList' not in ret_data:
+        if "activeList" not in ret_data:
             return action_result.set_status(phantom.APP_SUCCESS)
 
-        active_sessions = ret_data['activeList'].get('activeSession')
+        active_sessions = ret_data["activeList"].get("activeSession")
 
         if active_sessions is None:
             return action_result.set_status(phantom.APP_SUCCESS)
@@ -198,10 +213,10 @@ class CiscoISEConnector(BaseConnector):
             action_result.add_data(session)
 
             # Init the value of the quarantine status of the session to unknown
-            session['is_quarantined'] = "Unknown"
+            session["is_quarantined"] = "Unknown"
 
             # Get the quarantined state of the mac address
-            is_quarantined_rest = "{0}/{1}".format(IS_MAC_QUARANTINED_REST, session['calling_station_id'])
+            is_quarantined_rest = "{0}/{1}".format(IS_MAC_QUARANTINED_REST, session["calling_station_id"])
 
             ret_val, ret_data = self._call_rest_api(is_quarantined_rest, action_result, IS_MAC_QUARAN_RESP_SCHEMA)
 
@@ -210,7 +225,7 @@ class CiscoISEConnector(BaseConnector):
 
             # Can safely access the members of ret_data, since they have been parsed as by the rules of
             # IS_MAC_QUARAN_RESP_SCHEMA
-            session['is_quarantined'] = "Yes" if ret_data["EPS_RESULT"]["userData"] == "true" else "No"
+            session["is_quarantined"] = "Yes" if ret_data["EPS_RESULT"]["userData"] == "true" else "No"
 
         summary.update({CISCOISE_JSON_TOTAL_SESSIONS: len(active_sessions)})
 
@@ -265,10 +280,10 @@ class CiscoISEConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         endpoint = ERS_ENDPOINT_REST + "/" + param["endpoint_id"]
-        attribute = param.get('attribute', None)
-        attribute_value = param.get('attribute_value', None)
-        custom_attribute = param.get('custom_attribute', None)
-        custom_attribute_value = param.get('custom_attribute_value', None)
+        attribute = param.get("attribute", None)
+        attribute_value = param.get("attribute_value", None)
+        custom_attribute = param.get("custom_attribute", None)
+        custom_attribute_value = param.get("custom_attribute_value", None)
 
         final_data = {"ERSEndPoint": {}}
 
@@ -276,7 +291,7 @@ class CiscoISEConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Please specify attribute or custom attribute")
 
         if attribute is not None and attribute_value is not None:
-            final_data['ERSEndPoint'][attribute] = attribute_value
+            final_data["ERSEndPoint"][attribute] = attribute_value
         else:
             return action_result.set_status(phantom.APP_ERROR, "Please specify both attribute and attribute value")
 
@@ -284,7 +299,10 @@ class CiscoISEConnector(BaseConnector):
             custom_attribute_dict = {"customAttributes": {custom_attribute: custom_attribute_value}}
             final_data["ERSEndPoint"]["customAttributes"] = custom_attribute_dict
         else:
-            return action_result.set_status(phantom.APP_ERROR, "Please specify both custom attribute and custom attribute value")
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Please specify both custom attribute and custom attribute value"
+            )
 
         ret_val, ret_data = self._call_ers_api(endpoint, action_result, data=final_data, method="put")
         action_result.add_data(ret_data)
@@ -305,9 +323,9 @@ class CiscoISEConnector(BaseConnector):
         mac_ip_address = param[phantom.APP_JSON_IP_MACADDRESS]
 
         if phantom.is_mac(mac_ip_address):
-            endpoint = '{0}/{1}'.format(QUARANTINE_MAC_REST, mac_ip_address)
+            endpoint = "{0}/{1}".format(QUARANTINE_MAC_REST, mac_ip_address)
         elif phantom.is_ip(mac_ip_address):
-            endpoint = '{0}/{1}'.format(QUARANTINE_IP_REST, mac_ip_address)
+            endpoint = "{0}/{1}".format(QUARANTINE_IP_REST, mac_ip_address)
         else:
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_MAC_AND_IP_NOT_SPECIFIED)
 
@@ -320,18 +338,24 @@ class CiscoISEConnector(BaseConnector):
 
         # Can safely access the members of ret_data, since they have been parsed as by the rules of
         # QUARANTINE_RESP_SCHEMA
-        status = ret_data['EPS_RESULT']["status"]
+        status = ret_data["EPS_RESULT"]["status"]
 
         if status == "Failure":
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_ACTION_FAILED, error_code=ret_data['EPS_RESULT']['errorCode'])
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                CISCOISE_ERR_ACTION_FAILED,
+                error_code=ret_data["EPS_RESULT"]["errorCode"]
+            )
 
         # In cases where the radius authentication failed, the status is STILL set to success,
         # but failureType and failureMessage keys are added to the ret_data, so need to check for those
-        failure_type = phantom.get_value(ret_data['EPS_RESULT'], 'failureType')
-        failure_msg = phantom.get_value(ret_data['EPS_RESULT'], 'failureMessage')
+        failure_type = phantom.get_value(ret_data["EPS_RESULT"], "failureType")
+        failure_msg = phantom.get_value(ret_data["EPS_RESULT"], "failureMessage")
 
         if (failure_type is not None) or (failure_msg is not None):
-            action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_ACTION_FAILED, error_code=ret_data['EPS_RESULT']['errorCode'])
+            action_result.set_status(
+                phantom.APP_ERROR, CISCOISE_ERR_ACTION_FAILED, error_code=ret_data["EPS_RESULT"]["errorCode"]
+            )
             if failure_type is not None:
                 action_result.append_to_message(failure_type)
             if failure_msg is not None:
@@ -351,9 +375,9 @@ class CiscoISEConnector(BaseConnector):
         mac_ip_address = param[phantom.APP_JSON_IP_MACADDRESS]
 
         if phantom.is_mac(mac_ip_address):
-            endpoint = '{0}/{1}'.format(UNQUARANTINE_MAC_REST, mac_ip_address)
+            endpoint = "{0}/{1}".format(UNQUARANTINE_MAC_REST, mac_ip_address)
         elif phantom.is_ip(mac_ip_address):
-            endpoint = '{0}/{1}'.format(UNQUARANTINE_IP_REST, mac_ip_address)
+            endpoint = "{0}/{1}".format(UNQUARANTINE_IP_REST, mac_ip_address)
         else:
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_MAC_AND_IP_NOT_SPECIFIED)
 
@@ -364,25 +388,33 @@ class CiscoISEConnector(BaseConnector):
 
         action_result.add_data(ret_data)
 
-        status = ret_data['EPS_RESULT']["status"]
+        status = ret_data["EPS_RESULT"]["status"]
 
         if status == "Failure":
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_ACTION_FAILED, error_code=ret_data['EPS_RESULT']['errorCode'])
+            return action_result.set_status(
+                phantom.APP_ERROR, CISCOISE_ERR_ACTION_FAILED, error_code=ret_data["EPS_RESULT"]["errorCode"]
+            )
 
         # In cases where the radius authentication failed, the status is STILL set to success,
         # but failureType and failureMessage keys are added to the ret_data, so need to check for those
-        failure_type = phantom.get_value(ret_data['EPS_RESULT'], 'failureType')
-        failure_msg = phantom.get_value(ret_data['EPS_RESULT'], 'failureMessage')
+        failure_type = phantom.get_value(ret_data["EPS_RESULT"], "failureType")
+        failure_msg = phantom.get_value(ret_data["EPS_RESULT"], "failureMessage")
 
         if (failure_type is not None) or (failure_msg is not None):
-            action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_ACTION_FAILED, error_code=ret_data['EPS_RESULT']['errorCode'])
+            action_result.set_status(
+                phantom.APP_ERROR,
+                CISCOISE_ERR_ACTION_FAILED,
+                error_code=ret_data["EPS_RESULT"]["errorCode"],
+            )
             if failure_type is not None:
                 action_result.append_to_message(failure_type)
             if failure_msg is not None:
                 action_result.append_to_message(failure_msg)
             return action_result.get_status()
 
-        return action_result.set_status(phantom.APP_SUCCESS, CISCOISE_SUCC_SYSTEM_UNQUARANTINED)
+        return action_result.set_status(
+            phantom.APP_SUCCESS, CISCOISE_SUCC_SYSTEM_UNQUARANTINED
+        )
 
     def _logoff_system(self, param):
 
@@ -396,7 +428,7 @@ class CiscoISEConnector(BaseConnector):
         mac_address = param[CISCOISE_JSON_MACADDR]
         port = 2  # 0 is default, 1 is bounce, 2 is shutdown
 
-        endpoint = '{0}/{1}/{2}/{3}'.format(REAUTH_MAC_REST, server, mac_address, port)
+        endpoint = "{0}/{1}/{2}/{3}".format(REAUTH_MAC_REST, server, mac_address, port)
 
         ret_val, ret_data = self._call_rest_api(endpoint, action_result)
 
@@ -405,12 +437,12 @@ class CiscoISEConnector(BaseConnector):
 
         action_result.add_data(ret_data)
 
-        remote_coa = ret_data.get('remoteCoA')
+        remote_coa = ret_data.get("remoteCoA")
 
         if remote_coa is None:
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_PARSE_REPLY)
 
-        result = remote_coa.get('results')
+        result = remote_coa.get("results")
 
         if result is None:
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_PARSE_REPLY)
@@ -432,29 +464,29 @@ class CiscoISEConnector(BaseConnector):
         port = 2  # 0 is default, 1 is bounce, 2 is shutdown
 
         # First try to find the server that we should use
-        endpoint = '{0}/{1}'.format(MAC_SESSION_DETAILS_REST, mac_address)
+        endpoint = "{0}/{1}".format(MAC_SESSION_DETAILS_REST, mac_address)
 
         ret_val, ret_data = self._call_rest_api(endpoint, action_result, MAC_SESSION_RESP_SCHEMA)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        acs_server = ret_data['sessionParameters']['acs_server']
+        acs_server = ret_data["sessionParameters"]["acs_server"]
 
         # now terminate the session
-        endpoint = '{0}/{1}/{2}/{3}'.format(DISCONNECT_MAC_REST, acs_server, mac_address, port)
+        endpoint = "{0}/{1}/{2}/{3}".format(DISCONNECT_MAC_REST, acs_server, mac_address, port)
 
         ret_val, ret_data = self._call_rest_api(endpoint, action_result)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        remote_coa = ret_data.get('remoteCoA')
+        remote_coa = ret_data.get("remoteCoA")
 
         if remote_coa is None:
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_PARSE_REPLY)
 
-        result = remote_coa.get('results')
+        result = remote_coa.get("results")
 
         if result is None:
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_PARSE_REPLY)
@@ -472,8 +504,8 @@ class CiscoISEConnector(BaseConnector):
             payload = {}
 
         page = 1
-        payload['size'] = DEFAULT_MAX_RESULTS
-        payload['page'] = page
+        payload["size"] = DEFAULT_MAX_RESULTS
+        payload["page"] = page
 
         while True:
             ret_val, items = self._call_ers_api(endpoint, action_result, data=payload)
@@ -493,14 +525,14 @@ class CiscoISEConnector(BaseConnector):
                 break
 
             page = page + 1
-            payload['page'] = page
+            payload["page"] = page
 
         return items_list
 
     def _list_resources(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
-        resource = self._map_resource_type(param['resource'], action_result)
+        resource = self._map_resource_type(param["resource"], action_result)
         max_result = param.get("max_results")
         endpoint = ERS_RESOURCE_REST.format(resource=resource)
 
@@ -522,7 +554,7 @@ class CiscoISEConnector(BaseConnector):
             action_result.add_data(resource)
 
         summary = action_result.update_summary({})
-        summary['resources_returned'] = action_result.get_data_size()
+        summary["resources_returned"] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -536,7 +568,10 @@ class CiscoISEConnector(BaseConnector):
         value = param.get("value")
 
         if not resource_id and not key:
-            return action_result.set_status(phantom.APP_ERROR, "Please enter either 'resource id' or 'key' and 'value' to get the details of a particular resource")
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Please enter either 'resource id' or 'key' and 'value' to get the details of a particular resource",
+            )
         elif key and not value:
             return action_result.set_status(phantom.APP_ERROR, "Please enter value for the key")
         if not resource_id and (key and value):
@@ -552,7 +587,7 @@ class CiscoISEConnector(BaseConnector):
                 action_result.add_data(resource)
 
             summary = action_result.update_summary({})
-            summary['resources_returned'] = len(resources)
+            summary["resources_returned"] = len(resources)
 
             return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -563,7 +598,7 @@ class CiscoISEConnector(BaseConnector):
             return action_result.get_status()
 
         summary = action_result.update_summary({})
-        summary['resource_id'] = resource_id
+        summary["resource_id"] = resource_id
 
         action_result.add_data(resp.get(MAP_RESOURCE[param["resource"]][1]))
 
@@ -608,15 +643,17 @@ class CiscoISEConnector(BaseConnector):
 
         resource = MAP_RESOURCE[param["resource"]][0]
         resource_key = MAP_RESOURCE[param["resource"]][1]
-        resource_id = param['resource_id']
-        key = param['key']
-        value = param['value']
+        resource_id = param["resource_id"]
+        key = param["key"]
+        value = param["value"]
 
         endpoint = "{0}/{1}".format(ERS_RESOURCE_REST.format(resource=resource), resource_id)
 
         data_dict = {resource_key: {}}
         data_dict[resource_key][key] = value
-        ret_val, resp = self._call_ers_api(endpoint, action_result, data=data_dict, method="put")
+        ret_val, resp = self._call_ers_api(
+            endpoint, action_result, data=data_dict, method="put"
+        )
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -630,24 +667,21 @@ class CiscoISEConnector(BaseConnector):
         payload = {
             "OperationAdditionalData": {
                 "additionalData": [
-                    {
-                        "name": "macAddress",
-                        "value": ip_mac_address
-                    },
-                    {
-                        "name": "policyName",
-                        "value": policy_name
-                    }
+                    {"name": "macAddress", "value": ip_mac_address},
+                    {"name": "policyName", "value": policy_name},
                 ]
             }
         }
 
         if phantom.is_mac(ip_mac_address):
-            payload['OperationAdditionalData']['additionalData'][0]["name"] = "macAddress"
+            payload["OperationAdditionalData"]["additionalData"][0]["name"] = "macAddress"
         elif phantom.is_ip(ip_mac_address):
-            payload['OperationAdditionalData']['additionalData'][0]["name"] = "ipAddress"
+            payload["OperationAdditionalData"]["additionalData"][0]["name"] = "ipAddress"
         else:
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_MAC_AND_IP_NOT_SPECIFIED), ret_data
+            return (
+                action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_MAC_AND_IP_NOT_SPECIFIED),
+                ret_data,
+            )
 
         endpoint = ERS_ENDPOINT_ANC_APPLY
         if change_type == "clear":
@@ -682,7 +716,7 @@ class CiscoISEConnector(BaseConnector):
 
     def _test_connectivity_to_device(self, device_domain, verify=True):
         try:
-            rest_endpoint = 'https://{0}{1}'.format(device_domain, ACTIVE_LIST_REST)
+            rest_endpoint = "https://{0}{1}".format(device_domain, ACTIVE_LIST_REST)
             self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, device_domain)
             resp = requests.get(rest_endpoint, auth=self._auth, verify=verify)
         except Exception as e:
@@ -691,7 +725,11 @@ class CiscoISEConnector(BaseConnector):
         if resp.status_code == 200:
             return self.set_status_save_progress(phantom.APP_SUCCESS, CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED)
         else:
-            return self.set_status(phantom.APP_ERROR, CISCOISE_ERR_TEST_CONNECTIVITY_FAILED_ERR_CODE, code=resp.status_code)
+            return self.set_status(
+                phantom.APP_ERROR,
+                CISCOISE_ERR_TEST_CONNECTIVITY_FAILED_ERR_CODE,
+                code=resp.status_code
+            )
 
     def _test_connectivity(self, param):
 
@@ -702,7 +740,7 @@ class CiscoISEConnector(BaseConnector):
         self.save_progress("Connecting to first device")
         result = self._test_connectivity_to_device(first_device, verify)
 
-        secondary_device = config.get('secondary_device')
+        secondary_device = config.get("secondary_device")
         if secondary_device:
             self.save_progress("Connecting to second device")
             result = self._test_connectivity_to_device(secondary_device, verify)
@@ -750,10 +788,11 @@ class CiscoISEConnector(BaseConnector):
         return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     import sys
     import pudb
+
     pudb.set_trace()
 
     if len(sys.argv) < 2:

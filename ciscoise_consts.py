@@ -72,5 +72,5 @@ MAP_RESOURCE = {
     "Internal users": ["internaluser", "InternalUser"],
     "Network devices": ["networkdevice", "NetworkDevice"],
     "Network device groups": ["networkdevicegroup", "NetworkDeviceGroup"],
-    "Security groups": ["sgt", "Sgt"]
+    "Security groups": ["sgt", "Sgt"],
 }

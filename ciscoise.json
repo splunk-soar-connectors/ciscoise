@@ -19,14 +19,6 @@
     "latest_tested_version":  [
         "TODO"
     ],
-    "pip_dependencies": {
-        "wheel": [
-            {
-                "module" : "Cerberus",
-                "input_file": "wheels/Cerberus-1.3.4-py3-none-any.whl"
-            }
-        ]
-    },
     "configuration": {
         "device": {
             "data_type": "string",
@@ -65,10 +57,10 @@
             "description": "Password for ERS APIs",
             "required": true
         },
-        "secondary_device": {
+        "ha_device": {
             "data_type": "string",
-            "order": 0,
-            "description": "Secondary Device IP/Hostname"
+            "order": 6,
+            "description": "Device IP/Hostname for a High Availability node if available"
         }
     },
     "actions": [
@@ -1778,7 +1770,7 @@
         "wheel": [
             {
                 "module": "Cerberus",
-                "input_file": "wheels/Cerberus-1.3.2-py2-none-any.whl"
+                "input_file": "wheels/Cerberus-1.3.4-py3-none-any.whl"
             },
             {
                 "module": "certifi",
@@ -1798,7 +1790,7 @@
             },
             {
                 "module": "setuptools",
-                "input_file": "wheels/setuptools-44.1.1-py2.py3-none-any.whl"
+                "input_file": "wheels/setuptools-59.5.0-py3-none-any.whl"
             },
             {
                 "module": "urllib3",
