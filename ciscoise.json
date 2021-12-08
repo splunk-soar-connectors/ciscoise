@@ -16,8 +16,8 @@
     "logo_dark": "logo_cisco_dark.svg",
     "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "python_version": "3",
-    "latest_tested_version":  [
-        "TODO"
+    "latest_tested_version": [
+        "Cisco ISE version 3.0.0.458, 9th Dec 2021"
     ],
     "configuration": {
         "device": {
@@ -29,7 +29,6 @@
         "verify_server_cert": {
             "data_type": "boolean",
             "description": "Verify server certificate",
-            "required": true,
             "order": 1,
             "default": true
         },
@@ -88,8 +87,7 @@
                     "contains": [
                         "mac address"
                     ],
-                    "primary": false,
-                    "required": false
+                    "primary": true
                 }
             },
             "render": {
@@ -103,7 +101,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -176,6 +175,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.summary.endpoints_found",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
@@ -229,7 +235,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -278,17 +285,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.ERSEndPoint.identityStore",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.ERSEndPoint.identityStoreId",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.ERSEndPoint.link.href",
@@ -319,7 +320,7 @@
                 {
                     "data_path": "action_result.data.*.ERSEndPoint.mac",
                     "data_type": "string",
-                    "column_name": "Mac Address",
+                    "column_name": "MAC Address",
                     "column_order": 1,
                     "example_values": [
                         "8C:85:90:17:D6:39"
@@ -336,10 +337,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.ERSEndPoint.portalUser",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.ERSEndPoint.profileId",
@@ -446,7 +444,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -558,7 +557,11 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.acct_session_id",
@@ -567,7 +570,7 @@
                 {
                     "data_path": "action_result.data.*.audit_session_id",
                     "data_type": "string",
-                    "column_name": "Session id",
+                    "column_name": "Session ID",
                     "column_order": 4,
                     "contains": [
                         "ise session id"
@@ -576,7 +579,7 @@
                 {
                     "data_path": "action_result.data.*.calling_station_id",
                     "data_type": "string",
-                    "column_name": "Mac Address",
+                    "column_name": "MAC Address",
                     "column_order": 0,
                     "contains": [
                         "mac address"
@@ -590,6 +593,10 @@
                     "contains": [
                         "ip"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.framed_ipv6_address",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.is_quarantined",
@@ -629,16 +636,29 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.summary.sessions_found",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -672,7 +692,11 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_macaddress",
@@ -687,6 +711,34 @@
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EPS_RESULT.errorCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.EPS_RESULT.operationID",
+                    "data_type": "string",
+                    "example_value": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.EPS_RESULT.requestID",
+                    "data_type": "string",
+                    "example_value": [
+                        "-1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.EPS_RESULT.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Success"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -738,7 +790,11 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_macaddress",
@@ -753,6 +809,34 @@
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EPS_RESULT.errorCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.EPS_RESULT.operationID",
+                    "data_type": "string",
+                    "example_values": [
+                        "90"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.EPS_RESULT.requestID",
+                    "data_type": "string",
+                    "example_values": [
+                        "-1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.EPS_RESULT.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Success"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -802,7 +886,11 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.macaddress",
@@ -864,7 +952,6 @@
                 "max_results": {
                     "description": "Total number of observables to return",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 1000,
                     "order": 1
                 }
@@ -885,64 +972,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.link.href",
-                    "data_type": "string",
-                    "example_values": [
-                        "https://10.1.16.169:9060/ers/config/portal/40963c00-2e02-11e8-ba71-005056872c7f"
-                    ],
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.link.type",
-                    "data_type": "string",
-                    "example_values": [
-                        "application/xml"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.link.rel",
-                    "data_type": "string",
-                    "example_values": [
-                        "self"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.description",
-                    "data_type": "string",
-                    "example_values": [
-                        "Default portal used by sponsors to create and manage accounts for authorized visitors to securely access the network"
-                    ],
-                    "column_name": "Resource Description",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.data.*.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Sponsor Portal (default)"
-                    ],
-                    "column_name": "Resource Name",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.data.*.id",
-                    "data_type": "string",
-                    "example_values": [
-                        "40963c00-2e02-11e8-ba71-005056872c7f"
-                    ],
-                    "column_name": "Resource ID",
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Resources returned: 5"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.max_results",
                     "data_type": "numeric",
                     "example_values": [
@@ -957,10 +986,68 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Default portal used by sponsors to create and manage accounts for authorized visitors to securely access the network"
+                    ],
+                    "column_name": "Resource Description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "40963c00-2e02-11e8-ba71-005056872c7f"
+                    ],
+                    "column_name": "Resource ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.link.href",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://10.1.16.169:9060/ers/config/portal/40963c00-2e02-11e8-ba71-005056872c7f"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.link.rel",
+                    "data_type": "string",
+                    "example_values": [
+                        "self"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.link.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/xml"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Sponsor Portal (default)"
+                    ],
+                    "column_name": "Resource Name",
+                    "column_order": 1
+                },
+                {
                     "data_path": "action_result.summary.resources_returned",
                     "data_type": "numeric",
                     "example_values": [
                         5
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Resources returned: 5"
                     ]
                 },
                 {
@@ -1006,19 +1093,16 @@
                 "resource_id": {
                     "description": "Resource ID",
                     "data_type": "string",
-                    "required": false,
                     "order": 1
                 },
                 "key": {
                     "description": "Comma-separated keys",
                     "data_type": "string",
-                    "required": false,
                     "order": 2
                 },
                 "value": {
                     "description": "Comma-separated values",
                     "data_type": "string",
-                    "required": false,
                     "order": 3
                 }
             },
@@ -1029,122 +1113,6 @@
                     "example_values": [
                         "success",
                         "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "00:00:00:00:00:00"
-                    ],
-                    "column_name": "Name",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.data.*.description",
-                    "data_type": "string",
-                    "example_values": [
-                        "This endpoint for test"
-                    ],
-                    "column_name": "Description",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.data.*.profileId",
-                    "data_type": "string",
-                    "example_values": [
-                        "44031480-8c00-11e6-996c-525400b48521"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.staticProfileAssignment",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.mac",
-                    "data_type": "string",
-                    "example_values": [
-                        "00:00:00:00:00:00"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.link.href",
-                    "data_type": "string",
-                    "example_values": [
-                        "https://10.1.16.169:9060/ers/config/endpoint/d335f970-10e0-11ea-8f06-ce112ec9f8fa"
-                    ],
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.link.type",
-                    "data_type": "string",
-                    "example_values": [
-                        "application/xml"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.link.rel",
-                    "data_type": "string",
-                    "example_values": [
-                        "self"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.portalUser",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.id",
-                    "data_type": "string",
-                    "example_values": [
-                        "d335f970-10e0-11ea-8f06-ce112ec9f8fa"
-                    ],
-                    "column_name": "ID",
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.data.*.staticGroupAssignment",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.identityStore",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.groupId",
-                    "data_type": "string",
-                    "example_values": [
-                        "aa10ae00-8bff-11e6-996c-525400b48521"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.identityStoreId",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Resource id: d335f970-10e0-11ea-8f06-ce112ec9f8fa"
                     ]
                 },
                 {
@@ -1176,10 +1144,124 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "This endpoint for test"
+                    ],
+                    "column_name": "Description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.groupId",
+                    "data_type": "string",
+                    "example_values": [
+                        "aa10ae00-8bff-11e6-996c-525400b48521"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "d335f970-10e0-11ea-8f06-ce112ec9f8fa"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.identityStore",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.identityStoreId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.link.href",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://10.1.16.169:9060/ers/config/endpoint/d335f970-10e0-11ea-8f06-ce112ec9f8fa"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.link.rel",
+                    "data_type": "string",
+                    "example_values": [
+                        "self"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.link.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/xml"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.mac",
+                    "data_type": "string",
+                    "example_values": [
+                        "00:00:00:00:00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "00:00:00:00:00:00"
+                    ],
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.portalUser",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.profileId",
+                    "data_type": "string",
+                    "example_values": [
+                        "44031480-8c00-11e6-996c-525400b48521"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.staticGroupAssignment",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.staticProfileAssignment",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.resource_id",
                     "data_type": "string",
                     "example_values": [
                         "d335f970-10e0-11ea-8f06-ce112ec9f8fa"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.resources_returned",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Resource id: d335f970-10e0-11ea-8f06-ce112ec9f8fa"
                     ]
                 },
                 {
@@ -1245,15 +1327,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Resource deleted successfully"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
-                },
-                {
                     "data_path": "action_result.parameter.resource",
                     "data_type": "string",
                     "example_values": [
@@ -1274,6 +1347,15 @@
                 {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Resource deleted successfully"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1338,13 +1420,18 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.parameter.resource",
                     "data_type": "string",
                     "example_values": [
-                        "Resource created successfully"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
+                        "Endpoints"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_json",
+                    "data_type": "string",
+                    "example_values": [
+                        "{}"
+                    ]
                 },
                 {
                     "data_path": "action_result.data",
@@ -1358,17 +1445,26 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.resource",
+                    "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Endpoints"
+                        "Resource created successfully"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.resource_json",
-                    "data_type": "string",
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
                     "example_values": [
-                        "{}"
+                        1
                     ]
                 }
             ],
@@ -1432,23 +1528,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.parameter.key",
                     "data_type": "string",
                     "example_values": [
-                        "Resource updated successfully"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string",
-                    "example_values": [
-                        "Resource created successfully"
+                        "Endpoints"
                     ]
                 },
                 {
@@ -1466,17 +1549,44 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.key",
+                    "data_path": "action_result.parameter.value",
                     "data_type": "string",
                     "example_values": [
                         "Endpoints"
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.value",
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string",
                     "example_values": [
-                        "Endpoints"
+                        "Resource created successfully"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Resource updated successfully"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
                     ]
                 }
             ],
@@ -1511,7 +1621,8 @@
                     "contains": [
                         "mac address",
                         "ip"
-                    ]
+                    ],
+                    "primary": true
                 }
             },
             "render": {
@@ -1525,12 +1636,9 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.policy_name",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.ip_mac_address",
@@ -1539,6 +1647,10 @@
                         "mac address",
                         "ip"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.policy_name",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.SearchResult.resources.*.id",
@@ -1638,7 +1750,6 @@
                     "description": "Policy Name",
                     "data_type": "string",
                     "order": 0,
-                    "primary": false,
                     "required": true
                 },
                 "ip_mac_address": {
@@ -1649,7 +1760,8 @@
                     "contains": [
                         "mac address",
                         "ip"
-                    ]
+                    ],
+                    "primary": true
                 }
             },
             "render": {
@@ -1663,7 +1775,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
