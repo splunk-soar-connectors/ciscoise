@@ -15,19 +15,18 @@
 #
 #
 # Phantom imports
-import phantom.app as phantom
+import json
 
-from phantom.base_connector import BaseConnector
+import phantom.app as phantom
+import requests
+import xmltodict
+from cerberus import Validator
 from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
+from requests.auth import HTTPBasicAuth
 
 # THIS Connector imports
 from ciscoise_consts import *
-from cerberus import Validator
-
-import json
-import xmltodict
-import requests
-from requests.auth import HTTPBasicAuth
 
 
 class CiscoISEConnector(BaseConnector):
@@ -111,7 +110,8 @@ class CiscoISEConnector(BaseConnector):
         if not (200 <= resp.status_code < 399):
             error_message = resp.text
             if resp.status_code == 401:
-                error_message = "The request has not been applied because it lacks valid authentication credentials for the target resource."
+                error_message = "The request has not been applied because it lacks valid authentication credentials" \
+                                " for the target resource."
             elif resp.status_code == 404:
                 error_message = "Resource not found"
             return (
@@ -182,7 +182,7 @@ class CiscoISEConnector(BaseConnector):
     def _map_resource_type(self, resource_type, action_result, *args):
         try:
             return MAP_RESOURCE[resource_type][0]
-        except Exception as ex:
+        except Exception as ex:  # noqa: F841
             return action_result.set_status(phantom.APP_ERROR, "Invalid resource type")
 
     def _list_sessions(self, param):
@@ -545,7 +545,7 @@ class CiscoISEConnector(BaseConnector):
         try:
             if max_result:
                 max_result = int(max_result)
-        except ValueError as ex:
+        except ValueError as ex:  # noqa: F841
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_INVALID_PARAM.format(param="max_result"))
 
         if max_result is not None and max_result <= 0:
@@ -632,7 +632,7 @@ class CiscoISEConnector(BaseConnector):
         resource = MAP_RESOURCE[param["resource"]][0]
         try:
             resource_json = json.loads(param["resource_json"])
-        except Exception as ex:
+        except Exception as ex:  # noqa: F841
             return action_result.set_status(phantom.APP_ERROR, "Error parsing json")
 
         endpoint = "{0}".format(ERS_RESOURCE_REST.format(resource=resource))
@@ -797,6 +797,7 @@ class CiscoISEConnector(BaseConnector):
 if __name__ == "__main__":
 
     import sys
+
     import pudb
 
     pudb.set_trace()
