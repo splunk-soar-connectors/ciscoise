@@ -80,17 +80,20 @@ class CiscoISEConnector(BaseConnector):
     def _ha_device_wrapper(self, func):
         def make_another_call(*args, **kwargs):
             self.debug_print("Making call to primary device")
-            ret_val, ret_data = func(base_url=self._base_url, *args, **kwargs)
+            ret_val, ret_data = func(*args, **kwargs)
             if phantom.is_fail(ret_val) and self._ha_device:
                 self.debug_print("Call to first device failed. Data returned: {}".format(ret_data))
                 self.debug_print("Making call to secondary device")
-                ret_val, ret_data = func(base_url=self._ha_device_url, *args, **kwargs)
+                ret_val, ret_data = func(try_ha_device=True, *args, **kwargs)
             return ret_val, ret_data
 
         return make_another_call
 
-    def _call_ers_api(self, endpoint, action_result, base_url, data=None, allow_unknown=True, method="get"):
-        url = "{0}{1}".format(base_url, endpoint)
+    def _call_ers_api(self, endpoint, action_result, data=None, allow_unknown=True, method="get", try_ha_device=False):
+        url = "{0}{1}".format(self._base_url, endpoint)
+        if try_ha_device:
+            url = "{0}{1}".format(self._ha_device_url, endpoint)
+
         ret_data = None
 
         config = self.get_config()
@@ -131,8 +134,11 @@ class CiscoISEConnector(BaseConnector):
 
         return phantom.APP_SUCCESS, ret_data
 
-    def _call_rest_api(self, endpoint, action_result, base_url, schema=None, data=None, allow_unknown=True):
-        url = "{0}{1}".format(base_url, endpoint)
+    def _call_rest_api(self, endpoint, action_result, schema=None, data=None, allow_unknown=True, try_ha_device=False):
+        url = "{0}{1}".format(self._base_url, endpoint)
+        if try_ha_device:
+            url = "{0}{1}".format(self._ha_device_url, endpoint)
+
         ret_data = None
 
         config = self.get_config()
@@ -290,19 +296,19 @@ class CiscoISEConnector(BaseConnector):
         if not (attribute or custom_attribute):
             return action_result.set_status(phantom.APP_ERROR, "Please specify attribute or custom attribute")
 
-        if attribute is not None and attribute_value is not None:
-            final_data["ERSEndPoint"][attribute] = attribute_value
-        else:
+        if attribute and not attribute_value:
             return action_result.set_status(phantom.APP_ERROR, "Please specify both attribute and attribute value")
+        elif attribute and attribute_value:
+            final_data["ERSEndPoint"][attribute] = attribute_value
 
-        if custom_attribute is not None and custom_attribute_value is not None:
-            custom_attribute_dict = {"customAttributes": {custom_attribute: custom_attribute_value}}
-            final_data["ERSEndPoint"]["customAttributes"] = custom_attribute_dict
-        else:
+        if custom_attribute and not custom_attribute_value:
             return action_result.set_status(
                 phantom.APP_ERROR,
                 "Please specify both custom attribute and custom attribute value"
             )
+        elif custom_attribute and custom_attribute_value:
+            custom_attribute_dict = {"customAttributes": {custom_attribute: custom_attribute_value}}
+            final_data["ERSEndPoint"]["customAttributes"] = custom_attribute_dict
 
         ret_val, ret_data = self._call_ers_api(endpoint, action_result, data=final_data, method="put")
         action_result.add_data(ret_data)
@@ -539,7 +545,7 @@ class CiscoISEConnector(BaseConnector):
         try:
             if max_result:
                 max_result = int(max_result)
-        except ValueError:
+        except ValueError as ex:
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_INVALID_PARAM.format(param="max_result"))
 
         if max_result is not None and max_result <= 0:
@@ -626,7 +632,7 @@ class CiscoISEConnector(BaseConnector):
         resource = MAP_RESOURCE[param["resource"]][0]
         try:
             resource_json = json.loads(param["resource_json"])
-        except Exception:
+        except Exception as ex:
             return action_result.set_status(phantom.APP_ERROR, "Error parsing json")
 
         endpoint = "{0}".format(ERS_RESOURCE_REST.format(resource=resource))
