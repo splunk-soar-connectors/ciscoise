@@ -64,7 +64,7 @@ class CiscoISEConnector(BaseConnector):
 
         self._auth = HTTPBasicAuth(config[phantom.APP_JSON_USERNAME], config[phantom.APP_JSON_PASSWORD])
         ers_user = config.get("ers_user", None)
-        self._ha_device = config.get("secondary_device", None)
+        self._ha_device = config.get("ha_device", None)
         if ers_user is not None:
             self._ers_auth = HTTPBasicAuth(config["ers_user"], config["ers_password"])
         self._base_url = "https://{0}".format(config[phantom.APP_JSON_DEVICE])
@@ -80,10 +80,12 @@ class CiscoISEConnector(BaseConnector):
         def make_another_call(*args, **kwargs):
             self.debug_print("Making call to primary device")
             ret_val, ret_data = func(*args, **kwargs)
+
             if phantom.is_fail(ret_val) and self._ha_device:
                 self.debug_print("Call to first device failed. Data returned: {}".format(ret_data))
                 self.debug_print("Making call to secondary device")
                 ret_val, ret_data = func(try_ha_device=True, *args, **kwargs)
+
             return ret_val, ret_data
 
         return make_another_call
@@ -293,15 +295,15 @@ class CiscoISEConnector(BaseConnector):
 
         final_data = {"ERSEndPoint": {}}
 
-        if not (attribute or custom_attribute):
+        if not (attribute or custom_attribute or attribute_value or custom_attribute_value):
             return action_result.set_status(phantom.APP_ERROR, "Please specify attribute or custom attribute")
 
-        if attribute and not attribute_value:
+        if (attribute is not None) ^ (attribute_value is not None):
             return action_result.set_status(phantom.APP_ERROR, "Please specify both attribute and attribute value")
         elif attribute and attribute_value:
             final_data["ERSEndPoint"][attribute] = attribute_value
 
-        if custom_attribute and not custom_attribute_value:
+        if (custom_attribute is not None) ^ (custom_attribute_value is not None):
             return action_result.set_status(
                 phantom.APP_ERROR,
                 "Please specify both custom attribute and custom attribute value"
@@ -720,18 +722,18 @@ class CiscoISEConnector(BaseConnector):
         action_result.add_data(ret_data)
         return action_result.set_status(phantom.APP_SUCCESS, "Policy cleared")
 
-    def _test_connectivity_to_device(self, device_domain, verify=True):
+    def _test_connectivity_to_device(self, base_url, verify=True):
         try:
-            rest_endpoint = "https://{0}{1}".format(device_domain, ACTIVE_LIST_REST)
-            self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, device_domain)
+            rest_endpoint = "{0}{1}".format(base_url, ACTIVE_LIST_REST)
+            self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, base_url)
             resp = requests.get(rest_endpoint, auth=self._auth, verify=verify)
         except Exception as e:
-            return self.set_status(phantom.APP_ERROR, CISCOISE_ERR_TEST_CONNECTIVITY_FAILED, e)
+            return self.set_status_save_progress(phantom.APP_ERROR, CISCOISE_ERR_TEST_CONNECTIVITY_FAILED, e)
 
         if resp.status_code == 200:
             return self.set_status_save_progress(phantom.APP_SUCCESS, CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED)
         else:
-            return self.set_status(
+            return self.set_status_save_progress(
                 phantom.APP_ERROR,
                 CISCOISE_ERR_TEST_CONNECTIVITY_FAILED_ERR_CODE,
                 code=resp.status_code
@@ -740,16 +742,13 @@ class CiscoISEConnector(BaseConnector):
     def _test_connectivity(self, param):
 
         config = self.get_config()
-
-        first_device = config[phantom.APP_JSON_DEVICE]
         verify = config[phantom.APP_JSON_VERIFY]
         self.save_progress("Connecting to first device")
-        result = self._test_connectivity_to_device(first_device, verify)
+        result = self._test_connectivity_to_device(self._base_url, verify)
 
-        secondary_device = config.get("secondary_device")
-        if secondary_device:
+        if self._ha_device:
             self.save_progress("Connecting to second device")
-            result = self._test_connectivity_to_device(secondary_device, verify)
+            result = self._test_connectivity_to_device(self._ha_device_url, verify)
 
         return result
 

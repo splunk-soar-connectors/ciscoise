@@ -2,7 +2,7 @@
     "appid": "85232924-4776-4896-88fa-b982b304af7c",
     "name": "Cisco ISE",
     "description": "This app implements investigative and containment actions on a Cisco ISE device",
-    "publisher": "Phantom",
+    "publisher": "Splunk",
     "type": "network access control",
     "main_module": "ciscoise_connector.py",
     "app_version": "2.0.0",
@@ -26,11 +26,10 @@
             "description": "Device IP/Hostname",
             "required": true
         },
-        "verify_server_cert": {
-            "data_type": "boolean",
-            "description": "Verify server certificate",
+        "ha_device": {
+            "data_type": "string",
             "order": 1,
-            "default": true
+            "description": "Device IP/Hostname for a High Availability node if available"
         },
         "username": {
             "data_type": "string",
@@ -56,10 +55,11 @@
             "description": "Password for ERS APIs",
             "required": true
         },
-        "ha_device": {
-            "data_type": "string",
+        "verify_server_cert": {
+            "data_type": "boolean",
+            "description": "Verify server certificate",
             "order": 6,
-            "description": "Device IP/Hostname for a High Availability node if available"
+            "default": true
         }
     },
     "actions": [
@@ -121,14 +121,13 @@
                         "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
                     ],
                     "contains": [
-                        "ise endpoint id"
+                        "ise endpoint id",
+                        "ise resource id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.SearchResult.resources.*.link.href",
                     "data_type": "string",
-                    "column_name": "Link to ISE Endpoint",
-                    "column_order": 2,
                     "example_values": [
                         "https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea"
                     ],
@@ -218,7 +217,8 @@
                     "data_type": "string",
                     "order": 0,
                     "contains": [
-                        "ise endpoint id"
+                        "ise endpoint id",
+                        "ise resource id"
                     ],
                     "primary": true,
                     "required": true
@@ -247,7 +247,8 @@
                         "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
                     ],
                     "contains": [
-                        "ise endpoint id"
+                        "ise endpoint id",
+                        "ise resource id"
                     ]
                 },
                 {
@@ -280,7 +281,8 @@
                         "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
                     ],
                     "contains": [
-                        "ise endpoint id"
+                        "ise endpoint id",
+                        "ise resource id"
                     ]
                 },
                 {
@@ -294,8 +296,6 @@
                 {
                     "data_path": "action_result.data.*.ERSEndPoint.link.href",
                     "data_type": "string",
-                    "column_name": "Link to ISE Endpoint",
-                    "column_order": 3,
                     "example_values": [
                         "https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea"
                     ],
@@ -402,7 +402,8 @@
                     "data_type": "string",
                     "order": 0,
                     "contains": [
-                        "ise endpoint id"
+                        "ise endpoint id",
+                        "ise resource id"
                     ],
                     "primary": true,
                     "required": true
@@ -483,7 +484,8 @@
                         "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
                     ],
                     "contains": [
-                        "ise endpoint id"
+                        "ise endpoint id",
+                        "ise resource id"
                     ]
                 },
                 {
@@ -1001,7 +1003,10 @@
                         "40963c00-2e02-11e8-ba71-005056872c7f"
                     ],
                     "column_name": "Resource ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "ise resource id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.link.href",
@@ -1069,7 +1074,7 @@
         },
         {
             "action": "get resources",
-            "description": "Search for resources",
+            "description": "Search for resources. Returns resource with `resource id`, else finds resources with key-value",
             "type": "investigate",
             "identifier": "get_resources",
             "read_only": true,
@@ -1093,15 +1098,18 @@
                 "resource_id": {
                     "description": "Resource ID",
                     "data_type": "string",
-                    "order": 1
+                    "order": 1,
+                    "contains": [
+                        "ise resource id"
+                    ]
                 },
                 "key": {
-                    "description": "Comma-separated keys",
+                    "description": "Key",
                     "data_type": "string",
                     "order": 2
                 },
                 "value": {
-                    "description": "Comma-separated values",
+                    "description": "Value",
                     "data_type": "string",
                     "order": 3
                 }
@@ -1134,6 +1142,9 @@
                     "data_type": "string",
                     "example_values": [
                         "2e9cf1c0-30b6-11ea-8f06-ce112ec9f8fa"
+                    ],
+                    "contains": [
+                        "ise resource id"
                     ]
                 },
                 {
@@ -1166,7 +1177,10 @@
                         "d335f970-10e0-11ea-8f06-ce112ec9f8fa"
                     ],
                     "column_name": "ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "ise resource id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.identityStore",
@@ -1248,6 +1262,9 @@
                     "data_type": "string",
                     "example_values": [
                         "d335f970-10e0-11ea-8f06-ce112ec9f8fa"
+                    ],
+                    "contains": [
+                        "ise resource id"
                     ]
                 },
                 {
@@ -1314,7 +1331,10 @@
                     "description": "Resource ID",
                     "data_type": "string",
                     "required": true,
-                    "order": 1
+                    "order": 1,
+                    "contains": [
+                        "ise resource id"
+                    ]
                 }
             },
             "output": [
@@ -1338,6 +1358,9 @@
                     "data_type": "string",
                     "example_values": [
                         "2e9cf1c0-30b6-11ea-8f06-ce112ec9f8fa"
+                    ],
+                    "contains": [
+                        "ise resource id"
                     ]
                 },
                 {
@@ -1503,7 +1526,10 @@
                     "description": "ID of resource",
                     "data_type": "string",
                     "required": true,
-                    "order": 1
+                    "order": 1,
+                    "contains": [
+                        "ise resource id"
+                    ]
                 },
                 "key": {
                     "description": "Key of resource which needs to be updated",
@@ -1546,6 +1572,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Endpoints"
+                    ],
+                    "contains": [
+                        "ise resource id"
                     ]
                 },
                 {
@@ -1661,14 +1690,13 @@
                         "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
                     ],
                     "contains": [
-                        "ise endpoint id"
+                        "ise endpoint id",
+                        "ise resource id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.SearchResult.resources.*.link.href",
                     "data_type": "string",
-                    "column_name": "Link to ISE Endpoint",
-                    "column_order": 2,
                     "example_values": [
                         "https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea"
                     ],
@@ -1800,14 +1828,13 @@
                         "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
                     ],
                     "contains": [
-                        "ise endpoint id"
+                        "ise endpoint id",
+                        "ise resource id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.SearchResult.resources.*.link.href",
                     "data_type": "string",
-                    "column_name": "Link to ISE Endpoint",
-                    "column_order": 2,
                     "example_values": [
                         "https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea"
                     ],
