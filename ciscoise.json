@@ -1662,106 +1662,44 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.ip_mac_address",
                     "data_type": "string",
                     "contains": [
                         "mac address",
                         "ip"
-                    ]
+                    ],
+                    "column_name": "ip mac address",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.policy_name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.SearchResult.resources.*.id",
                     "data_type": "string",
-                    "column_name": "ISE Endpoint ID",
-                    "column_order": 1,
-                    "example_values": [
-                        "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
-                    ],
-                    "contains": [
-                        "ise endpoint id",
-                        "ise resource id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.SearchResult.resources.*.link.href",
-                    "data_type": "string",
-                    "example_values": [
-                        "https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea"
-                    ],
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.SearchResult.resources.*.link.rel",
-                    "data_type": "string",
-                    "example_values": [
-                        "self"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.SearchResult.resources.*.link.type",
-                    "data_type": "string",
-                    "example_values": [
-                        "application/xml"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.SearchResult.resources.*.name",
-                    "data_type": "string",
-                    "column_name": "Endpoint Name",
-                    "column_order": 0,
-                    "example_values": [
-                        "8C:85:90:17:D6:39"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.SearchResult.total",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.Endpoints found",
-                    "data_type": "string",
-                    "example_values": [
-                        "9",
-                        1
-                    ]
+                    "column_name": "policy name",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "9 Endpoints found",
-                        "1 Endpoints found"
-                    ]
+                        "Policy applied"
+                    ],
+                    "column_name": "status",
+                    "column_order": 2
                 },
                 {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
+                    "data_path": "action_result.data",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        1
+                        "success",
+                        "failed"
                     ]
                 }
             ],
@@ -1800,106 +1738,44 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.ip_mac_address",
                     "data_type": "string",
                     "contains": [
                         "mac address",
                         "ip"
-                    ]
+                    ],
+                    "column_name": "ip mac address",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.policy_name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.SearchResult.resources.*.id",
                     "data_type": "string",
-                    "column_name": "ISE Endpoint ID",
-                    "column_order": 1,
-                    "example_values": [
-                        "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
-                    ],
-                    "contains": [
-                        "ise endpoint id",
-                        "ise resource id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.SearchResult.resources.*.link.href",
-                    "data_type": "string",
-                    "example_values": [
-                        "https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea"
-                    ],
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.SearchResult.resources.*.link.rel",
-                    "data_type": "string",
-                    "example_values": [
-                        "self"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.SearchResult.resources.*.link.type",
-                    "data_type": "string",
-                    "example_values": [
-                        "application/xml"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.SearchResult.resources.*.name",
-                    "data_type": "string",
-                    "column_name": "Endpoint Name",
-                    "column_order": 0,
-                    "example_values": [
-                        "8C:85:90:17:D6:39"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.SearchResult.total",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.Endpoints found",
-                    "data_type": "string",
-                    "example_values": [
-                        "9",
-                        1
-                    ]
+                    "column_name": "policy name",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "9 Endpoints found",
-                        "1 Endpoints found"
-                    ]
+                        "Policy cleared"
+                    ],
+                    "column_name": "status",
+                    "column_order": 2
                 },
                 {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
+                    "data_path": "action_result.data",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        1
+                        "success",
+                        "failed"
                     ]
                 }
             ],
@@ -1930,7 +1806,7 @@
             },
             {
                 "module": "setuptools",
-                "input_file": "wheels/setuptools-59.5.0-py3-none-any.whl"
+                "input_file": "wheels/setuptools-59.6.0-py3-none-any.whl"
             },
             {
                 "module": "urllib3",
