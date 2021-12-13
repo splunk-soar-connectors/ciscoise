@@ -10,7 +10,7 @@
     "package_name": "phantom_ciscoise",
     "product_vendor": "Cisco Systems",
     "product_name": "Cisco ISE",
-    "product_version_regex": "2.2",
+    "product_version_regex": "/([2].[67])|([3].[01])/",
     "min_phantom_version": "5.0.0",
     "logo": "logo_cisco.svg",
     "logo_dark": "logo_cisco_dark.svg",
