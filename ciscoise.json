@@ -46,20 +46,18 @@
         "ers_user": {
             "data_type": "string",
             "order": 4,
-            "description": "Username for ERS APIs",
-            "required": true
+            "description": "Username for ERS APIs"
         },
         "ers_password": {
             "data_type": "password",
             "order": 5,
-            "description": "Password for ERS APIs",
-            "required": true
+            "description": "Password for ERS APIs"
         },
         "verify_server_cert": {
             "data_type": "boolean",
             "description": "Verify server certificate",
             "order": 6,
-            "default": true
+            "default": false
         }
     },
     "actions": [

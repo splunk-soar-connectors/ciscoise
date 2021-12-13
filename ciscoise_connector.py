@@ -91,6 +91,8 @@ class CiscoISEConnector(BaseConnector):
         return make_another_call
 
     def _call_ers_api(self, endpoint, action_result, data=None, allow_unknown=True, method="get", try_ha_device=False):
+        if self._ers_auth is None:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide ERS credentials for this action"), None
         url = "{0}{1}".format(self._base_url, endpoint)
         if try_ha_device:
             url = "{0}{1}".format(self._ha_device_url, endpoint)

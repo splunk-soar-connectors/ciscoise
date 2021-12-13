@@ -21,42 +21,21 @@
 </ol>
 <h2>Note</h2>
 <ol>
-    <li>This app is not backward compatible</li>
-    <li>Quarantine device and Unquarantine device may not work sometimes. Apply policy and Clear policy with policy type QUARANTINE are recommended</li>
+    <li>Quarantine device and Unquarantine device actions may not work properly sometimes. Apply policy and Clear policy with policy type QUARANTINE are recommended to use</li>
+    <li>ERS credentials are required for actions list endpoints, get device info, update device info, get resources, delete resource, create resource, update resource,
+        apply policy and create policy</li>
     <li>An ISE node can assume any or all of the following personas: Administration, Policy Service, and Monitoring. For detailed info:
-                <a href="https://www.cisco.com/en/US/docs/security/ise/1.0/user_guide/ise10_dis_deploy.html#wp1123452">Types of nodes</a>
+                <a target="_blank" href="https://www.cisco.com/en/US/docs/security/ise/1.0/user_guide/ise10_dis_deploy.html#wp1123452">Types of nodes</a>
         <ul>
             <li>All actions can run on Administration node.</li>
-            <li>Actions create resource, update resource, delete resource, list resource, get resources, list sessions, update device info, get device info and list endpoints
-                requires
-                Monitoring node
+            <li>Actions create resource, update resource, delete resource, list resource, get resources, list sessions, update device info, get device info, and list endpoints
+                can run on Monitoring node
             </li>
-            <li>Actions quarantine device, unquarantine device, apply policy, clear policy and terminate session requires Policy Service node</li>
+            <li>Actions quarantine device, unquarantine device, apply policy, clear policy, and terminate session can run on Policy Service node</li>
         </ul>
     </li>
-</ol>
-<h2>Port Information</h2>
-<p>
-    The app uses HTTP/ HTTPS protocol for communicating with the Cisco ISE server. Below are the default ports used by Splunk SOAR.
-    <table cellspacing="5">
-        <tr class=plain>
-            <th>Service Name</th>
-            <th>Transport Protocol</th>
-            <th>Port</th>
-        </tr>
-        <tr>
-            <td>http</td>
-            <td>tcp</td>
-            <td>80</td>
-        </tr>
-        <tr>
-            <td>https</td>
-            <td>tcp</td>
-            <td>443</td>
-        </tr>
-    </table>
-</p>
-<h2>Example JSON for creating resources</h2>
+    <li>For create resource action, user needs to provide valid json with required fields of that specified resource (For more details head over to
+        <a href="https://developer.cisco.com/docs/identity-services-engine/v1/#!endpoint" target="_blank">API Reference</a>). Examples as below</li>
 <ul>
     <li>Endpoint
         <pre>
@@ -178,3 +157,26 @@
     </pre>
     </li>
 </ul>
+
+</ol>
+<h2>Port Information</h2>
+<p>
+    The app uses HTTP/ HTTPS protocol for communicating with the Cisco ISE server. Below are the default ports used by Splunk SOAR.
+    <table cellspacing="5">
+        <tr class=plain>
+            <th>Service Name</th>
+            <th>Transport Protocol</th>
+            <th>Port</th>
+        </tr>
+        <tr>
+            <td>http</td>
+            <td>tcp</td>
+            <td>80</td>
+        </tr>
+        <tr>
+            <td>https</td>
+            <td>tcp</td>
+            <td>443</td>
+        </tr>
+    </table>
+</p>
