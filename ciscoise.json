@@ -14,7 +14,7 @@
     "min_phantom_version": "5.0.0",
     "logo": "logo_cisco.svg",
     "logo_dark": "logo_cisco_dark.svg",
-    "license": "Copyright (c) 2016-2021 Splunk Inc.",
+    "license": "Copyright (c) 2014-2021 Splunk Inc.",
     "python_version": "3",
     "latest_tested_version": [
         "Cisco ISE version 3.0.0.458, 9th Dec 2021"
@@ -934,7 +934,7 @@
             "read_only": true,
             "parameters": {
                 "resource": {
-                    "description": "Resources of the resource to be fetched",
+                    "description": "Resource type of the resources to fetch",
                     "data_type": "string",
                     "order": 0,
                     "required": true,
@@ -1078,7 +1078,7 @@
             "read_only": true,
             "parameters": {
                 "resource": {
-                    "description": "Resources of the resource to be fetched",
+                    "description": "Resource type of the resource to fetch",
                     "data_type": "string",
                     "order": 0,
                     "required": true,
@@ -1310,7 +1310,7 @@
             "read_only": false,
             "parameters": {
                 "resource": {
-                    "description": "Resources of the resource to be deleted",
+                    "description": "Resource type of the resource to be deleted",
                     "data_type": "string",
                     "order": 0,
                     "required": true,
@@ -1409,7 +1409,7 @@
             "read_only": false,
             "parameters": {
                 "resource": {
-                    "description": "Resources of the resource to be created",
+                    "description": "Resource type of the resource to be created",
                     "data_type": "string",
                     "order": 0,
                     "required": true,
@@ -1505,7 +1505,7 @@
             "read_only": false,
             "parameters": {
                 "resource": {
-                    "description": "Resources of the resource to be created",
+                    "description": "Resource type of the resource to be created",
                     "data_type": "string",
                     "order": 0,
                     "required": true,
@@ -1666,13 +1666,13 @@
                         "mac address",
                         "ip"
                     ],
-                    "column_name": "ip mac address",
+                    "column_name": "IP MAC address",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.policy_name",
                     "data_type": "string",
-                    "column_name": "policy name",
+                    "column_name": "Policy Name",
                     "column_order": 1
                 },
                 {
@@ -1681,7 +1681,7 @@
                     "example_values": [
                         "Policy applied"
                     ],
-                    "column_name": "status",
+                    "column_name": "Status",
                     "column_order": 2
                 },
                 {
@@ -1742,13 +1742,13 @@
                         "mac address",
                         "ip"
                     ],
-                    "column_name": "ip mac address",
+                    "column_name": "IP MAC address",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.policy_name",
                     "data_type": "string",
-                    "column_name": "policy name",
+                    "column_name": "Policy Name",
                     "column_order": 1
                 },
                 {
@@ -1757,7 +1757,7 @@
                     "example_values": [
                         "Policy cleared"
                     ],
-                    "column_name": "status",
+                    "column_name": "Status",
                     "column_order": 2
                 },
                 {
