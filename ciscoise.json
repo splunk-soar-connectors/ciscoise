@@ -205,7 +205,7 @@
         },
         {
             "action": "get device info",
-            "description": "Get informaton about a specific endpoint",
+            "description": "Get information about a specific endpoint",
             "type": "investigate",
             "identifier": "get_endpoint",
             "read_only": true,
@@ -390,7 +390,7 @@
         },
         {
             "action": "update device info",
-            "description": "Update informaton or attributes for a specific endpoint",
+            "description": "Update information or attributes for a specific endpoint",
             "type": "contain",
             "identifier": "update_endpoint",
             "read_only": false,
@@ -1072,7 +1072,7 @@
         },
         {
             "action": "get resources",
-            "description": "Search for resources. Returns resource with `resource id`, else finds resources with key-value",
+            "description": "Get the information about resource if resource_id is provided. Fetch the list of resources match with the key-value filter",
             "type": "investigate",
             "identifier": "get_resources",
             "read_only": true,

@@ -53,16 +53,23 @@ CISCOISE_SUCC_SYSTEM_UNQUARANTINED = "System unquarantined"
 CISCOISE_SUCC_LIST_ENDPOINTS = "{0} Endpoints found"
 CISCOISE_SUCC_GET_ENDPOINT = "Endpoint found"
 CISCOISE_SUCC_UPDATE_ENDPOINT = "Endpoint updated"
-CISCOISE_ERR_INVALID_PARAM = "Please provide non-zero positive integer in {param}"
+CISCOISE_ERR_INVALID_PARAM = "Please provide a non-zero positive integer in {param}"
 CISCOISE_MAP_IP_ABSENT_ERROR = "Please provide either mac address or ip address"
+CISCOISE_ERS_CRED_MISSING = "ERS credentials in asset configuration are required for this action"
 DEFAULT_MAX_RESULTS = 7
 
 # Json reply schema
-IS_MAC_QUARAN_RESP_SCHEMA = {"EPS_RESULT": {"type": "dict", "schema": {"status": {"type": "string"}, "userData": {"type": "string"}}}}
-QUARANTINE_RESP_SCHEMA = {"EPS_RESULT": {"type": "dict", "schema": {"status": {"type": "string"}, "errorCode": {"type": "string"}}}}
+IS_MAC_QUARAN_RESP_SCHEMA = {
+    "EPS_RESULT": {"type": "dict", "schema": {"status": {"type": "string"}, "userData": {"type": "string"}}}
+}
+QUARANTINE_RESP_SCHEMA = {
+    "EPS_RESULT": {"type": "dict", "schema": {"status": {"type": "string"}, "errorCode": {"type": "string"}}}
+}
 MAC_SESSION_RESP_SCHEMA = {"sessionParameters": {"type": "dict", "schema": {"acs_server": {"type": "string"}}}}
 DISCONNECT_MAC_SESS_RESP_SCHEMA = {"remoteCoA": {"type": "dict", "schema": {"results": {"type": "string"}}}}
-ERS_UPDATE_ENDPOINT_SCHEMA = {"updatedField": {"type": "dict", "schema": {"newValue": {"type": "string"}, "oldValue": {"type": "string"}}}}
+ERS_UPDATE_ENDPOINT_SCHEMA = {
+    "updatedField": {"type": "dict", "schema": {"newValue": {"type": "string"}, "oldValue": {"type": "string"}}}
+}
 
 MAP_RESOURCE = {
     "Endpoints": ["endpoint", "ERSEndPoint"],
