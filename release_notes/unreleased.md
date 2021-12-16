@@ -1,7 +1,7 @@
 **Unreleased**
 * Compatibility changes for Python 3 support [PAPP-19196]
-* Add new optional asset configuration parameters 'ers_user' and 'ers_password'
-* Add new optional asset configuration parameter 'ha_device' for secondary node [PAPP-21216]
+* Add new optional asset configuration parameters 'ers\_user' and 'ers\_password'
+* Add new optional asset configuration parameter 'ha\_device' for secondary node [PAPP-21216]
 * Updated logo for the app
 * Updated documentation for the app
 * Added support for the below mentioned actions:
