@@ -149,7 +149,10 @@ class CiscoISEConnector(BaseConnector):
         verify = config[phantom.APP_JSON_VERIFY]
 
         try:
-            resp = requests.get(url, verify=verify, auth=self._auth)
+            resp = requests.get(  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
+                url,
+                verify=verify,
+                auth=self._auth)
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data
 
@@ -728,7 +731,10 @@ class CiscoISEConnector(BaseConnector):
         try:
             rest_endpoint = "{0}{1}".format(base_url, ACTIVE_LIST_REST)
             self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, base_url)
-            resp = requests.get(rest_endpoint, auth=self._auth, verify=verify)
+            resp = requests.get(  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
+                rest_endpoint,
+                auth=self._auth,
+                verify=verify)
         except Exception as e:
             self.debug_print("Exception is test connectivity: {}".format(e))
             return self.set_status_save_progress(phantom.APP_ERROR, CISCOISE_ERR_TEST_CONNECTIVITY_FAILED)
