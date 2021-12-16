@@ -3,7 +3,7 @@
     "name": "Cisco ISE",
     "description": "This app implements investigative and containment actions on a Cisco ISE device",
     "publisher": "Splunk",
-    "type": "network access control",
+    "type": "network security",
     "main_module": "ciscoise_connector.py",
     "app_version": "2.0.0",
     "utctime_updated": "2018-12-07T02:21:36.000000Z",
@@ -1125,7 +1125,7 @@
                     "data_path": "action_result.parameter.key",
                     "data_type": "string",
                     "example_values": [
-                        "mac, profileId"
+                        "mac"
                     ]
                 },
                 {
@@ -1451,7 +1451,7 @@
                     "data_path": "action_result.parameter.resource_json",
                     "data_type": "string",
                     "example_values": [
-                        "{}"
+                        "{\n\"ERSEndPoint\": {\n\"name\": \"name\",\n\"description\": \"MyEndpoint\",\n\"mac\": \"11:22:33:44:55:66\"\n}\n}"
                     ]
                 },
                 {
@@ -1699,6 +1699,20 @@
                         "success",
                         "failed"
                     ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -1774,6 +1788,20 @@
                     "example_values": [
                         "success",
                         "failed"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
                     ]
                 }
             ],

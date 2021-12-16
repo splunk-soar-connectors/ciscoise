@@ -66,7 +66,7 @@ class CiscoISEConnector(BaseConnector):
         ers_user = config.get("ers_user", None)
         self._ha_device = config.get("ha_device", None)
         if ers_user is not None:
-            self._ers_auth = HTTPBasicAuth(config["ers_user"], config["ers_password"])
+            self._ers_auth = HTTPBasicAuth(config.get("ers_user"), config.get("ers_password"))
         self._base_url = "https://{0}".format(config[phantom.APP_JSON_DEVICE])
 
         if self._ha_device:
@@ -730,7 +730,8 @@ class CiscoISEConnector(BaseConnector):
             self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, base_url)
             resp = requests.get(rest_endpoint, auth=self._auth, verify=verify)
         except Exception as e:
-            return self.set_status_save_progress(phantom.APP_ERROR, CISCOISE_ERR_TEST_CONNECTIVITY_FAILED, e)
+            self.debug_print("Exception is test connectivity: {}".format(e))
+            return self.set_status_save_progress(phantom.APP_ERROR, CISCOISE_ERR_TEST_CONNECTIVITY_FAILED)
 
         if resp.status_code == 200:
             return self.set_status_save_progress(phantom.APP_SUCCESS, CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED)
