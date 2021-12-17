@@ -16,6 +16,7 @@
     "logo_dark": "logo_cisco_dark.svg",
     "license": "Copyright (c) 2014-2021 Splunk Inc.",
     "python_version": "3",
+    "fips_compliant":true,
     "latest_tested_version": [
         "Cisco ISE version 3.0.0.458, 9th Dec 2021"
     ],
