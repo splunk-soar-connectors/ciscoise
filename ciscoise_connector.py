@@ -47,7 +47,7 @@ class CiscoISEConnector(BaseConnector):
     ACTION_ID_APPLY_POLICY = "apply_policy"
     ACTION_ID_CLEAR_POLICY = "clear_policy"
     ACTION_ID_LIST_POLICIES = "list_policies"
-    ACTION_ID_CREATE_POLICY = "create_policy"
+    ACTION_ID_CREATE_POLICY = "add_policy"
     ACTION_ID_DELETE_POLICY = "delete_policy"
 
     def __init__(self):
@@ -782,7 +782,7 @@ class CiscoISEConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Policy deleted")
 
-    def _create_policy(self, param):
+    def _add_policy(self, param):
 
         ret_val = phantom.APP_SUCCESS
 
@@ -897,7 +897,7 @@ class CiscoISEConnector(BaseConnector):
         elif action == self.ACTION_ID_LIST_POLICIES:
             result = self._list_policies(param)
         elif action == self.ACTION_ID_CREATE_POLICY:
-            result = self._create_policy(param)
+            result = self._add_policy(param)
         elif action == self.ACTION_ID_DELETE_POLICY:
             result = self._delete_policy(param)
 

@@ -1935,10 +1935,10 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "create policy",
-            "description": "Create Policy",
+            "action": "add policy",
+            "description": "Add Policy",
             "type": "investigate",
-            "identifier": "create_policy",
+            "identifier": "add_policy",
             "read_only": true,
             "parameters": {
                 "name": {
