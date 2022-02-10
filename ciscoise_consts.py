@@ -34,6 +34,7 @@ ERS_ENDPOINT_REST = ":9060/ers/config/endpoint"
 ERS_RESOURCE_REST = ":9060/ers/config/{resource}"
 ERS_ENDPOINT_ANC_APPLY = ":9060/ers/config/ancendpoint/apply"
 ERS_ENDPOINT_ANC_CLEAR = ":9060/ers/config/ancendpoint/clear"
+ERS_POLICIES = ":9060/ers/config/ancpolicy"
 
 # Error/Success
 CISCOISE_ERR_TEST_CONNECTIVITY_FAILED = "Test connectivity failed"

@@ -30,7 +30,6 @@ from ciscoise_consts import *
 
 
 class CiscoISEConnector(BaseConnector):
-
     # actions supported by this script
     ACTION_ID_LIST_SESSIONS = "list_sessions"
     ACTION_ID_TERMINATE_SESSION = "terminate_session"
@@ -47,6 +46,9 @@ class CiscoISEConnector(BaseConnector):
     ACTION_ID_UPDATE_RESOURCE = "update_resource"
     ACTION_ID_APPLY_POLICY = "apply_policy"
     ACTION_ID_CLEAR_POLICY = "clear_policy"
+    ACTION_ID_LIST_POLICIES = "list_policies"
+    ACTION_ID_CREATE_POLICY = "create_policy"
+    ACTION_ID_DELETE_POLICY = "delete_policy"
 
     def __init__(self):
 
@@ -107,7 +109,13 @@ class CiscoISEConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data
         try:
             headers = {"Content-Type": "application/json", "ACCEPT": "application/json"}
-            resp = request_func(url, json=data, verify=verify, headers=headers, auth=self._ers_auth)
+            resp = request_func(  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
+                url,
+                json=data,
+                verify=verify,
+                headers=headers,
+                auth=self._ers_auth
+            )
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data
 
@@ -727,6 +735,94 @@ class CiscoISEConnector(BaseConnector):
         action_result.add_data(ret_data)
         return action_result.set_status(phantom.APP_SUCCESS, "Policy cleared")
 
+    def _list_policies(self, param):
+
+        ret_val = phantom.APP_SUCCESS
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_data = None
+        endpoint = ERS_POLICIES
+
+        ret_val, ret_data = self._call_ers_api(endpoint, action_result)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        total = ret_data["SearchResult"]["total"]
+        policies = ret_data["SearchResult"]["resources"]
+
+        for policy in policies:
+            endpoint = f"{ERS_POLICIES}/{policy['id']}"
+
+            ret_val, ret_data = self._call_ers_api(endpoint, action_result)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            data = ret_data["ErsAncPolicy"]
+            data['actions'] = ', '.join(data['actions'])
+            action_result.add_data(data)
+
+        action_result.update_summary({"policies_found": total})
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _delete_policy(self, param):
+
+        ret_val = phantom.APP_SUCCESS
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_data = None
+        endpoint = f"{ERS_POLICIES}/{param['policy_id']}"
+
+        ret_val, ret_data = self._call_ers_api(endpoint, action_result, method="delete")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Policy deleted")
+
+    def _create_policy(self, param):
+
+        ret_val = phantom.APP_SUCCESS
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        name = param["name"]
+        quarantine = param.get("quarantine", False)
+        port_bounce = param.get("port_bounce", False)
+        re_authenticate = param.get("re_authenticate", False)
+        shutdown = param.get("shutdown", False)
+
+        if not (quarantine or port_bounce or re_authenticate or shutdown):
+            return action_result.set_status(phantom.APP_ERROR, "Atleast one action type is required")
+
+        body = {
+            "ErsAncPolicy": {
+                "name": name,
+                "actions": []
+            }
+        }
+
+        if quarantine:
+            body["ErsAncPolicy"]["actions"].append("QUARANTINE")
+        if port_bounce:
+            body["ErsAncPolicy"]["actions"].append("PORTBOUNCE")
+        if re_authenticate:
+            body["ErsAncPolicy"]["actions"].append("RE_AUTHENTICATE")
+        if shutdown:
+            body["ErsAncPolicy"]["actions"].append("SHUTDOWN")
+
+        ret_data = None
+        endpoint = f"{ERS_POLICIES}"
+
+        ret_val, ret_data = self._call_ers_api(endpoint, action_result, method="post", data=body)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS, 'Policy created')
+
     def _test_connectivity_to_device(self, base_url, verify=True):
         try:
             rest_endpoint = "{0}{1}".format(base_url, ACTIVE_LIST_REST)
@@ -798,6 +894,12 @@ class CiscoISEConnector(BaseConnector):
             result = self._apply_policy(param)
         elif action == self.ACTION_ID_CLEAR_POLICY:
             result = self._clear_policy(param)
+        elif action == self.ACTION_ID_LIST_POLICIES:
+            result = self._list_policies(param)
+        elif action == self.ACTION_ID_CREATE_POLICY:
+            result = self._create_policy(param)
+        elif action == self.ACTION_ID_DELETE_POLICY:
+            result = self._delete_policy(param)
 
         return result
 
