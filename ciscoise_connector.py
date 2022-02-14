@@ -808,8 +808,6 @@ class CiscoISEConnector(BaseConnector):
             body["ErsAncPolicy"]["actions"].append("QUARANTINE")
         if port_bounce:
             body["ErsAncPolicy"]["actions"].append("PORTBOUNCE")
-        if re_authenticate:
-            body["ErsAncPolicy"]["actions"].append("RE_AUTHENTICATE")
         if shutdown:
             body["ErsAncPolicy"]["actions"].append("SHUTDOWN")
 

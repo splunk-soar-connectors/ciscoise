@@ -1964,16 +1964,10 @@
                     "order": 3,
                     "default": false
                 },
-                "re_authenticate": {
-                    "data_type": "boolean",
-                    "description": "RE_AUTHENTICATE action type",
-                    "order": 4,
-                    "default": false
-                },
                 "quarantine": {
                     "data_type": "boolean",
                     "description": "QUARANTINE action type",
-                    "order": 5,
+                    "order": 4,
                     "default": true
                 }
             },
@@ -2008,13 +2002,6 @@
                 },
                 {
                     "data_path": "action_result.parameter.quarantine",
-                    "data_type": "boolean",
-                    "example_values": [
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.re_authenticate",
                     "data_type": "boolean",
                     "example_values": [
                         false
