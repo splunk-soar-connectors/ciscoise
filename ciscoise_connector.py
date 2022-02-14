@@ -34,8 +34,6 @@ class CiscoISEConnector(BaseConnector):
     ACTION_ID_LIST_SESSIONS = "list_sessions"
     ACTION_ID_TERMINATE_SESSION = "terminate_session"
     ACTION_ID_LOGOFF_SYSTEM = "logoff_system"
-    ACTION_ID_QUARANTINE_SYSTEM = "quarantine_device"
-    ACTION_ID_UNQUARANTINE_SYSTEM = "unquarantine_device"
     ACTION_ID_LIST_ENDPOINTS = "list_endpoints"
     ACTION_ID_GET_ENDPOINT = "get_endpoint"
     ACTION_ID_UPDATE_ENDPOINT = "update_endpoint"
@@ -202,13 +200,9 @@ class CiscoISEConnector(BaseConnector):
 
     def _list_sessions(self, param):
 
-        ret_val = phantom.APP_SUCCESS
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         summary = action_result.update_summary({CISCOISE_JSON_TOTAL_SESSIONS: 0})
-
-        ret_data = None
 
         ret_val, ret_data = self._call_rest_api(ACTIVE_LIST_REST, action_result)
 
@@ -254,11 +248,8 @@ class CiscoISEConnector(BaseConnector):
 
     def _list_endpoints(self, param):
 
-        ret_val = phantom.APP_SUCCESS
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ret_data = None
         endpoint = ERS_ENDPOINT_REST
 
         mac_filter = param.get("mac_address", None)
@@ -280,11 +271,8 @@ class CiscoISEConnector(BaseConnector):
 
     def _get_endpoint(self, param):
 
-        ret_val = phantom.APP_SUCCESS
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ret_data = None
         endpoint = ERS_ENDPOINT_REST + "/" + param["endpoint_id"]
 
         ret_val, ret_data = self._call_ers_api(endpoint, action_result)
@@ -333,117 +321,9 @@ class CiscoISEConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Endpoint Updated")
 
-    def _quarantine_system(self, param):
-
-        ret_val = phantom.APP_SUCCESS
-
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        ret_data = None
-
-        mac_ip_address = param[phantom.APP_JSON_IP_MACADDRESS]
-
-        if phantom.is_mac(mac_ip_address):
-            endpoint = "{0}/{1}".format(QUARANTINE_MAC_REST, mac_ip_address)
-        elif phantom.is_ip(mac_ip_address):
-            endpoint = "{0}/{1}".format(QUARANTINE_IP_REST, mac_ip_address)
-        else:
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_MAC_AND_IP_NOT_SPECIFIED)
-
-        ret_val, ret_data = self._call_rest_api(endpoint, action_result, QUARANTINE_RESP_SCHEMA)
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        action_result.add_data(ret_data)
-
-        # Can safely access the members of ret_data, since they have been parsed as by the rules of
-        # QUARANTINE_RESP_SCHEMA
-        status = ret_data["EPS_RESULT"]["status"]
-
-        if status == "Failure":
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                CISCOISE_ERR_ACTION_FAILED,
-                error_code=ret_data["EPS_RESULT"]["errorCode"]
-            )
-
-        # In cases where the radius authentication failed, the status is STILL set to success,
-        # but failureType and failureMessage keys are added to the ret_data, so need to check for those
-        failure_type = phantom.get_value(ret_data["EPS_RESULT"], "failureType")
-        failure_msg = phantom.get_value(ret_data["EPS_RESULT"], "failureMessage")
-
-        if (failure_type is not None) or (failure_msg is not None):
-            action_result.set_status(
-                phantom.APP_ERROR, CISCOISE_ERR_ACTION_FAILED, error_code=ret_data["EPS_RESULT"]["errorCode"]
-            )
-            if failure_type is not None:
-                action_result.append_to_message(failure_type)
-            if failure_msg is not None:
-                action_result.append_to_message(failure_msg)
-            return action_result.get_status()
-
-        return action_result.set_status(phantom.APP_SUCCESS, CISCOISE_SUCC_SYSTEM_QUARANTINED)
-
-    def _unquarantine_system(self, param):
-
-        ret_val = phantom.APP_SUCCESS
-
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        ret_data = None
-
-        mac_ip_address = param[phantom.APP_JSON_IP_MACADDRESS]
-
-        if phantom.is_mac(mac_ip_address):
-            endpoint = "{0}/{1}".format(UNQUARANTINE_MAC_REST, mac_ip_address)
-        elif phantom.is_ip(mac_ip_address):
-            endpoint = "{0}/{1}".format(UNQUARANTINE_IP_REST, mac_ip_address)
-        else:
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_MAC_AND_IP_NOT_SPECIFIED)
-
-        ret_val, ret_data = self._call_rest_api(endpoint, action_result, QUARANTINE_RESP_SCHEMA)
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        action_result.add_data(ret_data)
-
-        status = ret_data["EPS_RESULT"]["status"]
-
-        if status == "Failure":
-            return action_result.set_status(
-                phantom.APP_ERROR, CISCOISE_ERR_ACTION_FAILED, error_code=ret_data["EPS_RESULT"]["errorCode"]
-            )
-
-        # In cases where the radius authentication failed, the status is STILL set to success,
-        # but failureType and failureMessage keys are added to the ret_data, so need to check for those
-        failure_type = phantom.get_value(ret_data["EPS_RESULT"], "failureType")
-        failure_msg = phantom.get_value(ret_data["EPS_RESULT"], "failureMessage")
-
-        if (failure_type is not None) or (failure_msg is not None):
-            action_result.set_status(
-                phantom.APP_ERROR,
-                CISCOISE_ERR_ACTION_FAILED,
-                error_code=ret_data["EPS_RESULT"]["errorCode"],
-            )
-            if failure_type is not None:
-                action_result.append_to_message(failure_type)
-            if failure_msg is not None:
-                action_result.append_to_message(failure_msg)
-            return action_result.get_status()
-
-        return action_result.set_status(
-            phantom.APP_SUCCESS, CISCOISE_SUCC_SYSTEM_UNQUARANTINED
-        )
-
     def _logoff_system(self, param):
 
-        ret_val = phantom.APP_SUCCESS
-
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        ret_data = None
 
         server = param[CISCOISE_JSON_SERVER]
         mac_address = param[CISCOISE_JSON_MACADDR]
@@ -475,11 +355,7 @@ class CiscoISEConnector(BaseConnector):
 
     def _terminate_session(self, param):
 
-        ret_val = phantom.APP_SUCCESS
-
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        ret_data = None
 
         mac_address = param[phantom.APP_JSON_MACADDRESS]
         port = 2  # 0 is default, 1 is bounce, 2 is shutdown
@@ -737,11 +613,8 @@ class CiscoISEConnector(BaseConnector):
 
     def _list_policies(self, param):
 
-        ret_val = phantom.APP_SUCCESS
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ret_data = None
         endpoint = ERS_POLICIES
 
         ret_val, ret_data = self._call_ers_api(endpoint, action_result)
@@ -768,11 +641,8 @@ class CiscoISEConnector(BaseConnector):
 
     def _delete_policy(self, param):
 
-        ret_val = phantom.APP_SUCCESS
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ret_data = None
         endpoint = f"{ERS_POLICIES}/{param['policy_id']}"
 
         ret_val, ret_data = self._call_ers_api(endpoint, action_result, method="delete")
@@ -783,8 +653,6 @@ class CiscoISEConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Policy deleted")
 
     def _add_policy(self, param):
-
-        ret_val = phantom.APP_SUCCESS
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -811,7 +679,6 @@ class CiscoISEConnector(BaseConnector):
         if shutdown:
             body["ErsAncPolicy"]["actions"].append("SHUTDOWN")
 
-        ret_data = None
         endpoint = f"{ERS_POLICIES}"
 
         ret_val, ret_data = self._call_ers_api(endpoint, action_result, method="post", data=body)
@@ -868,10 +735,6 @@ class CiscoISEConnector(BaseConnector):
             result = self._terminate_session(param)
         elif action == self.ACTION_ID_LOGOFF_SYSTEM:
             result = self._logoff_system(param)
-        elif action == self.ACTION_ID_QUARANTINE_SYSTEM:
-            result = self._quarantine_system(param)
-        elif action == self.ACTION_ID_UNQUARANTINE_SYSTEM:
-            result = self._unquarantine_system(param)
         elif action == self.ACTION_ID_LIST_ENDPOINTS:
             result = self._list_endpoints(param)
         elif action == self.ACTION_ID_GET_ENDPOINT:
