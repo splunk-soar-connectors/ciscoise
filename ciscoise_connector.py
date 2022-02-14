@@ -91,7 +91,8 @@ class CiscoISEConnector(BaseConnector):
         return make_another_call
 
     def _call_ers_api(self, endpoint, action_result, data=None, allow_unknown=True, method="get", try_ha_device=False):
-        if self._ers_auth is None:
+        auth_method = self._ers_auth or self._auth
+        if not auth_method:
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERS_CRED_MISSING), None
         url = "{0}{1}".format(self._base_url, endpoint)
         if try_ha_device:
@@ -112,7 +113,7 @@ class CiscoISEConnector(BaseConnector):
                 json=data,
                 verify=verify,
                 headers=headers,
-                auth=self._ers_auth
+                auth=auth_method
             )
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data
@@ -657,12 +658,6 @@ class CiscoISEConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         name = param["name"]
-        quarantine = param.get("quarantine", False)
-        port_bounce = param.get("port_bounce", False)
-        shutdown = param.get("shutdown", False)
-
-        if not (quarantine or port_bounce or shutdown):
-            return action_result.set_status(phantom.APP_ERROR, "Atleast one action type is required")
 
         body = {
             "ErsAncPolicy": {
@@ -671,12 +666,15 @@ class CiscoISEConnector(BaseConnector):
             }
         }
 
-        if quarantine:
+        if param.get("quarantine", False):
             body["ErsAncPolicy"]["actions"].append("QUARANTINE")
-        if port_bounce:
+        if param.get("port_bounce", False):
             body["ErsAncPolicy"]["actions"].append("PORTBOUNCE")
-        if shutdown:
+        if param.get("shutdown", False):
             body["ErsAncPolicy"]["actions"].append("SHUTDOWN")
+
+        if not len(body["ErsAncPolicy"]["actions"]):
+            return action_result.set_status(phantom.APP_ERROR, "Atleast one action type is required")
 
         endpoint = f"{ERS_POLICIES}"
 
