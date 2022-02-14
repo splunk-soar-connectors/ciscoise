@@ -659,10 +659,9 @@ class CiscoISEConnector(BaseConnector):
         name = param["name"]
         quarantine = param.get("quarantine", False)
         port_bounce = param.get("port_bounce", False)
-        re_authenticate = param.get("re_authenticate", False)
         shutdown = param.get("shutdown", False)
 
-        if not (quarantine or port_bounce or re_authenticate or shutdown):
+        if not (quarantine or port_bounce or shutdown):
             return action_result.set_status(phantom.APP_ERROR, "Atleast one action type is required")
 
         body = {
