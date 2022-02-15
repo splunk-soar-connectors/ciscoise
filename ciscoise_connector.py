@@ -76,6 +76,32 @@ class CiscoISEConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
+    def _validate_integers(self, action_result, parameter, key, allow_zero=False):
+        """ This method is to check if the provided input parameter value
+        is a non-zero positive integer and returns the integer value of the parameter itself.
+        :param action_result: Action result or BaseConnector object
+        :param parameter: input parameter
+        :return: integer value of the parameter or None in case of failure
+        """
+
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_INVALID_PARAM.format(key)), None
+                parameter = int(parameter)
+
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_INVALID_PARAM.format(key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR,
+                                                "Please provide a valid non-negative integer value in the {} parameter".format(key)), None
+            if not allow_zero and parameter == 0:
+                return action_result.set_status(phantom.APP_ERROR,
+                                                "Please provide non-zero positive integer in {}".format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
     def _ha_device_wrapper(self, func):
         def make_another_call(*args, **kwargs):
             self.debug_print("Making call to primary device")
@@ -253,7 +279,7 @@ class CiscoISEConnector(BaseConnector):
 
         endpoint = ERS_ENDPOINT_REST
 
-        mac_filter = param.get("mac_address", None)
+        mac_filter = param.get("mac_address")
         if mac_filter is not None:
             endpoint = ERS_ENDPOINT_REST + "?filter=mac.EQ." + mac_filter
 
@@ -431,17 +457,12 @@ class CiscoISEConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         resource = self._map_resource_type(param["resource"], action_result)
-        max_result = param.get("max_results")
+        ret_val, max_result = self._validate_integers(action_result, param.get("max_results"), 'max_result')
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         endpoint = ERS_RESOURCE_REST.format(resource=resource)
-
-        try:
-            if max_result:
-                max_result = int(max_result)
-        except ValueError as ex:  # noqa: F841
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_INVALID_PARAM.format(param="max_result"))
-
-        if max_result is not None and max_result <= 0:
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_INVALID_PARAM.format(param="max_result"))
 
         resources = self._paginator(endpoint, action_result, limit=max_result)
 
