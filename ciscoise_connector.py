@@ -678,24 +678,12 @@ class CiscoISEConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        name = param["name"]
-
         body = {
             "ErsAncPolicy": {
-                "name": name,
-                "actions": []
+                "name": param["name"],
+                "actions": [param["action_type"]]
             }
         }
-
-        if param.get("quarantine", False):
-            body["ErsAncPolicy"]["actions"].append("QUARANTINE")
-        if param.get("port_bounce", False):
-            body["ErsAncPolicy"]["actions"].append("PORTBOUNCE")
-        if param.get("shutdown", False):
-            body["ErsAncPolicy"]["actions"].append("SHUTDOWN")
-
-        if not len(body["ErsAncPolicy"]["actions"]):
-            return action_result.set_status(phantom.APP_ERROR, "Atleast one action type is required")
 
         endpoint = f"{ERS_POLICIES}"
 

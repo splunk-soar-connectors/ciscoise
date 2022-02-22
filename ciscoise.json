@@ -1746,27 +1746,17 @@
                     "default": false,
                     "required": true
                 },
-                "ph": {
-                    "data_type": "ph",
-                    "order": 1
-                },
-                "port_bounce": {
-                    "data_type": "boolean",
-                    "description": "PORT_BOUNCE action type",
-                    "order": 2,
-                    "default": false
-                },
-                "shutdown": {
-                    "data_type": "boolean",
-                    "description": "SHUTDOWN action type",
-                    "order": 3,
-                    "default": false
-                },
-                "quarantine": {
-                    "data_type": "boolean",
-                    "description": "QUARANTINE action type",
-                    "order": 4,
-                    "default": true
+                "action_type": {
+                    "data_type": "string",
+                    "description": "Policy action type",
+                    "order": 1,
+                    "value_list": [
+                        "QUARANTINE",
+                        "SHUTDOWN",
+                        "PORTBOUNCE"
+                    ],
+                    "required": true,
+                    "default": "QUARANTINE"
                 }
             },
             "render": {
@@ -1792,24 +1782,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.port_bounce",
+                    "data_path": "action_result.parameter.action_type",
                     "data_type": "boolean",
                     "example_values": [
                         true
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.quarantine",
-                    "data_type": "boolean",
-                    "example_values": [
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.shutdown",
-                    "data_type": "boolean",
-                    "example_values": [
-                        false
                     ]
                 },
                 {
