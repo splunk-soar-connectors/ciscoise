@@ -18,7 +18,7 @@
     "python_version": "3",
     "fips_compliant": true,
     "latest_tested_version": [
-        "Cisco ISE version 3.0.0.458, 15th Feb 2022"
+        "Cisco ISE version 3.0.0.458, 22th Feb 2022"
     ],
     "configuration": {
         "device": {
@@ -1775,17 +1775,17 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.action_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "QUARANTINE"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.name",
                     "data_type": "string",
                     "example_values": [
                         "policy_name"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.action_type",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true
                     ]
                 },
                 {
