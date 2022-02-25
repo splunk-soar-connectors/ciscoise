@@ -5,25 +5,33 @@
   without a valid written license from Splunk Inc. is PROHIBITED.
 -->
 
-<h2>Getting ERS credentials</h2>
-<ol>
-    <li>
-        <h3>Enable Ers</h3>
-        <p>ERS uses on HTTPS port 9060 which is by default closed. Clients trying to access this port without enabling ERS first, will face a timeout from the server.
-            Therefore, the first requirement is to enable ERS from the Cisco ISE admin UI. Go to <b>Administration > Settings > ERS Settings</b> and enable the Enable ERS
-            for Read/Write radio button</p>
-    </li>
-    <li>
-        <h3>Creating ERS Admin</h3>
-        <p>Go to <b>Administration > Settings > ERS Settings</b> and then from the panel on the left select <b>Admin Users</b> under administrators.
-            Now add an account by clicking <b>Add > Create an admin user</b>. Then enter name and password and select <b>ERS Admin</b> in Admin Group and then press save.</p>
-    </li>
-</ol>
+<h2>Setting up authentication</h2>
+<ul>
+    <ul>
+        <li>
+            <p>ERS uses on HTTPS port 9060 which is by default closed. Clients trying to access this port without enabling ERS first, will face a timeout from the server.
+                Therefore, the first requirement is to enable ERS from the Cisco ISE admin UI. Go to <b>Administration > Settings > ERS Settings</b> and enable the Enable ERS
+                for Read/Write radio button</p>
+        </li>
+        <li>
+            <p>Go to <b>Administration > System > Admin Users</b>. Now add an account by clicking <b>Add > Create an admin user</b>. Then enter name and password and select <b>ERS Admin</b> in Admin Group and then press save.</p>
+        </li>
+    </ul>
+    <ul>
+        <li>
+            <p>Go to <b>Administration > System > Admin Users</b>. Now add an account by clicking <b>Add > Create an admin user</b>. Then enter name and password and select <b>MnT Admin</b> in Admin Group and then press save.</p>
+        </li>
+    </ul>
+    <ul>
+        <li>Also you can add both MnT Admin and ERS Admin Access group to a user and use that credentials.</li>
+    </ul>
+</ul>
 <h2>Note</h2>
 <ol>
     <li>This app expects user with MnT Admin Access group in username/password fields and user in ERS Admin group in ERS username/password fields or user with
         both MnT Admin or ERS Admin access group in username/password field</li>
     <li>App will use username/password if ERS username/password is not provided</li>
+    <li>Actions quarantine system and unquarantine system are deprecated in this versions. Users are advised to use apply policy and clear policy actions to achieve same objective</li>
     <li>ERS credentials are required for actions list endpoints, get device info, update device info, get resources, delete resource, create resource, update resource,
         apply policy and create policy</li>
     <li>An ISE node can assume any or all of the following personas: Administration, Policy Service, and Monitoring. For detailed info:

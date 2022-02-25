@@ -1632,7 +1632,7 @@
         },
         {
             "action": "list policies",
-            "description": "Lists all the policies available",
+            "description": "Lists all the ANC policies available",
             "type": "investigate",
             "identifier": "list_policies",
             "read_only": true,
@@ -1665,7 +1665,7 @@
                     "example_values": [
                         "policy_name"
                     ],
-                    "column_name": "Policy ID",
+                    "column_name": "Policy Name",
                     "column_order": 0,
                     "contains": [
                         "ise policy id"
@@ -1734,7 +1734,7 @@
         },
         {
             "action": "add policy",
-            "description": "Add Policy",
+            "description": "Add a new ANC Policy",
             "type": "investigate",
             "identifier": "add_policy",
             "read_only": true,
@@ -1829,8 +1829,8 @@
             "identifier": "delete_policy",
             "read_only": true,
             "parameters": {
-                "policy_id": {
-                    "description": "Policy ID",
+                "policy_name": {
+                    "description": "Policy Name",
                     "data_type": "string",
                     "order": 0,
                     "required": true,
