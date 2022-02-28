@@ -131,6 +131,7 @@ class CiscoISEConnector(BaseConnector):
         try:
             request_func = getattr(requests, method)
         except AttributeError as e:
+            self.debug_print("Exception occurred: {}".format(e))
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data
         try:
             headers = {"Content-Type": "application/json", "ACCEPT": "application/json"}
@@ -142,6 +143,7 @@ class CiscoISEConnector(BaseConnector):
                 auth=auth_method
             )
         except Exception as e:
+            self.debug_print("Exception occurred: {}".format(e))
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data
 
         if not (200 <= resp.status_code < 399):
@@ -187,6 +189,7 @@ class CiscoISEConnector(BaseConnector):
                 verify=verify,
                 auth=self._auth)
         except Exception as e:
+            self.debug_print("Exception occurred: {}".format(e))
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data
 
         if resp.status_code != 200:
@@ -206,6 +209,7 @@ class CiscoISEConnector(BaseConnector):
         try:
             response_dict = xmltodict.parse(xml)
         except Exception as e:
+            self.debug_print("Exception occurred: {}".format(e))
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_UNABLE_TO_PARSE_REPLY, e), ret_data
 
         ret_data = response_dict

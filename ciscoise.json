@@ -1735,9 +1735,9 @@
         {
             "action": "add policy",
             "description": "Add a new ANC Policy",
-            "type": "investigate",
+            "type": "generic",
             "identifier": "add_policy",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "name": {
                     "data_type": "string",
@@ -1825,9 +1825,9 @@
         {
             "action": "delete policy",
             "description": "Delete a policy",
-            "type": "investigate",
+            "type": "generic",
             "identifier": "delete_policy",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "policy_name": {
                     "description": "Policy Name",
@@ -1856,7 +1856,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.policy_id",
+                    "data_path": "action_result.parameter.policy_name",
                     "data_type": "string",
                     "contains": [
                         "ise policy id"
