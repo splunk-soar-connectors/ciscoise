@@ -669,7 +669,7 @@ class CiscoISEConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = f"{ERS_POLICIES}/{param['policy_id']}"
+        endpoint = f"{ERS_POLICIES}/{param['policy_name']}"
 
         ret_val, ret_data = self._call_ers_api(endpoint, action_result, method="delete")
 
