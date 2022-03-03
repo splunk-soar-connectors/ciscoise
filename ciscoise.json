@@ -5,20 +5,20 @@
     "publisher": "Splunk",
     "type": "network security",
     "main_module": "ciscoise_connector.py",
-    "app_version": "2.0.6",
+    "app_version": "3.0.0",
     "utctime_updated": "2022-01-07T20:54:18.000000Z",
     "package_name": "phantom_ciscoise",
     "product_vendor": "Cisco Systems",
     "product_name": "Cisco ISE",
     "product_version_regex": "/([2].[67])|([3].[01])/",
-    "min_phantom_version": "5.0.0",
+    "min_phantom_version": "5.1.0",
     "logo": "logo_cisco.svg",
     "logo_dark": "logo_cisco_dark.svg",
-    "license": "Copyright (c) 2014-2021 Splunk Inc.",
+    "license": "Copyright (c) 2014-2022 Splunk Inc.",
     "python_version": "3",
     "fips_compliant": true,
     "latest_tested_version": [
-        "Cisco ISE version 3.0.0.458, 9th Dec 2021"
+        "Cisco ISE version 3.0.0.458, 22th Feb 2022"
     ],
     "configuration": {
         "device": {
@@ -668,208 +668,6 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "quarantine device",
-            "description": "Quarantine the device",
-            "type": "contain",
-            "identifier": "quarantine_device",
-            "read_only": false,
-            "parameters": {
-                "ip_macaddress": {
-                    "description": "MAC or IP address of device to quarantine",
-                    "data_type": "string",
-                    "order": 0,
-                    "contains": [
-                        "mac address",
-                        "ip"
-                    ],
-                    "primary": true,
-                    "required": true
-                }
-            },
-            "undo": "unquarantine device",
-            "render": {
-                "width": 12,
-                "title": "Quarantine Device",
-                "type": "table",
-                "height": 5
-            },
-            "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.ip_macaddress",
-                    "data_type": "string",
-                    "column_name": "Device MAC/IP",
-                    "example_values": [
-                        "11:11:11:11:11:11"
-                    ],
-                    "contains": [
-                        "mac address",
-                        "ip"
-                    ],
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.EPS_RESULT.errorCode",
-                    "data_type": "string",
-                    "example_values": [
-                        "0"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.EPS_RESULT.operationID",
-                    "data_type": "string",
-                    "example_value": [
-                        "0"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.EPS_RESULT.requestID",
-                    "data_type": "string",
-                    "example_value": [
-                        "-1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.EPS_RESULT.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "Success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "column_name": "Message",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
-                }
-            ],
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "unquarantine device",
-            "description": "Unquarantine the device",
-            "type": "correct",
-            "identifier": "unquarantine_device",
-            "read_only": false,
-            "undo": "quarantine device",
-            "parameters": {
-                "ip_macaddress": {
-                    "description": "MAC or IP address of device to unquarantine",
-                    "data_type": "string",
-                    "order": 0,
-                    "contains": [
-                        "mac address",
-                        "ip"
-                    ],
-                    "primary": true,
-                    "required": true
-                }
-            },
-            "render": {
-                "width": 12,
-                "title": "Unquarantine Device",
-                "type": "table",
-                "height": 5
-            },
-            "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.ip_macaddress",
-                    "data_type": "string",
-                    "column_name": "Device MAC/IP",
-                    "contains": [
-                        "mac address",
-                        "ip"
-                    ],
-                    "example_values": [
-                        "11:11:11:11:11:11"
-                    ],
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.EPS_RESULT.errorCode",
-                    "data_type": "string",
-                    "example_values": [
-                        "0"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.EPS_RESULT.operationID",
-                    "data_type": "string",
-                    "example_values": [
-                        "90"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.EPS_RESULT.requestID",
-                    "data_type": "string",
-                    "example_values": [
-                        "-1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.EPS_RESULT.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "Success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "column_name": "Message",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
-                }
-            ],
-            "versions": "EQ(*)"
-        },
-        {
             "action": "terminate session",
             "description": "Terminate sessions",
             "type": "contain",
@@ -1110,7 +908,8 @@
                     "order": 1,
                     "contains": [
                         "ise resource id"
-                    ]
+                    ],
+                    "primary": true
                 },
                 "key": {
                     "description": "Key",
@@ -1343,7 +1142,8 @@
                     "order": 1,
                     "contains": [
                         "ise resource id"
-                    ]
+                    ],
+                    "primary": true
                 }
             },
             "output": [
@@ -1538,7 +1338,8 @@
                     "order": 1,
                     "contains": [
                         "ise resource id"
-                    ]
+                    ],
+                    "primary": true
                 },
                 "key": {
                     "description": "Key of resource which needs to be updated",
@@ -1648,7 +1449,6 @@
                     "description": "Policy Name",
                     "data_type": "string",
                     "order": 0,
-                    "primary": false,
                     "required": true
                 },
                 "ip_mac_address": {
@@ -1671,6 +1471,14 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.ip_mac_address",
                     "data_type": "string",
                     "contains": [
@@ -1680,7 +1488,7 @@
                     "example_values": [
                         "11:11:11:11:11:11"
                     ],
-                    "column_name": "IP MAC address",
+                    "column_name": "IP MAC Address",
                     "column_order": 0
                 },
                 {
@@ -1693,15 +1501,6 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Policy applied"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 2
-                },
-                {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
@@ -1710,12 +1509,13 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
-                    ]
+                        "Policy applied"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 2
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1767,6 +1567,14 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.ip_mac_address",
                     "data_type": "string",
                     "contains": [
@@ -1776,7 +1584,7 @@
                     "example_values": [
                         "11:11:11:11:11:11"
                     ],
-                    "column_name": "IP MAC address",
+                    "column_name": "IP MAC Address",
                     "column_order": 0
                 },
                 {
@@ -1789,6 +1597,14 @@
                     "column_order": 1
                 },
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
@@ -1796,6 +1612,181 @@
                     ],
                     "column_name": "Status",
                     "column_order": 2
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list policies",
+            "description": "Lists all the ANC policies available",
+            "type": "investigate",
+            "identifier": "list_policies",
+            "read_only": true,
+            "parameters": {},
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Policies"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.actions",
+                    "data_type": "string",
+                    "example_value": "SHUTDOWN",
+                    "column_name": "Action Type",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "policy_name"
+                    ],
+                    "column_name": "Policy Name",
+                    "column_order": 0,
+                    "contains": [
+                        "ise policy id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.link.href",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://10.0.0.0:9060/ers/config/ancpolicy/policy_name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.link.rel",
+                    "data_type": "string",
+                    "example_values": [
+                        "self"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.link.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/json"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "policy_name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.policies_found",
+                    "data_type": "numeric",
+                    "example_value": 6
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Policies found: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add policy",
+            "description": "Add a new ANC Policy",
+            "type": "generic",
+            "identifier": "add_policy",
+            "read_only": false,
+            "parameters": {
+                "name": {
+                    "data_type": "string",
+                    "description": "Policy Name",
+                    "order": 0,
+                    "default": false,
+                    "required": true
+                },
+                "action_type": {
+                    "data_type": "string",
+                    "description": "Policy action type",
+                    "order": 1,
+                    "value_list": [
+                        "QUARANTINE",
+                        "SHUTDOWN",
+                        "PORTBOUNCE"
+                    ],
+                    "required": true,
+                    "default": "QUARANTINE"
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Results"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.action_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "QUARANTINE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "policy_name"
+                    ]
                 },
                 {
                     "data_path": "action_result.data",
@@ -1806,12 +1797,87 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Policy created"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete policy",
+            "description": "Delete a policy",
+            "type": "generic",
+            "identifier": "delete_policy",
+            "read_only": false,
+            "parameters": {
+                "policy_name": {
+                    "description": "Policy Name",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "contains": [
+                        "ise policy id"
+                    ],
+                    "primary": true
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Results"
+            },
+            "output": [
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
                         "success",
                         "failed"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.policy_name",
+                    "data_type": "string",
+                    "contains": [
+                        "ise policy id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Policy deleted"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1835,35 +1901,71 @@
         "wheel": [
             {
                 "module": "Cerberus",
-                "input_file": "wheels/Cerberus-1.3.4-py3-none-any.whl"
+                "input_file": "wheels/py3/Cerberus-1.3.4-py3-none-any.whl"
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/certifi-2021.10.8-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/certifi-2021.10.8-py2.py3-none-any.whl"
             },
             {
                 "module": "chardet",
-                "input_file": "wheels/chardet-3.0.4-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/chardet-3.0.4-py2.py3-none-any.whl"
             },
             {
                 "module": "idna",
-                "input_file": "wheels/idna-2.10-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/idna-2.10-py2.py3-none-any.whl"
             },
             {
                 "module": "requests",
-                "input_file": "wheels/requests-2.25.0-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/requests-2.25.0-py2.py3-none-any.whl"
             },
             {
                 "module": "setuptools",
-                "input_file": "wheels/setuptools-59.6.0-py3-none-any.whl"
+                "input_file": "wheels/py3/setuptools-59.6.0-py3-none-any.whl"
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/urllib3-1.26.7-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/urllib3-1.26.8-py2.py3-none-any.whl"
             },
             {
                 "module": "xmltodict",
-                "input_file": "wheels/xmltodict-0.12.0-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/xmltodict-0.12.0-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "pip39_dependencies": {
+        "wheel": [
+            {
+                "module": "Cerberus",
+                "input_file": "wheels/py3/Cerberus-1.3.4-py3-none-any.whl"
+            },
+            {
+                "module": "certifi",
+                "input_file": "wheels/shared/certifi-2021.10.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "chardet",
+                "input_file": "wheels/shared/chardet-3.0.4-py2.py3-none-any.whl"
+            },
+            {
+                "module": "idna",
+                "input_file": "wheels/shared/idna-2.10-py2.py3-none-any.whl"
+            },
+            {
+                "module": "requests",
+                "input_file": "wheels/shared/requests-2.25.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "setuptools",
+                "input_file": "wheels/py3/setuptools-60.8.2-py3-none-any.whl"
+            },
+            {
+                "module": "urllib3",
+                "input_file": "wheels/shared/urllib3-1.26.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "xmltodict",
+                "input_file": "wheels/shared/xmltodict-0.12.0-py2.py3-none-any.whl"
             }
         ]
     }
