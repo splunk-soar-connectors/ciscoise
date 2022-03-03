@@ -7,7 +7,7 @@
 
 <h2>Asset Configuration For Authentication</h2>
 <ul>
-    <li>ERS uses HTTPS port 9060 which is by default closed. Clients trying to access this port without enabling ERS first will face a timeout from the server. Therefore, the first requirement is to enable ERS from the Cisco ISE admin UI. Go to Administration > Settings > ERS Settings and enable the Enable ERS for Read/Write radio button</li>
+    <li>ERS uses HTTPS port 9060 which is closed by default. Clients trying to access this port without enabling ERS first will face a timeout from the server. Therefore, the first requirement is to enable ERS from the Cisco ISE admin UI. Go to Administration > Settings > ERS Settings and enable the Enable ERS for Read/Write radio button</li>
     <li>Go to Administration > System > Admin Users. Now add an account by clicking Add > Create an admin user. Then enter name and password and select ERS Admin in Admin Group and then press save.</li>
     <li>Go to Administration > System > Admin Users. Now add an account by clicking Add > Create an admin user. Then enter name and password and select MnT Admin in Admin Group and then press save.</li>
     <li>Configurations expect user with MnT Admin Access group in username/password fields and user in ERS Admin group in ERS username/password fields or user with both MnT Admin or ERS Admin access group in username/password field.</li>
@@ -15,8 +15,20 @@
 </ul>
 <h2>Note</h2>
 <ol>
-    <li>Actions quarantine system and unquarantine system are removed in the version X.X.X. Users are advised to use apply policy and clear policy actions to achieve the same objective</li>
-    <li>ERS credentials are required for actions list endpoints, get device info, update device info, get resources, delete resource, create resource, update resource, apply policy and create policy</li>
+    <li>The actions "quarantine system" and "unquarantine system" are removed in the version X.X.X. Users are advised to use "apply policy" and "clear policy" actions to achieve the same objective</li>
+    <li>ERS credentials are required for actions
+        <ul>
+            <li>list endpoints</li>
+            <li>get device info</li>
+            <li>update device info</li>
+            <li>get resources</li>
+            <li>delete resource</li>
+            <li>create resource</li>
+            <li>update resource</li>
+            <li>apply policy</li>
+            <li>create policy</li>
+        </ul>
+    </li>
     <li>An ISE node can assume any or all of the following personas: Administration, Policy Service, and Monitoring. For detailed info:
                 <a target="_blank" href="https://www.cisco.com/en/US/docs/security/ise/1.0/user_guide/ise10_dis_deploy.html#wp1123452">Types of nodes</a>
         <ul>
