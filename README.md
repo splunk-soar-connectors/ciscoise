@@ -2,16 +2,16 @@
 # Cisco ISE
 
 Publisher: Splunk  
-Connector Version: 2\.0\.5  
+Connector Version: 3\.0\.0  
 Product Vendor: Cisco Systems  
 Product Name: Cisco ISE  
 Product Version Supported (regex): "/\(\[2\]\.\[67\]\)\|\(\[3\]\.\[01\]\)/"  
-Minimum Product Version: 5\.0\.0  
+Minimum Product Version: 5\.1\.0  
 
 This app implements investigative and containment actions on a Cisco ISE device
 
-[comment]: # " File: readme.md"
-[comment]: # "  Copyright (c) 2014-2021 Splunk Inc."
+[comment]: # " File: README.md"
+[comment]: # "  Copyright (c) 2014-2022 Splunk Inc."
 [comment]: # ""
 [comment]: # "  SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part"
 [comment]: # "  without a valid written license from Splunk Inc. is PROHIBITED."
@@ -19,28 +19,39 @@ This app implements investigative and containment actions on a Cisco ISE device
 [comment]: # " pragma: allowlist secret "
 [comment]: # " pragma: allowlist secret "
 [comment]: # " pragma: allowlist secret "
-## Getting ERS credentials
+## Asset Configuration For Authentication
 
-1.  ### Enable Ers
-
-    ERS uses on HTTPS port 9060 which is by default closed. Clients trying to access this port
-    without enabling ERS first, will face a timeout from the server. Therefore, the first
-    requirement is to enable ERS from the Cisco ISE admin UI. Go to **Administration \> Settings \>
-    ERS Settings** and enable the Enable ERS for Read/Write radio button
-
-2.  ### Creating ERS Admin
-
-    Go to **Administration \> Settings \> ERS Settings** and then from the panel on the left select
-    **Admin Users** under administrators. Now add an account by clicking **Add \> Create an admin
-    user** . Then enter name and password and select **ERS Admin** in Admin Group and then press
+-   ERS uses HTTPS port 9060 which is closed by default. Clients trying to access this port without
+    enabling ERS first will face a timeout from the server. Therefore, the first requirement is to
+    enable ERS from the Cisco ISE admin UI. Go to Administration \> Settings \> ERS Settings and
+    enable the Enable ERS for Read/Write radio button
+-   Go to Administration \> System \> Admin Users. Now add an account by clicking Add \> Create an
+    admin user. Then enter name and password and select ERS Admin in Admin Group and then press
     save.
+-   Go to Administration \> System \> Admin Users. Now add an account by clicking Add \> Create an
+    admin user. Then enter name and password and select MnT Admin in Admin Group and then press
+    save.
+-   Configurations expect user with MnT Admin Access group in username/password fields and user in
+    ERS Admin group in ERS username/password fields or user with both MnT Admin or ERS Admin access
+    group in username/password field.
+-   Also, you can add both MnT Admin and ERS Admin Access groups to a user and use that credentials
+    in username/password. The App will use username/password if ERS username/password is not
+    provided
 
 ## Note
 
-1.  Quarantine device and Unquarantine device actions may not work properly sometimes. Apply policy
-    and Clear policy with policy type QUARANTINE are recommended to use
-2.  ERS credentials are required for actions list endpoints, get device info, update device info,
-    get resources, delete resource, create resource, update resource, apply policy and create policy
+1.  The actions "quarantine system" and "unquarantine system" are removed in the version X.X.X.
+    Users are advised to use "apply policy" and "clear policy" actions to achieve the same objective
+2.  ERS credentials are required for actions
+    -   list endpoints
+    -   get device info
+    -   update device info
+    -   get resources
+    -   delete resource
+    -   create resource
+    -   update resource
+    -   apply policy
+    -   create policy
 3.  An ISE node can assume any or all of the following personas: Administration, Policy Service, and
     Monitoring. For detailed info: [Types of
     nodes](https://www.cisco.com/en/US/docs/security/ise/1.0/user_guide/ise10_dis_deploy.html#wp1123452)
@@ -203,8 +214,6 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [get device info](#action-get-device-info) - Get information about a specific endpoint  
 [update device info](#action-update-device-info) - Update information or attributes for a specific endpoint  
 [list sessions](#action-list-sessions) - List the sessions currently available on the Monitoring node  
-[quarantine device](#action-quarantine-device) - Quarantine the device  
-[unquarantine device](#action-unquarantine-device) - Unquarantine the device  
 [terminate session](#action-terminate-session) - Terminate sessions  
 [list resources](#action-list-resources) - Lists all the resources configured on the system of a particular resource  
 [get resources](#action-get-resources) - Get the information about resource if resource\_id is provided\. Fetch the list of resources match with the key\-value filter  
@@ -213,6 +222,9 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [update resource](#action-update-resource) - Update a resource  
 [apply policy](#action-apply-policy) - Apply policy on selected Ip address or MAC address  
 [clear policy](#action-clear-policy) - Clear policy on selected Ip address or MAC address  
+[list policies](#action-list-policies) - Lists all the ANC policies available  
+[add policy](#action-add-policy) - Add a new ANC Policy  
+[delete policy](#action-delete-policy) - Delete a policy  
 
 ## action: 'test connectivity'
 Validate the asset configuration for connectivity\. This action logs into the device using a REST API call to check the connection and credentials
@@ -346,58 +358,6 @@ action\_result\.data\.\*\.server | string |  `ise server`
 action\_result\.data\.\*\.user\_name | string |  `user name` 
 action\_result\.summary | string | 
 action\_result\.summary\.sessions\_found | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
-
-## action: 'quarantine device'
-Quarantine the device
-
-Type: **contain**  
-Read only: **False**
-
-#### Action Parameters
-PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
---------- | -------- | ----------- | ---- | --------
-**ip\_macaddress** |  required  | MAC or IP address of device to quarantine | string |  `mac address`  `ip` 
-
-#### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.ip\_macaddress | string |  `mac address`  `ip` 
-action\_result\.data | string | 
-action\_result\.data\.\*\.EPS\_RESULT\.errorCode | string | 
-action\_result\.data\.\*\.EPS\_RESULT\.operationID | string | 
-action\_result\.data\.\*\.EPS\_RESULT\.requestID | string | 
-action\_result\.data\.\*\.EPS\_RESULT\.status | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
-
-## action: 'unquarantine device'
-Unquarantine the device
-
-Type: **correct**  
-Read only: **False**
-
-#### Action Parameters
-PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
---------- | -------- | ----------- | ---- | --------
-**ip\_macaddress** |  required  | MAC or IP address of device to unquarantine | string |  `mac address`  `ip` 
-
-#### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.ip\_macaddress | string |  `mac address`  `ip` 
-action\_result\.data | string | 
-action\_result\.data\.\*\.EPS\_RESULT\.errorCode | string | 
-action\_result\.data\.\*\.EPS\_RESULT\.operationID | string | 
-action\_result\.data\.\*\.EPS\_RESULT\.requestID | string | 
-action\_result\.data\.\*\.EPS\_RESULT\.status | string | 
-action\_result\.summary | string | 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
@@ -586,12 +546,12 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.ip\_mac\_address | string |  `mac address`  `ip` 
 action\_result\.parameter\.policy\_name | string | 
-action\_result\.message | string | 
 action\_result\.data | string | 
 action\_result\.summary | string | 
-action\_result\.status | string | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -610,11 +570,82 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.ip\_mac\_address | string |  `mac address`  `ip` 
 action\_result\.parameter\.policy\_name | string | 
-action\_result\.message | string | 
 action\_result\.data | string | 
 action\_result\.summary | string | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
+
+## action: 'list policies'
+Lists all the ANC policies available
+
+Type: **investigate**  
+Read only: **True**
+
+#### Action Parameters
+No parameters are required for this action
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS
+--------- | ---- | --------
 action\_result\.status | string | 
+action\_result\.data\.\*\.actions | string | 
+action\_result\.data\.\*\.id | string |  `ise policy id` 
+action\_result\.data\.\*\.link\.href | string | 
+action\_result\.data\.\*\.link\.rel | string | 
+action\_result\.data\.\*\.link\.type | string | 
+action\_result\.data\.\*\.name | string | 
+action\_result\.summary | string | 
+action\_result\.summary\.policies\_found | numeric | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
+
+## action: 'add policy'
+Add a new ANC Policy
+
+Type: **generic**  
+Read only: **False**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**name** |  required  | Policy Name | string | 
+**action\_type** |  required  | Policy action type | string | 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS
+--------- | ---- | --------
+action\_result\.status | string | 
+action\_result\.parameter\.action\_type | string | 
+action\_result\.parameter\.name | string | 
+action\_result\.data | string | 
+action\_result\.summary | string | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
+
+## action: 'delete policy'
+Delete a policy
+
+Type: **generic**  
+Read only: **False**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**policy\_name** |  required  | Policy Name | string |  `ise policy id` 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS
+--------- | ---- | --------
+action\_result\.status | string | 
+action\_result\.parameter\.policy\_name | string |  `ise policy id` 
+action\_result\.data | string | 
+action\_result\.summary | string | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric | 
