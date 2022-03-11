@@ -2,7 +2,7 @@
 # Cisco ISE
 
 Publisher: Splunk  
-Connector Version: 3\.0\.0  
+Connector Version: 3\.0\.1  
 Product Vendor: Cisco Systems  
 Product Name: Cisco ISE  
 Product Version Supported (regex): "/\(\[2\]\.\[67\]\)\|\(\[3\]\.\[01\]\)/"  
@@ -40,7 +40,7 @@ This app implements investigative and containment actions on a Cisco ISE device
 
 ## Note
 
-1.  The actions "quarantine system" and "unquarantine system" are removed in the version X.X.X.
+1.  The actions "quarantine system" and "unquarantine system" are removed in the version 3.0.0.
     Users are advised to use "apply policy" and "clear policy" actions to achieve the same objective
 2.  ERS credentials are required for actions
     -   list endpoints
