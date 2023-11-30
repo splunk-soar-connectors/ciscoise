@@ -6,7 +6,7 @@
     "type": "network security",
     "main_module": "ciscoise_connector.py",
     "app_version": "3.0.2",
-    "utctime_updated": "2022-03-11T04:16:56.000000Z",
+    "utctime_updated": "2023-03-11T04:16:56.000000Z",
     "package_name": "phantom_ciscoise",
     "product_vendor": "Cisco Systems",
     "product_name": "Cisco ISE",
@@ -14,11 +14,11 @@
     "min_phantom_version": "5.1.0",
     "logo": "logo_cisco.svg",
     "logo_dark": "logo_cisco_dark.svg",
-    "license": "Copyright (c) 2014-2022 Splunk Inc.",
+    "license": "Copyright (c) 2014-2023 Splunk Inc.",
     "python_version": "3",
     "fips_compliant": true,
     "latest_tested_version": [
-        "Cisco ISE version 3.0.0.458, 22th Feb 2022"
+        "Cisco ISE version 3.0.0.458, 22th Feb 2023"
     ],
     "configuration": {
         "device": {

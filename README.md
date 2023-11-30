@@ -11,7 +11,7 @@ Minimum Product Version: 5.1.0
 This app implements investigative and containment actions on a Cisco ISE device
 
 [comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2014-2022 Splunk Inc."
+[comment]: # "  Copyright (c) 2014-2023 Splunk Inc."
 [comment]: # ""
 [comment]: # "  SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part"
 [comment]: # "  without a valid written license from Splunk Inc. is PROHIBITED."
