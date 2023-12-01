@@ -6,7 +6,7 @@
     "type": "network security",
     "main_module": "ciscoise_connector.py",
     "app_version": "3.0.2",
-    "utctime_updated": "2023-03-11T04:16:56.000000Z",
+    "utctime_updated": "2022-03-11T04:16:56.000000Z",
     "package_name": "phantom_ciscoise",
     "product_vendor": "Cisco Systems",
     "product_name": "Cisco ISE",
@@ -18,7 +18,7 @@
     "python_version": "3",
     "fips_compliant": true,
     "latest_tested_version": [
-        "Cisco ISE version 3.0.0.458, 22th Feb 2023"
+        "Cisco ISE version 3.0.0.458, 22th Feb 2022"
     ],
     "configuration": {
         "device": {
