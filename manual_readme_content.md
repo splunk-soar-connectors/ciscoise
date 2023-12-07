@@ -82,7 +82,7 @@
                     "name": "guestUser",
                     "guestInfo": {
                       "userName": "DS3ewdsa34wWE",
-                      "password": "asdlkj324ew", 
+                      "password": "asdlkj324ew", # pragma: allowlist secret
                       "enabled": true
                     },
                     "guestAccessInfo": {
@@ -110,7 +110,7 @@
                     "enabled": true,
                     "password": "*******",
                     "changePassword": true,
-                    "passwordIDStore": "Internal Users" 
+                    "passwordIDStore": "Internal Users" # pragma: allowlist secret
                 }
             }
                 
@@ -140,7 +140,7 @@
                             "pushIdSupport": false
                         },
                         "tacacsSettings": {
-                            "sharedSecret": "aaa" 
+                            "sharedSecret": "aaa" # pragma: allowlist secret
                         },
                         "profileName": "Cisco",
                         "NetworkDeviceIPList": [
