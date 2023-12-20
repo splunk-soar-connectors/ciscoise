@@ -1,5 +1,5 @@
 [comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2014-2022 Splunk Inc."
+[comment]: # "  Copyright (c) 2014-2023 Splunk Inc."
 [comment]: # ""
 [comment]: # "  SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part"
 [comment]: # "  without a valid written license from Splunk Inc. is PROHIBITED."
@@ -82,7 +82,7 @@
                     "name": "guestUser",
                     "guestInfo": {
                       "userName": "DS3ewdsa34wWE",
-                      "password": "asdlkj324ew", 
+                      "password": "asdlkj324ew", # pragma: allowlist secret
                       "enabled": true
                     },
                     "guestAccessInfo": {
@@ -110,7 +110,7 @@
                     "enabled": true,
                     "password": "*******",
                     "changePassword": true,
-                    "passwordIDStore": "Internal Users" 
+                    "passwordIDStore": "Internal Users" # pragma: allowlist secret
                 }
             }
                 
@@ -140,7 +140,7 @@
                             "pushIdSupport": false
                         },
                         "tacacsSettings": {
-                            "sharedSecret": "aaa" 
+                            "sharedSecret": "aaa" # pragma: allowlist secret
                         },
                         "profileName": "Cisco",
                         "NetworkDeviceIPList": [
