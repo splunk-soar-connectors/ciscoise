@@ -2,16 +2,16 @@
 # Cisco ISE
 
 Publisher: Splunk  
-Connector Version: 3\.0\.1  
+Connector Version: 3.0.2  
 Product Vendor: Cisco Systems  
 Product Name: Cisco ISE  
-Product Version Supported (regex): "/\(\[2\]\.\[67\]\)\|\(\[3\]\.\[01\]\)/"  
-Minimum Product Version: 5\.1\.0  
+Product Version Supported (regex): "/([2].[67])|([3].[01])/"  
+Minimum Product Version: 5.1.0  
 
 This app implements investigative and containment actions on a Cisco ISE device
 
 [comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2014-2022 Splunk Inc."
+[comment]: # "  Copyright (c) 2014-2023 Splunk Inc."
 [comment]: # ""
 [comment]: # "  SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part"
 [comment]: # "  without a valid written license from Splunk Inc. is PROHIBITED."
@@ -94,7 +94,7 @@ This app implements investigative and containment actions on a Cisco ISE device
                     "name": "guestUser",
                     "guestInfo": {
                       "userName": "DS3ewdsa34wWE",
-                      "password": "asdlkj324ew", 
+                      "password": "asdlkj324ew", # pragma: allowlist secret
                       "enabled": true
                     },
                     "guestAccessInfo": {
@@ -122,7 +122,7 @@ This app implements investigative and containment actions on a Cisco ISE device
                     "enabled": true,
                     "password": "*******",
                     "changePassword": true,
-                    "passwordIDStore": "Internal Users" 
+                    "passwordIDStore": "Internal Users" # pragma: allowlist secret
                 }
             }
                 
@@ -152,7 +152,7 @@ This app implements investigative and containment actions on a Cisco ISE device
                             "pushIdSupport": false
                         },
                         "tacacsSettings": {
-                            "sharedSecret": "aaa" 
+                            "sharedSecret": "aaa" # pragma: allowlist secret
                         },
                         "profileName": "Cisco",
                         "NetworkDeviceIPList": [
@@ -201,22 +201,22 @@ The below configuration variables are required for this Connector to operate.  T
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
 **device** |  required  | string | Device IP/Hostname
-**ha\_device** |  optional  | string | Device IP/Hostname for a High Availability node if available
+**ha_device** |  optional  | string | Device IP/Hostname for a High Availability node if available
 **username** |  required  | string | Username
 **password** |  required  | password | Password
-**ers\_user** |  optional  | string | Username for ERS APIs
-**ers\_password** |  optional  | password | Password for ERS APIs
-**verify\_server\_cert** |  optional  | boolean | Verify server certificate
+**ers_user** |  optional  | string | Username for ERS APIs
+**ers_password** |  optional  | password | Password for ERS APIs
+**verify_server_cert** |  optional  | boolean | Verify server certificate
 
 ### Supported Actions  
-[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity\. This action logs into the device using a REST API call to check the connection and credentials  
+[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity. This action logs into the device using a REST API call to check the connection and credentials  
 [list endpoints](#action-list-endpoints) - List the endpoints configured on the system  
 [get device info](#action-get-device-info) - Get information about a specific endpoint  
 [update device info](#action-update-device-info) - Update information or attributes for a specific endpoint  
 [list sessions](#action-list-sessions) - List the sessions currently available on the Monitoring node  
 [terminate session](#action-terminate-session) - Terminate sessions  
 [list resources](#action-list-resources) - Lists all the resources configured on the system of a particular resource  
-[get resources](#action-get-resources) - Get the information about resource if resource\_id is provided\. Fetch the list of resources match with the key\-value filter  
+[get resources](#action-get-resources) - Get the information about resource if resource_id is provided. Fetch the list of resources match with the key-value filter  
 [delete resource](#action-delete-resource) - Delete a resource  
 [create resource](#action-create-resource) - Create a resource  
 [update resource](#action-update-resource) - Update a resource  
@@ -227,7 +227,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [delete policy](#action-delete-policy) - Delete a policy  
 
 ## action: 'test connectivity'
-Validate the asset configuration for connectivity\. This action logs into the device using a REST API call to check the connection and credentials
+Validate the asset configuration for connectivity. This action logs into the device using a REST API call to check the connection and credentials
 
 Type: **test**  
 Read only: **True**
@@ -247,24 +247,24 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**mac\_address** |  optional  | Mac Address to filter on \(6 bytes, colon separated\) | string |  `mac address` 
+**mac_address** |  optional  | Mac Address to filter on (6 bytes, colon separated) | string |  `mac address` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.mac\_address | string |  `mac address` 
-action\_result\.data\.\*\.SearchResult\.resources\.\*\.id | string |  `ise endpoint id`  `ise resource id` 
-action\_result\.data\.\*\.SearchResult\.resources\.\*\.link\.href | string |  `url` 
-action\_result\.data\.\*\.SearchResult\.resources\.\*\.link\.rel | string | 
-action\_result\.data\.\*\.SearchResult\.resources\.\*\.link\.type | string | 
-action\_result\.data\.\*\.SearchResult\.resources\.\*\.name | string | 
-action\_result\.data\.\*\.SearchResult\.total | numeric | 
-action\_result\.summary\.Endpoints found | string | 
-action\_result\.summary\.endpoints\_found | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.mac_address | string |  `mac address`  |   11:11:11:11:11:11 
+action_result.data.\*.SearchResult.resources.\*.id | string |  `ise endpoint id`  `ise resource id`  |   d0337940-a86f-11e7-b6e9-000c29d5f0ea 
+action_result.data.\*.SearchResult.resources.\*.link.href | string |  `url`  |   https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea 
+action_result.data.\*.SearchResult.resources.\*.link.rel | string |  |   self 
+action_result.data.\*.SearchResult.resources.\*.link.type | string |  |   application/xml 
+action_result.data.\*.SearchResult.resources.\*.name | string |  |   8C:85:90:17:D6:39 
+action_result.data.\*.SearchResult.total | numeric |  |   1 
+action_result.summary.Endpoints found | string |  |   9  1 
+action_result.summary.endpoints_found | numeric |  |   1 
+action_result.message | string |  |   9 Endpoints found  1 Endpoints found 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get device info'
 Get information about a specific endpoint
@@ -275,32 +275,32 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**endpoint\_id** |  required  | ISE Endpoint ID for device | string |  `ise endpoint id`  `ise resource id` 
+**endpoint_id** |  required  | ISE Endpoint ID for device | string |  `ise endpoint id`  `ise resource id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.endpoint\_id | string |  `ise endpoint id`  `ise resource id` 
-action\_result\.data\.\*\.ERSEndPoint\.customAttributes\.customAttributes\.ITSecurityBlock | string | 
-action\_result\.data\.\*\.ERSEndPoint\.description | string | 
-action\_result\.data\.\*\.ERSEndPoint\.groupId | string | 
-action\_result\.data\.\*\.ERSEndPoint\.id | string |  `ise endpoint id`  `ise resource id` 
-action\_result\.data\.\*\.ERSEndPoint\.identityStore | string | 
-action\_result\.data\.\*\.ERSEndPoint\.identityStoreId | string | 
-action\_result\.data\.\*\.ERSEndPoint\.link\.href | string |  `url` 
-action\_result\.data\.\*\.ERSEndPoint\.link\.rel | string | 
-action\_result\.data\.\*\.ERSEndPoint\.link\.type | string | 
-action\_result\.data\.\*\.ERSEndPoint\.mac | string | 
-action\_result\.data\.\*\.ERSEndPoint\.name | string | 
-action\_result\.data\.\*\.ERSEndPoint\.portalUser | string | 
-action\_result\.data\.\*\.ERSEndPoint\.profileId | string | 
-action\_result\.data\.\*\.ERSEndPoint\.staticGroupAssignment | boolean | 
-action\_result\.data\.\*\.ERSEndPoint\.staticProfileAssignment | boolean | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.endpoint_id | string |  `ise endpoint id`  `ise resource id`  |   59985000-712d-11e6-9062-000c29bea319  d0337940-a86f-11e7-b6e9-000c29d5f0ea 
+action_result.data.\*.ERSEndPoint.customAttributes.customAttributes.ITSecurityBlock | string |  |   true 
+action_result.data.\*.ERSEndPoint.description | string |  |   description 
+action_result.data.\*.ERSEndPoint.groupId | string |  |   aa10ae00-8bff-11e6-996c-525400b48521 
+action_result.data.\*.ERSEndPoint.id | string |  `ise endpoint id`  `ise resource id`  |   d0337940-a86f-11e7-b6e9-000c29d5f0ea 
+action_result.data.\*.ERSEndPoint.identityStore | string |  |  
+action_result.data.\*.ERSEndPoint.identityStoreId | string |  |  
+action_result.data.\*.ERSEndPoint.link.href | string |  `url`  |   https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea 
+action_result.data.\*.ERSEndPoint.link.rel | string |  |   self 
+action_result.data.\*.ERSEndPoint.link.type | string |  |   application/xml 
+action_result.data.\*.ERSEndPoint.mac | string |  |   8C:85:90:17:D6:39 
+action_result.data.\*.ERSEndPoint.name | string |  |   8C:85:90:17:D6:39 
+action_result.data.\*.ERSEndPoint.portalUser | string |  |  
+action_result.data.\*.ERSEndPoint.profileId | string |  |   09663280-8c00-11e6-996c-525400b48521 
+action_result.data.\*.ERSEndPoint.staticGroupAssignment | boolean |  |   True  False 
+action_result.data.\*.ERSEndPoint.staticProfileAssignment | boolean |  |   True  False 
+action_result.summary | string |  |  
+action_result.message | string |  |   Endpoint found 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'update device info'
 Update information or attributes for a specific endpoint
@@ -311,28 +311,28 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**endpoint\_id** |  required  | ISE Endpoint ID for device | string |  `ise endpoint id`  `ise resource id` 
+**endpoint_id** |  required  | ISE Endpoint ID for device | string |  `ise endpoint id`  `ise resource id` 
 **attribute** |  optional  | Attribute to update for the Endpoint | string | 
-**attribute\_value** |  optional  | Value to put in the attribute for the Endpoint | string | 
-**custom\_attribute** |  optional  | Custom attribute to update for the Endpoint | string | 
-**custom\_attribute\_value** |  optional  | Value to put in the custom attribute for the Endpoint | string | 
+**attribute_value** |  optional  | Value to put in the attribute for the Endpoint | string | 
+**custom_attribute** |  optional  | Custom attribute to update for the Endpoint | string | 
+**custom_attribute_value** |  optional  | Value to put in the custom attribute for the Endpoint | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.attribute | string | 
-action\_result\.parameter\.attribute\_value | string | 
-action\_result\.parameter\.custom\_attribute | string | 
-action\_result\.parameter\.custom\_attribute\_value | string | 
-action\_result\.parameter\.endpoint\_id | string |  `ise endpoint id`  `ise resource id` 
-action\_result\.data\.\*\.UpdatedFieldsList\.updatedField\.\*\.field | string | 
-action\_result\.data\.\*\.UpdatedFieldsList\.updatedField\.\*\.newValue | string | 
-action\_result\.data\.\*\.UpdatedFieldsList\.updatedField\.\*\.oldValue | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.attribute | string |  |   ITSecurityBlock 
+action_result.parameter.attribute_value | string |  |   True 
+action_result.parameter.custom_attribute | string |  |   CustomAttribute 
+action_result.parameter.custom_attribute_value | string |  |   True 
+action_result.parameter.endpoint_id | string |  `ise endpoint id`  `ise resource id`  |   d0337940-a86f-11e7-b6e9-000c29d5f0ea 
+action_result.data.\*.UpdatedFieldsList.updatedField.\*.field | string |  |   customAttributes 
+action_result.data.\*.UpdatedFieldsList.updatedField.\*.newValue | string |  |   {ITSecurityBlock=True} 
+action_result.data.\*.UpdatedFieldsList.updatedField.\*.oldValue | string |  |   {ITSecurityBlock=False} 
+action_result.summary | string |  |  
+action_result.message | string |  |   Endpoint Updated 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list sessions'
 List the sessions currently available on the Monitoring node
@@ -344,23 +344,23 @@ Read only: **True**
 No parameters are required for this action
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.data\.\*\.acct\_session\_id | string | 
-action\_result\.data\.\*\.audit\_session\_id | string |  `ise session id` 
-action\_result\.data\.\*\.calling\_station\_id | string |  `mac address` 
-action\_result\.data\.\*\.framed\_ip\_address | string |  `ip` 
-action\_result\.data\.\*\.framed\_ipv6\_address | string | 
-action\_result\.data\.\*\.is\_quarantined | string | 
-action\_result\.data\.\*\.nas\_ip\_address | string |  `nas server` 
-action\_result\.data\.\*\.server | string |  `ise server` 
-action\_result\.data\.\*\.user\_name | string |  `user name` 
-action\_result\.summary | string | 
-action\_result\.summary\.sessions\_found | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.data.\*.acct_session_id | string |  |  
+action_result.data.\*.audit_session_id | string |  `ise session id`  |  
+action_result.data.\*.calling_station_id | string |  `mac address`  |  
+action_result.data.\*.framed_ip_address | string |  `ip`  |  
+action_result.data.\*.framed_ipv6_address | string |  |  
+action_result.data.\*.is_quarantined | string |  |  
+action_result.data.\*.nas_ip_address | string |  `nas server`  |  
+action_result.data.\*.server | string |  `ise server`  |  
+action_result.data.\*.user_name | string |  `user name`  |  
+action_result.summary | string |  |  
+action_result.summary.sessions_found | numeric |  |   0 
+action_result.message | string |  |  
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'terminate session'
 Terminate sessions
@@ -374,15 +374,15 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **macaddress** |  required  | MAC address of device to terminate sessions of | string |  `mac address` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.macaddress | string |  `mac address` 
-action\_result\.data | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.macaddress | string |  `mac address`  |   11:11:11:11:11:11 
+action_result.data | string |  |  
+action_result.summary | string |  |  
+action_result.message | string |  |  
+summary.total_objects | numeric |  |  
+summary.total_objects_successful | numeric |  |    
 
 ## action: 'list resources'
 Lists all the resources configured on the system of a particular resource
@@ -394,27 +394,27 @@ Read only: **True**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource** |  required  | Resource type of the resources to fetch | string | 
-**max\_results** |  optional  | Total number of observables to return | numeric | 
+**max_results** |  optional  | Total number of observables to return | numeric | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.max\_results | numeric | 
-action\_result\.parameter\.resource | string | 
-action\_result\.data\.\*\.description | string | 
-action\_result\.data\.\*\.id | string |  `ise resource id` 
-action\_result\.data\.\*\.link\.href | string |  `url` 
-action\_result\.data\.\*\.link\.rel | string | 
-action\_result\.data\.\*\.link\.type | string | 
-action\_result\.data\.\*\.name | string | 
-action\_result\.summary\.resources\_returned | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.max_results | numeric |  |   2 
+action_result.parameter.resource | string |  |   Endpoints 
+action_result.data.\*.description | string |  |   Default portal used by sponsors to create and manage accounts for authorized visitors to securely access the network 
+action_result.data.\*.id | string |  `ise resource id`  |   40963c00-2e02-11e8-ba71-005056872c7f 
+action_result.data.\*.link.href | string |  `url`  |   https://10.1.16.169:9060/ers/config/portal/40963c00-2e02-11e8-ba71-005056872c7f 
+action_result.data.\*.link.rel | string |  |   self 
+action_result.data.\*.link.type | string |  |   application/xml 
+action_result.data.\*.name | string |  |   Sponsor Portal (default) 
+action_result.summary.resources_returned | numeric |  |   5 
+action_result.message | string |  |   Resources returned: 5 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get resources'
-Get the information about resource if resource\_id is provided\. Fetch the list of resources match with the key\-value filter
+Get the information about resource if resource_id is provided. Fetch the list of resources match with the key-value filter
 
 Type: **investigate**  
 Read only: **True**
@@ -423,37 +423,37 @@ Read only: **True**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource** |  required  | Resource type of the resource to fetch | string | 
-**resource\_id** |  optional  | Resource ID | string |  `ise resource id` 
+**resource_id** |  optional  | Resource ID | string |  `ise resource id` 
 **key** |  optional  | Key | string | 
 **value** |  optional  | Value | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.key | string | 
-action\_result\.parameter\.resource | string | 
-action\_result\.parameter\.resource\_id | string |  `ise resource id` 
-action\_result\.parameter\.value | string | 
-action\_result\.data\.\*\.description | string | 
-action\_result\.data\.\*\.groupId | string | 
-action\_result\.data\.\*\.id | string |  `ise resource id` 
-action\_result\.data\.\*\.identityStore | string | 
-action\_result\.data\.\*\.identityStoreId | string | 
-action\_result\.data\.\*\.link\.href | string |  `url` 
-action\_result\.data\.\*\.link\.rel | string | 
-action\_result\.data\.\*\.link\.type | string | 
-action\_result\.data\.\*\.mac | string | 
-action\_result\.data\.\*\.name | string | 
-action\_result\.data\.\*\.portalUser | string | 
-action\_result\.data\.\*\.profileId | string | 
-action\_result\.data\.\*\.staticGroupAssignment | boolean | 
-action\_result\.data\.\*\.staticProfileAssignment | boolean | 
-action\_result\.summary\.resource\_id | string |  `ise resource id` 
-action\_result\.summary\.resources\_returned | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.key | string |  |   mac 
+action_result.parameter.resource | string |  |   Endpoints 
+action_result.parameter.resource_id | string |  `ise resource id`  |   2e9cf1c0-30b6-11ea-8f06-ce112ec9f8fa 
+action_result.parameter.value | string |  |   00:00:00:00:00:00 
+action_result.data.\*.description | string |  |   This endpoint for test 
+action_result.data.\*.groupId | string |  |   aa10ae00-8bff-11e6-996c-525400b48521 
+action_result.data.\*.id | string |  `ise resource id`  |   d335f970-10e0-11ea-8f06-ce112ec9f8fa 
+action_result.data.\*.identityStore | string |  |  
+action_result.data.\*.identityStoreId | string |  |  
+action_result.data.\*.link.href | string |  `url`  |   https://10.1.16.169:9060/ers/config/endpoint/d335f970-10e0-11ea-8f06-ce112ec9f8fa 
+action_result.data.\*.link.rel | string |  |   self 
+action_result.data.\*.link.type | string |  |   application/xml 
+action_result.data.\*.mac | string |  |   00:00:00:00:00:00 
+action_result.data.\*.name | string |  |   00:00:00:00:00:00 
+action_result.data.\*.portalUser | string |  |  
+action_result.data.\*.profileId | string |  |   44031480-8c00-11e6-996c-525400b48521 
+action_result.data.\*.staticGroupAssignment | boolean |  |   True  False 
+action_result.data.\*.staticProfileAssignment | boolean |  |   True  False 
+action_result.summary.resource_id | string |  `ise resource id`  |   d335f970-10e0-11ea-8f06-ce112ec9f8fa 
+action_result.summary.resources_returned | numeric |  |   0 
+action_result.message | string |  |   Resource id: d335f970-10e0-11ea-8f06-ce112ec9f8fa 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'delete resource'
 Delete a resource
@@ -465,19 +465,19 @@ Read only: **False**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource** |  required  | Resource type of the resource to be deleted | string | 
-**resource\_id** |  required  | Resource ID | string |  `ise resource id` 
+**resource_id** |  required  | Resource ID | string |  `ise resource id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.resource | string | 
-action\_result\.parameter\.resource\_id | string |  `ise resource id` 
-action\_result\.data | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.resource | string |  |   Endpoints 
+action_result.parameter.resource_id | string |  `ise resource id`  |   2e9cf1c0-30b6-11ea-8f06-ce112ec9f8fa 
+action_result.data | string |  |  
+action_result.summary | string |  |  
+action_result.message | string |  |   Resource deleted successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'create resource'
 Create a resource
@@ -489,19 +489,25 @@ Read only: **False**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource** |  required  | Resource type of the resource to be created | string | 
-**resource\_json** |  required  | JSON which contains all values needed to create a resource | string | 
+**resource_json** |  required  | JSON which contains all values needed to create a resource | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.resource | string | 
-action\_result\.parameter\.resource\_json | string | 
-action\_result\.data | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.resource | string |  |   Endpoints 
+action_result.parameter.resource_json | string |  |   {
+"ERSEndPoint": {
+"name": "name",
+"description": "MyEndpoint",
+"mac": "11:22:33:44:55:66"
+}
+} 
+action_result.data | string |  |  
+action_result.summary | string |  |   Resource created successfully 
+action_result.message | string |  |   Resource created successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'update resource'
 Update a resource
@@ -513,23 +519,23 @@ Read only: **False**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource** |  required  | Resource type of the resource to be created | string | 
-**resource\_id** |  required  | ID of resource | string |  `ise resource id` 
+**resource_id** |  required  | ID of resource | string |  `ise resource id` 
 **key** |  required  | Key of resource which needs to be updated | string | 
 **value** |  required  | New value of key | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.key | string | 
-action\_result\.parameter\.resource | string | 
-action\_result\.parameter\.resource\_id | string |  `ise resource id` 
-action\_result\.parameter\.value | string | 
-action\_result\.data | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.key | string |  |   mac 
+action_result.parameter.resource | string |  |   Endpoints 
+action_result.parameter.resource_id | string |  `ise resource id`  |   2e9cf1c0-30b6-11ea-8f06-ce112ec9f8fa 
+action_result.parameter.value | string |  |   11:11:11:11:11:11 
+action_result.data | string |  |  
+action_result.summary | string |  |   Resource created successfully 
+action_result.message | string |  |   Resource updated successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'apply policy'
 Apply policy on selected Ip address or MAC address
@@ -540,20 +546,20 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**policy\_name** |  required  | Policy Name | string | 
-**ip\_mac\_address** |  required  | MAC or IP Address of the device | string |  `mac address`  `ip` 
+**policy_name** |  required  | Policy Name | string | 
+**ip_mac_address** |  required  | MAC or IP Address of the device | string |  `mac address`  `ip` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.ip\_mac\_address | string |  `mac address`  `ip` 
-action\_result\.parameter\.policy\_name | string | 
-action\_result\.data | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.ip_mac_address | string |  `mac address`  `ip`  |   11:11:11:11:11:11 
+action_result.parameter.policy_name | string |  |   testPolicy 
+action_result.data | string |  |  
+action_result.summary | string |  |  
+action_result.message | string |  |   Policy applied 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'clear policy'
 Clear policy on selected Ip address or MAC address
@@ -564,20 +570,20 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**policy\_name** |  required  | Policy Name | string | 
-**ip\_mac\_address** |  required  | MAC or IP Address of the device | string |  `mac address`  `ip` 
+**policy_name** |  required  | Policy Name | string | 
+**ip_mac_address** |  required  | MAC or IP Address of the device | string |  `mac address`  `ip` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.ip\_mac\_address | string |  `mac address`  `ip` 
-action\_result\.parameter\.policy\_name | string | 
-action\_result\.data | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.ip_mac_address | string |  `mac address`  `ip`  |   11:11:11:11:11:11 
+action_result.parameter.policy_name | string |  |   testPolicy 
+action_result.data | string |  |  
+action_result.summary | string |  |  
+action_result.message | string |  |   Policy cleared 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list policies'
 Lists all the ANC policies available
@@ -589,20 +595,20 @@ Read only: **True**
 No parameters are required for this action
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.data\.\*\.actions | string | 
-action\_result\.data\.\*\.id | string |  `ise policy id` 
-action\_result\.data\.\*\.link\.href | string | 
-action\_result\.data\.\*\.link\.rel | string | 
-action\_result\.data\.\*\.link\.type | string | 
-action\_result\.data\.\*\.name | string | 
-action\_result\.summary | string | 
-action\_result\.summary\.policies\_found | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.data.\*.actions | string |  |  
+action_result.data.\*.id | string |  `ise policy id`  |   policy_name 
+action_result.data.\*.link.href | string |  |   https://10.0.0.0:9060/ers/config/ancpolicy/policy_name 
+action_result.data.\*.link.rel | string |  |   self 
+action_result.data.\*.link.type | string |  |   application/json 
+action_result.data.\*.name | string |  |   policy_name 
+action_result.summary | string |  |  
+action_result.summary.policies_found | numeric |  |  
+action_result.message | string |  |   Policies found: 1 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'add policy'
 Add a new ANC Policy
@@ -614,19 +620,19 @@ Read only: **False**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **name** |  required  | Policy Name | string | 
-**action\_type** |  required  | Policy action type | string | 
+**action_type** |  required  | Policy action type | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.action\_type | string | 
-action\_result\.parameter\.name | string | 
-action\_result\.data | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.action_type | string |  |   QUARANTINE 
+action_result.parameter.name | string |  |   policy_name 
+action_result.data | string |  |  
+action_result.summary | string |  |  
+action_result.message | string |  |   Policy created 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'delete policy'
 Delete a policy
@@ -637,15 +643,15 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**policy\_name** |  required  | Policy Name | string |  `ise policy id` 
+**policy_name** |  required  | Policy Name | string |  `ise policy id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.policy\_name | string |  `ise policy id` 
-action\_result\.data | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric | 
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.policy_name | string |  `ise policy id`  |  
+action_result.data | string |  |  
+action_result.summary | string |  |  
+action_result.message | string |  |   Policy deleted 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1 

@@ -1,6 +1,6 @@
 # File: ciscoise_connector.py
 #
-# Copyright (c) 2014-2022 Splunk Inc.
+# Copyright (c) 2014-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -87,11 +87,11 @@ class CiscoISEConnector(BaseConnector):
         if parameter is not None:
             try:
                 if not float(parameter).is_integer():
-                    return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_INVALID_PARAM.format(key)), None
+                    return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_INVALID_PARAM.format(key)), None
                 parameter = int(parameter)
 
             except Exception:
-                return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_INVALID_PARAM.format(key)), None
+                return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_INVALID_PARAM.format(key)), None
 
             if parameter < 0:
                 return action_result.set_status(phantom.APP_ERROR,
@@ -132,7 +132,7 @@ class CiscoISEConnector(BaseConnector):
             request_func = getattr(requests, method)
         except AttributeError as e:
             self.debug_print("Exception occurred: {}".format(e))
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data
+            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_REST_API, e), ret_data
         try:
             headers = {"Content-Type": "application/json", "ACCEPT": "application/json"}
             resp = request_func(  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
@@ -144,7 +144,7 @@ class CiscoISEConnector(BaseConnector):
             )
         except Exception as e:
             self.debug_print("Exception occurred: {}".format(e))
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data
+            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_REST_API, e), ret_data
 
         if not (200 <= resp.status_code < 399):
             error_message = resp.text
@@ -156,7 +156,7 @@ class CiscoISEConnector(BaseConnector):
             return (
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    CISCOISE_ERR_REST_API_ERR_CODE,
+                    CISCOISE_REST_API_ERROR_CODE,
                     code=resp.status_code,
                     message=error_message
                 ),
@@ -190,13 +190,13 @@ class CiscoISEConnector(BaseConnector):
                 auth=self._auth)
         except Exception as e:
             self.debug_print("Exception occurred: {}".format(e))
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_REST_API, e), ret_data
+            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_REST_API, e), ret_data
 
         if resp.status_code != 200:
             return (
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    CISCOISE_ERR_REST_API_ERR_CODE,
+                    CISCOISE_REST_API_ERROR_CODE,
                     code=resp.status_code,
                     message=resp.text,
                 ),
@@ -210,14 +210,14 @@ class CiscoISEConnector(BaseConnector):
             response_dict = xmltodict.parse(xml)
         except Exception as e:
             self.debug_print("Exception occurred: {}".format(e))
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_UNABLE_TO_PARSE_REPLY, e), ret_data
+            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_UNABLE_TO_PARSE_REPLY, e), ret_data
 
         ret_data = response_dict
 
         if schema is not None:
             v = Validator(schema, allow_unknown=allow_unknown)
             if v.validate(ret_data) is False:
-                action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_UNABLE_TO_PARSE_REPLY)
+                action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_UNABLE_TO_PARSE_REPLY)
                 action_result.append_to_message(v.errors)
                 return action_result.get_status(), ret_data
 
@@ -372,15 +372,15 @@ class CiscoISEConnector(BaseConnector):
         remote_coa = ret_data.get("remoteCoA")
 
         if remote_coa is None:
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_PARSE_REPLY)
+            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_PARSE_REPLY)
 
         result = remote_coa.get("results")
 
         if result is None:
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_PARSE_REPLY)
+            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_PARSE_REPLY)
 
         if result == "false":
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_LOGOFF_SYSTEM)
+            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_LOGOFF_SYSTEM)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -412,15 +412,15 @@ class CiscoISEConnector(BaseConnector):
         remote_coa = ret_data.get("remoteCoA")
 
         if remote_coa is None:
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_PARSE_REPLY)
+            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_PARSE_REPLY)
 
         result = remote_coa.get("results")
 
         if result is None:
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_PARSE_REPLY)
+            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_PARSE_REPLY)
 
         if result == "false":
-            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_TERMINATE_SESSION)
+            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_TERMINATE_SESSION)
 
         return action_result.set_status(phantom.APP_SUCCESS, CISCOISE_SUCC_SESSION_TERMINATED)
 
@@ -602,7 +602,7 @@ class CiscoISEConnector(BaseConnector):
             payload["OperationAdditionalData"]["additionalData"][0]["name"] = "ipAddress"
         else:
             return (
-                action_result.set_status(phantom.APP_ERROR, CISCOISE_ERR_MAC_AND_IP_NOT_SPECIFIED),
+                action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_MAC_AND_IP_NOT_SPECIFIED),
                 ret_data,
             )
 
@@ -708,14 +708,14 @@ class CiscoISEConnector(BaseConnector):
                 verify=verify)
         except Exception as e:
             self.debug_print("Exception is test connectivity: {}".format(e))
-            return self.set_status_save_progress(phantom.APP_ERROR, CISCOISE_ERR_TEST_CONNECTIVITY_FAILED)
+            return self.set_status_save_progress(phantom.APP_ERROR, CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED)
 
         if resp.status_code == 200:
             return self.set_status_save_progress(phantom.APP_SUCCESS, CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED)
         else:
             return self.set_status_save_progress(
                 phantom.APP_ERROR,
-                CISCOISE_ERR_TEST_CONNECTIVITY_FAILED_ERR_CODE,
+                CISCOISE_TEST_CONNECTIVITY_FAILED_ERROR_CODE,
                 code=resp.status_code
             )
 
