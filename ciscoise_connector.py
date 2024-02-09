@@ -49,7 +49,7 @@ class CiscoISEConnector(BaseConnector):
     ACTION_ID_DELETE_POLICY = "delete_policy"
 
     def __init__(self):
-
+        self.my_state = {}
         # Call the BaseConnectors init first
         super(CiscoISEConnector, self).__init__()
 
@@ -124,6 +124,8 @@ class CiscoISEConnector(BaseConnector):
         if try_ha_device:
             url = "{0}{1}".format(self._ha_device_url, endpoint)
 
+        self.debug_print("url = {}".format(url))
+
         ret_data = None
 
         config = self.get_config()
@@ -142,6 +144,7 @@ class CiscoISEConnector(BaseConnector):
                 headers=headers,
                 auth=auth_method
             )
+
         except Exception as e:
             self.debug_print("Exception occurred: {}".format(e))
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_REST_API, e), ret_data
@@ -424,36 +427,51 @@ class CiscoISEConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, CISCOISE_SUCC_SESSION_TERMINATED)
 
-    def _paginator(self, endpoint, action_result, payload=None, limit=None):
+    def _paginator(self, endpoint, action_result, param=None, limit=None):
 
         items_list = list()
 
-        if not payload:
+        if not param:
             payload = {}
 
-        page = 1
-        payload["size"] = DEFAULT_MAX_RESULTS
-        payload["page"] = page
+        count = 1
+        # param["size"] = DEFAULT_MAX_RESULTS
+        # param["page"] = page
 
         while True:
             ret_val, items = self._call_ers_api(endpoint, action_result, data=payload)
-
+            self.my_state[count] = items
             if phantom.is_fail(ret_val):
+                self.debug_print("Saving state for Cisco ISE 1: {}".format(self.my_state))
+                self.save_state(self.my_state)
                 return None
 
             items_list.extend(items.get("SearchResult", {}).get("resources"))
 
+            next_page_dict = items.get("SearchResult", {}).get("nextPage")
+
+            if next_page_dict is not None:
+                endpoint = next_page_dict.get("href").replace(self._base_url, "")
+                self.debug_print("endpoint = {}".format(endpoint))
+            else:
+                break
+
             if limit and len(items_list) >= limit:
+                self.debug_print("Saving state for Cisco ISE 2: {}".format(self.my_state))
+                self.save_state(self.my_state)
                 return items_list[:limit]
 
-            if len(items.get("SearchResult", {}).get("resources")) < DEFAULT_MAX_RESULTS:
-                break
+            # if len(items.get("SearchResult", {}).get("resources")) < DEFAULT_MAX_RESULTS:
+            #     break
 
             if len(items_list) == items.get("SearchResult", {}).get("total"):
                 break
 
-            page = page + 1
-            payload["page"] = page
+            count = count + 1
+            # payload["page"] = page
+
+        self.debug_print("Saving state for Cisco ISE 3: {}".format(self.my_state))
+        self.save_state(self.my_state)
 
         return items_list
 

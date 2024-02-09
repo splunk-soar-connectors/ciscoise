@@ -51,7 +51,7 @@ CISCOISE_SUCC_UPDATE_ENDPOINT = "Endpoint updated"
 CISCOISE_ERROR_INVALID_PARAM = "Please provide a non-zero positive integer in {param}"
 CISCOISE_MAP_IP_ABSENT_ERROR = "Please provide either mac address or ip address"
 CISCOISE_ERS_CRED_MISSING = "ERS credentials in asset configuration are required for this action"
-DEFAULT_MAX_RESULTS = 7
+DEFAULT_MAX_RESULTS = 20
 
 # Json reply schema
 IS_MAC_QUARAN_RESP_SCHEMA = {
