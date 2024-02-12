@@ -49,7 +49,6 @@ class CiscoISEConnector(BaseConnector):
     ACTION_ID_DELETE_POLICY = "delete_policy"
 
     def __init__(self):
-        self.my_state = {}
         # Call the BaseConnectors init first
         super(CiscoISEConnector, self).__init__()
 
@@ -116,7 +115,7 @@ class CiscoISEConnector(BaseConnector):
 
         return make_another_call
 
-    def _call_ers_api(self, endpoint, action_result, data=None, allow_unknown=True, method="get", try_ha_device=False):
+    def _call_ers_api(self, endpoint, action_result, data=None, allow_unknown=True, method="get", try_ha_device=False, params=None):
         auth_method = self._ers_auth or self._auth
         if not auth_method:
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERS_CRED_MISSING), None
@@ -124,7 +123,7 @@ class CiscoISEConnector(BaseConnector):
         if try_ha_device:
             url = "{0}{1}".format(self._ha_device_url, endpoint)
 
-        self.debug_print("url = {}".format(url))
+        self.debug_print("url for calling an ERS API: {}".format(url))
 
         ret_data = None
 
@@ -142,7 +141,8 @@ class CiscoISEConnector(BaseConnector):
                 json=data,
                 verify=verify,
                 headers=headers,
-                auth=auth_method
+                auth=auth_method,
+                params=params
             )
 
         except Exception as e:
@@ -427,53 +427,37 @@ class CiscoISEConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, CISCOISE_SUCC_SESSION_TERMINATED)
 
-    def _paginator(self, endpoint, action_result, param=None, limit=None):
+    def _paginator(self, endpoint, action_result, limit=None):
 
         items_list = list()
-
-        if not param:
-            payload = {}
-
-        count = 1
-        # param["size"] = DEFAULT_MAX_RESULTS
-        # param["page"] = page
+        params = {}
+        params["size"] = DEFAULT_MAX_RESULTS
 
         while True:
-            ret_val, items = self._call_ers_api(endpoint, action_result, data=payload)
-            self.my_state[count] = items
+            ret_val, items = self._call_ers_api(endpoint, action_result, param=params)
             if phantom.is_fail(ret_val):
-                self.debug_print("Saving state for Cisco ISE 1: {}".format(self.my_state))
-                self.save_state(self.my_state)
+                self.debug_print("Call to ERS API Failed")
                 return None
-
-            items_list.extend(items.get("SearchResult", {}).get("resources"))
-
+            items_from_page = items.get("SearchResult", {}).get("resources")
+            items_list.extend(items_from_page)
+            self.debug_print("Retrieved {} records from the endpoint {}".format(len(items_from_page), endpoint))
             next_page_dict = items.get("SearchResult", {}).get("nextPage")
 
             if next_page_dict is not None:
                 endpoint = next_page_dict.get("href").replace(self._base_url, "")
-                self.debug_print("endpoint = {}".format(endpoint))
+                self.debug_print("Next page available")
             else:
-                break
+                if limit and len(items_list) >= limit:
+                    self.debug_print("Reached to the final page and max limit reached")
+                    return items_list[:limit]
+                else:
+                    self.debug_print("Max limit not reached, but no more records left to retrieve")
+                    return items_list
 
             if limit and len(items_list) >= limit:
-                self.debug_print("Saving state for Cisco ISE 2: {}".format(self.my_state))
+                self.debug_print("Next page available. But max limit reached.")
                 self.save_state(self.my_state)
                 return items_list[:limit]
-
-            # if len(items.get("SearchResult", {}).get("resources")) < DEFAULT_MAX_RESULTS:
-            #     break
-
-            if len(items_list) == items.get("SearchResult", {}).get("total"):
-                break
-
-            count = count + 1
-            # payload["page"] = page
-
-        self.debug_print("Saving state for Cisco ISE 3: {}".format(self.my_state))
-        self.save_state(self.my_state)
-
-        return items_list
 
     def _list_resources(self, param):
 
