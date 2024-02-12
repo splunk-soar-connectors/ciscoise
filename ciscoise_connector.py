@@ -115,7 +115,7 @@ class CiscoISEConnector(BaseConnector):
 
         return make_another_call
 
-    def _call_ers_api(self, endpoint, action_result, data=None, allow_unknown=True, method="get", try_ha_device=False):
+    def _call_ers_api(self, endpoint, action_result, data=None, allow_unknown=True, method="get", try_ha_device=False, params=None):
         auth_method = self._ers_auth or self._auth
         if not auth_method:
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERS_CRED_MISSING), None
@@ -142,6 +142,7 @@ class CiscoISEConnector(BaseConnector):
                 verify=verify,
                 headers=headers,
                 auth=auth_method,
+                params=params
             )
 
         except Exception as e:
@@ -429,9 +430,11 @@ class CiscoISEConnector(BaseConnector):
     def _paginator(self, endpoint, action_result, limit=None):
 
         items_list = list()
-        endpoint = endpoint + "?size=" + str(DEFAULT_MAX_RESULTS)
+        params = {}
+        params["size"] = DEFAULT_MAX_RESULTS
+
         while True:
-            ret_val, items = self._call_ers_api(endpoint, action_result)
+            ret_val, items = self._call_ers_api(endpoint, action_result, params=params)
             if phantom.is_fail(ret_val):
                 self.debug_print("Call to ERS API Failed")
                 return None
