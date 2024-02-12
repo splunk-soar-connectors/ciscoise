@@ -434,7 +434,7 @@ class CiscoISEConnector(BaseConnector):
         params["size"] = DEFAULT_MAX_RESULTS
 
         while True:
-            ret_val, items = self._call_ers_api(endpoint, action_result, param=params)
+            ret_val, items = self._call_ers_api(endpoint, action_result, params=params)
             if phantom.is_fail(ret_val):
                 self.debug_print("Call to ERS API Failed")
                 return None
