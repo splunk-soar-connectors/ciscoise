@@ -6,7 +6,7 @@ Connector Version: 3.0.3
 Product Vendor: Cisco Systems  
 Product Name: Cisco ISE  
 Product Version Supported (regex): "/([2].[67])|([3].[01])/"  
-Minimum Product Version: 5.1.0  
+Minimum Product Version: 6.1.1  
 
 This app implements investigative and containment actions on a Cisco ISE device
 
