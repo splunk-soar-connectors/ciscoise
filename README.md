@@ -2,16 +2,16 @@
 # Cisco ISE
 
 Publisher: Splunk  
-Connector Version: 3.0.2  
+Connector Version: 3.1.0  
 Product Vendor: Cisco Systems  
 Product Name: Cisco ISE  
 Product Version Supported (regex): "/([2].[67])|([3].[01])/"  
-Minimum Product Version: 5.1.0  
+Minimum Product Version: 6.1.1  
 
 This app implements investigative and containment actions on a Cisco ISE device
 
 [comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2014-2023 Splunk Inc."
+[comment]: # "  Copyright (c) 2014-2024 Splunk Inc."
 [comment]: # ""
 [comment]: # "  SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part"
 [comment]: # "  without a valid written license from Splunk Inc. is PROHIBITED."
