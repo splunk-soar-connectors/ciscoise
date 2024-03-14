@@ -456,7 +456,6 @@ class CiscoISEConnector(BaseConnector):
 
             if limit and len(items_list) >= limit:
                 self.debug_print("Next page available. But max limit reached.")
-                self.save_state(self.my_state)
                 return items_list[:limit]
 
     def _list_resources(self, param):
