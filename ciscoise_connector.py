@@ -791,7 +791,6 @@ if __name__ == '__main__':
     import argparse
 
     import pudb
-    import requests
 
     pudb.set_trace()
 
