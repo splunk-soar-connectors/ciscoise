@@ -33,9 +33,11 @@ ERS_ENDPOINT_ANC_CLEAR = ":9060/ers/config/ancendpoint/clear"
 ERS_POLICIES = ":9060/ers/config/ancpolicy"
 
 # Error/Success
-CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED = "Test connectivity failed"
+CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED_1 = "Test connectivity failed for primary device"
+CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED_2 = "Test connectivity failed for second device"
 CISCOISE_TEST_CONNECTIVITY_FAILED_ERROR_CODE = "Test connectivity failed with status code: '{code}'"
-CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED = "Test connectivity passed"
+CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED_1 = "Test connectivity passed for primary device"
+CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED_2 = "Test connectivity passed for second device"
 CISCOISE_ERROR_REST_API = "REST Api error"
 CISCOISE_REST_API_ERROR_CODE = "REST Api error with status code: {code}, Message from server: {message}"
 CISCOISE_ERROR_UNABLE_TO_PARSE_REPLY = "Parsing error, Unable to convert xml reply to json"

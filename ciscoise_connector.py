@@ -16,6 +16,7 @@
 #
 # Phantom imports
 import json
+import sys
 
 import phantom.app as phantom
 import requests
@@ -708,30 +709,39 @@ class CiscoISEConnector(BaseConnector):
                 auth=self._auth,
                 verify=verify)
         except Exception as e:
-            self.debug_print("Exception is test connectivity: {}".format(e))
-            return self.set_status_save_progress(phantom.APP_ERROR, CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED)
+            return False, str(e)
 
         if resp.status_code == 200:
-            return self.set_status_save_progress(phantom.APP_SUCCESS, CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED)
-        else:
-            return self.set_status_save_progress(
-                phantom.APP_ERROR,
-                CISCOISE_TEST_CONNECTIVITY_FAILED_ERROR_CODE,
-                code=resp.status_code
-            )
+            return True, ''
+
+        return False, resp.text
 
     def _test_connectivity(self, param):
-
+        action_result = self.add_action_result(ActionResult(dict(param)))
         config = self.get_config()
         verify = config[phantom.APP_JSON_VERIFY]
-        self.save_progress("Connecting to first device")
-        result = self._test_connectivity_to_device(self._base_url, verify)
+        result, message = self._test_connectivity_to_device(self._base_url, verify)
+
+        if not result:
+            self.save_progress("Error occurred while connecting to first device")
+            self.save_progress(str(message))
+            self.save_progress(CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED_1)
+            action_result.set_status(phantom.APP_ERROR)
+        else:
+            self.save_progress(CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED_1)
+            action_result.set_status(phantom.APP_SUCCESS, CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED_1)
 
         if self._ha_device:
-            self.save_progress("Connecting to second device")
-            result = self._test_connectivity_to_device(self._ha_device_url, verify)
+            result, message = self._test_connectivity_to_device(self._ha_device_url, verify)
 
-        return result
+            if not result:
+                self.save_progress("Error occurred while connecting to high availability device")
+                self.save_progress(str(message))
+                self.save_progress(CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED_2)
+            else:
+                self.save_progress(CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED_2)
+
+        return action_result.get_status()
 
     def handle_action(self, param):
 
@@ -776,17 +786,61 @@ class CiscoISEConnector(BaseConnector):
         return result
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
-    import sys
+    import argparse
 
     import pudb
+    import requests
 
     pudb.set_trace()
 
+    argparser = argparse.ArgumentParser()
+
+    argparser.add_argument('input_test_json', help='Input Test JSON file')
+    argparser.add_argument('-u', '--username', help='username', required=False)
+    argparser.add_argument('-p', '--password', help='password', required=False)
+    argparser.add_argument('-v', '--verify', action='store_true', help='verify', required=False, default=False)
+
+    args = argparser.parse_args()
+    session_id = None
+
+    username = args.username
+    password = args.password
+    verify = args.verify
+
+    if username is not None and password is None:
+
+        # User specified a username but not a password, so ask
+        import getpass
+        password = getpass.getpass("Password: ")
+
+    if username and password:
+        login_url = BaseConnector._get_phantom_base_url() + "login"
+        try:
+            print("Accessing the Login page")
+            r = requests.get(login_url, verify=verify, timeout=30)
+            csrftoken = r.cookies['csrftoken']
+
+            data = dict()
+            data['username'] = username
+            data['password'] = password
+            data['csrfmiddlewaretoken'] = csrftoken
+
+            headers = dict()
+            headers['Cookie'] = 'csrftoken=' + csrftoken
+            headers['Referer'] = login_url
+
+            print("Logging into Platform to get the session id")
+            r2 = requests.post(login_url, verify=verify, data=data, headers=headers, timeout=30)
+            session_id = r2.cookies['sessionid']
+        except Exception as e:
+            print("Unable to get session id from the platfrom. Error: " + str(e))
+            sys.exit(1)
+
     if len(sys.argv) < 2:
         print("No test json specified as input")
-        sys.exit(1)
+        sys.exit(0)
 
     with open(sys.argv[1]) as f:
         in_json = f.read()
@@ -795,6 +849,10 @@ if __name__ == "__main__":
 
         connector = CiscoISEConnector()
         connector.print_progress_message = True
+
+        if session_id is not None:
+            in_json['user_session_token'] = session_id
+
         ret_val = connector._handle_action(json.dumps(in_json), None)
         print(json.dumps(json.loads(ret_val), indent=4))
 
