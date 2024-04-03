@@ -52,7 +52,9 @@ This app implements investigative and containment actions on a Cisco ISE device
     -   update resource
     -   apply policy
     -   create policy
-3.  An ISE node can assume any or all of the following personas: Administration, Policy Service, and
+3.  If resource is **Guest User** in resource related actions, it is required to use **Sponsor Account** credentials to access the GuestAPI, For creating sponsor account refer this document: [Set Up Admin and Sponsor Account for ERS](https://www.cisco.com/c/en/us/support/docs/security/identity-services-engine/215476-configure-ise-guest-accounts-with-rest-a.html)
+4.  Once you have internal user created from step #3, Add username and password in **ers_username** and **ers_password** in asset configuration respectively. 
+5.  An ISE node can assume any or all of the following personas: Administration, Policy Service, and
     Monitoring. For detailed info: [Types of
     nodes](https://www.cisco.com/en/US/docs/security/ise/1.0/user_guide/ise10_dis_deploy.html#wp1123452)
     -   All actions can run on Administration node.
@@ -61,7 +63,7 @@ This app implements investigative and containment actions on a Cisco ISE device
         node
     -   Actions quarantine device, unquarantine device, apply policy, clear policy, and terminate
         session can run on Policy Service node
-4.  For create resource action, user needs to provide valid json with required fields of that
+6.  For create resource action, user needs to provide valid json with required fields of that
     specified resource (For more details head over to [API
     Reference](https://developer.cisco.com/docs/identity-services-engine/v1/#!endpoint) ). Examples
     as below
