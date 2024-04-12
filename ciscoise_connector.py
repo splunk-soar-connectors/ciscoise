@@ -443,7 +443,7 @@ class CiscoISEConnector(BaseConnector):
             if items_from_page is not None:
                 items_list.extend(items_from_page)
                 self.debug_print("Retrieved {} records from the endpoint {}".format(len(items_from_page), endpoint))
-            
+
             next_page_dict = items.get("SearchResult", {}).get("nextPage")
 
             if next_page_dict is not None:
