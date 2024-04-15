@@ -432,34 +432,33 @@ class CiscoISEConnector(BaseConnector):
 
         items_list = list()
         params = {}
-        params["size"] = DEFAULT_MAX_RESULTS
+        if limit:
+            params["size"] = min(DEFAULT_MAX_RESULTS, limit)
+        else:
+            params["size"] = DEFAULT_MAX_RESULTS
 
         while True:
             ret_val, items = self._call_ers_api(endpoint, action_result, params=params)
             if phantom.is_fail(ret_val):
                 self.debug_print("Call to ERS API Failed")
                 return None
-            items_from_page = items.get("SearchResult", {}).get("resources")
-            if items_from_page is not None:
-                items_list.extend(items_from_page)
-                self.debug_print("Retrieved {} records from the endpoint {}".format(len(items_from_page), endpoint))
+            items_from_page = items.get("SearchResult", {}).get("resources", [])
+
+            items_list.extend(items_from_page)
+            self.debug_print("Retrieved {} records from the endpoint {}".format(len(items_from_page), endpoint))
 
             next_page_dict = items.get("SearchResult", {}).get("nextPage")
 
-            if next_page_dict is not None:
-                endpoint = next_page_dict.get("href").replace(self._base_url, "")
-                self.debug_print("Next page available")
+            if limit and len(items_list) >= limit:
+                self.debug_print("Reached to the final page and max limit reached")
+                return items_list[:limit]
             else:
-                if limit and len(items_list) >= limit:
-                    self.debug_print("Reached to the final page and max limit reached")
-                    return items_list[:limit]
-                else:
+                if next_page_dict is None:
                     self.debug_print("Max limit not reached, but no more records left to retrieve")
                     return items_list
-
-            if limit and len(items_list) >= limit:
-                self.debug_print("Next page available. But max limit reached.")
-                return items_list[:limit]
+                else:
+                    endpoint = next_page_dict.get("href").replace(self._base_url, "")
+                    self.debug_print("Next page available")
 
     def _list_resources(self, param):
 
