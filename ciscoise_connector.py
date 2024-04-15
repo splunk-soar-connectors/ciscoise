@@ -450,11 +450,11 @@ class CiscoISEConnector(BaseConnector):
             next_page_dict = items.get("SearchResult", {}).get("nextPage")
 
             if limit and len(items_list) >= limit:
-                self.debug_print("Reached to the final page and max limit reached")
+                self.debug_print("Maximum limit reached")
                 return items_list[:limit]
             else:
                 if next_page_dict is None:
-                    self.debug_print("Max limit not reached, but no more records left to retrieve")
+                    self.debug_print("No more records left to retrieve")
                     return items_list
                 else:
                     endpoint = next_page_dict.get("href").replace(self._base_url, "")
