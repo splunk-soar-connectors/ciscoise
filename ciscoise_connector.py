@@ -464,7 +464,7 @@ class CiscoISEConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         resource = self._map_resource_type(param["resource"], action_result)
-        ret_val, max_result = self._validate_integers(action_result, param.get("max_results"), 'max_result')
+        ret_val, max_result = self._validate_integers(action_result, param.get("max_results"), 'max results')
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
