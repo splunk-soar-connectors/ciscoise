@@ -18,7 +18,7 @@
     "python_version": "3",
     "fips_compliant": true,
     "latest_tested_version": [
-        "Cisco ISE version 3.0.0.458, 24 Apr 2024"
+        "Cisco ISE version 3.0.0.458, 29 Apr 2024"
     ],
     "configuration": {
         "device": {
