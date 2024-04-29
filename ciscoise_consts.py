@@ -33,8 +33,8 @@ ERS_ENDPOINT_ANC_CLEAR = ":9060/ers/config/ancendpoint/clear"
 ERS_POLICIES = ":9060/ers/config/ancpolicy"
 
 # Error/Success
-CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED_1 = "Test connectivity failed for primary device"
-CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED_2 = "Test connectivity failed for second device"
+CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED_PRIMARY_DEVICE = "Test connectivity failed for primary device"
+CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED_HA_DEVICE = "Test connectivity failed for high availability device"
 CISCOISE_TEST_CONNECTIVITY_FAILED_ERROR_CODE = "Test connectivity failed with status code: '{code}'"
 CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED_1 = "Test connectivity passed for primary device"
 CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED_2 = "Test connectivity passed for second device"

@@ -453,7 +453,7 @@ class CiscoISEConnector(BaseConnector):
                 self.debug_print("Maximum limit reached")
                 return items_list[:limit]
             else:
-                if next_page_dict is None:
+                if not next_page_dict:
                     self.debug_print("No more records left to retrieve")
                     return items_list
                 else:
@@ -724,9 +724,9 @@ class CiscoISEConnector(BaseConnector):
         result, message = self._test_connectivity_to_device(self._base_url, verify)
 
         if not result:
-            self.save_progress("Error occurred while connecting to first device")
+            self.save_progress("Error occurred while connecting to primary device")
             self.save_progress(str(message))
-            self.save_progress(CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED_1)
+            self.save_progress(CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED_PRIMARY_DEVICE)
             action_result.set_status(phantom.APP_ERROR)
         else:
             self.save_progress(CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED_1)
@@ -738,7 +738,7 @@ class CiscoISEConnector(BaseConnector):
             if not result:
                 self.save_progress("Error occurred while connecting to high availability device")
                 self.save_progress(str(message))
-                self.save_progress(CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED_2)
+                self.save_progress(CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED_HA_DEVICE)
             else:
                 self.save_progress(CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED_2)
 
