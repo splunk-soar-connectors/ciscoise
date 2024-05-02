@@ -1,2 +1,1 @@
 **Unreleased**
-* Fixed pagination logic for 'list resources' action [PAPP-33229]
