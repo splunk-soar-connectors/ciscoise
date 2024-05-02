@@ -1,6 +1,6 @@
 # File: ciscoise_consts.py
 #
-# Copyright (c) 2014-2023 Splunk Inc.
+# Copyright (c) 2014-2024 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,9 +33,11 @@ ERS_ENDPOINT_ANC_CLEAR = ":9060/ers/config/ancendpoint/clear"
 ERS_POLICIES = ":9060/ers/config/ancpolicy"
 
 # Error/Success
-CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED = "Test connectivity failed"
+CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED_PRIMARY_DEVICE = "Test connectivity failed for primary device"
+CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED_HA_DEVICE = "Test connectivity failed for high availability device"
 CISCOISE_TEST_CONNECTIVITY_FAILED_ERROR_CODE = "Test connectivity failed with status code: '{code}'"
-CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED = "Test connectivity passed"
+CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED_1 = "Test connectivity passed for primary device"
+CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED_2 = "Test connectivity passed for second device"
 CISCOISE_ERROR_REST_API = "REST Api error"
 CISCOISE_REST_API_ERROR_CODE = "REST Api error with status code: {code}, Message from server: {message}"
 CISCOISE_ERROR_UNABLE_TO_PARSE_REPLY = "Parsing error, Unable to convert xml reply to json"
@@ -48,10 +50,10 @@ CISCOISE_ERROR_ACTION_FAILED = "Action failed with error code: {error_code}"
 CISCOISE_SUCC_LIST_ENDPOINTS = "{0} Endpoints found"
 CISCOISE_SUCC_GET_ENDPOINT = "Endpoint found"
 CISCOISE_SUCC_UPDATE_ENDPOINT = "Endpoint updated"
-CISCOISE_ERROR_INVALID_PARAM = "Please provide a non-zero positive integer in {param}"
+CISCOISE_ERROR_INVALID_PARAM = "Please provide a non-zero positive integer in '{}'"
 CISCOISE_MAP_IP_ABSENT_ERROR = "Please provide either mac address or ip address"
 CISCOISE_ERS_CRED_MISSING = "ERS credentials in asset configuration are required for this action"
-DEFAULT_MAX_RESULTS = 7
+DEFAULT_MAX_RESULTS = 100
 
 # Json reply schema
 IS_MAC_QUARAN_RESP_SCHEMA = {

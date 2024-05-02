@@ -1,6 +1,6 @@
 # File: ciscoise_connector.py
 #
-# Copyright (c) 2014-2023 Splunk Inc.
+# Copyright (c) 2014-2024 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 #
 # Phantom imports
 import json
+import sys
 
 import phantom.app as phantom
 import requests
@@ -49,7 +50,6 @@ class CiscoISEConnector(BaseConnector):
     ACTION_ID_DELETE_POLICY = "delete_policy"
 
     def __init__(self):
-
         # Call the BaseConnectors init first
         super(CiscoISEConnector, self).__init__()
 
@@ -116,13 +116,15 @@ class CiscoISEConnector(BaseConnector):
 
         return make_another_call
 
-    def _call_ers_api(self, endpoint, action_result, data=None, allow_unknown=True, method="get", try_ha_device=False):
+    def _call_ers_api(self, endpoint, action_result, data=None, allow_unknown=True, method="get", try_ha_device=False, params=None):
         auth_method = self._ers_auth or self._auth
         if not auth_method:
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERS_CRED_MISSING), None
         url = "{0}{1}".format(self._base_url, endpoint)
         if try_ha_device:
             url = "{0}{1}".format(self._ha_device_url, endpoint)
+
+        self.debug_print("url for calling an ERS API: {}".format(url))
 
         ret_data = None
 
@@ -140,8 +142,10 @@ class CiscoISEConnector(BaseConnector):
                 json=data,
                 verify=verify,
                 headers=headers,
-                auth=auth_method
+                auth=auth_method,
+                params=params
             )
+
         except Exception as e:
             self.debug_print("Exception occurred: {}".format(e))
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_REST_API, e), ret_data
@@ -424,44 +428,43 @@ class CiscoISEConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, CISCOISE_SUCC_SESSION_TERMINATED)
 
-    def _paginator(self, endpoint, action_result, payload=None, limit=None):
+    def _paginator(self, endpoint, action_result, limit=None):
 
         items_list = list()
-
-        if not payload:
-            payload = {}
-
-        page = 1
-        payload["size"] = DEFAULT_MAX_RESULTS
-        payload["page"] = page
+        params = {}
+        if limit:
+            params["size"] = min(DEFAULT_MAX_RESULTS, limit)
+        else:
+            params["size"] = DEFAULT_MAX_RESULTS
 
         while True:
-            ret_val, items = self._call_ers_api(endpoint, action_result, data=payload)
-
+            ret_val, items = self._call_ers_api(endpoint, action_result, params=params)
             if phantom.is_fail(ret_val):
+                self.debug_print("Call to ERS API Failed")
                 return None
+            items_from_page = items.get("SearchResult", {}).get("resources", [])
 
-            items_list.extend(items.get("SearchResult", {}).get("resources"))
+            items_list.extend(items_from_page)
+            self.debug_print("Retrieved {} records from the endpoint {}".format(len(items_from_page), endpoint))
+
+            next_page_dict = items.get("SearchResult", {}).get("nextPage")
 
             if limit and len(items_list) >= limit:
+                self.debug_print("Maximum limit reached")
                 return items_list[:limit]
-
-            if len(items.get("SearchResult", {}).get("resources")) < DEFAULT_MAX_RESULTS:
-                break
-
-            if len(items_list) == items.get("SearchResult", {}).get("total"):
-                break
-
-            page = page + 1
-            payload["page"] = page
-
-        return items_list
+            else:
+                if not next_page_dict:
+                    self.debug_print("No more records left to retrieve")
+                    return items_list
+                else:
+                    endpoint = next_page_dict.get("href").replace(self._base_url, "")
+                    self.debug_print("Next page available")
 
     def _list_resources(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         resource = self._map_resource_type(param["resource"], action_result)
-        ret_val, max_result = self._validate_integers(action_result, param.get("max_results"), 'max_result')
+        ret_val, max_result = self._validate_integers(action_result, param.get("max_results"), 'max results')
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -707,30 +710,39 @@ class CiscoISEConnector(BaseConnector):
                 auth=self._auth,
                 verify=verify)
         except Exception as e:
-            self.debug_print("Exception is test connectivity: {}".format(e))
-            return self.set_status_save_progress(phantom.APP_ERROR, CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED)
+            return False, str(e)
 
         if resp.status_code == 200:
-            return self.set_status_save_progress(phantom.APP_SUCCESS, CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED)
-        else:
-            return self.set_status_save_progress(
-                phantom.APP_ERROR,
-                CISCOISE_TEST_CONNECTIVITY_FAILED_ERROR_CODE,
-                code=resp.status_code
-            )
+            return True, ''
+
+        return False, resp.text
 
     def _test_connectivity(self, param):
-
+        action_result = self.add_action_result(ActionResult(dict(param)))
         config = self.get_config()
         verify = config[phantom.APP_JSON_VERIFY]
-        self.save_progress("Connecting to first device")
-        result = self._test_connectivity_to_device(self._base_url, verify)
+        result, message = self._test_connectivity_to_device(self._base_url, verify)
+
+        if not result:
+            self.save_progress("Error occurred while connecting to primary device")
+            self.save_progress(str(message))
+            self.save_progress(CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED_PRIMARY_DEVICE)
+            action_result.set_status(phantom.APP_ERROR)
+        else:
+            self.save_progress(CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED_1)
+            action_result.set_status(phantom.APP_SUCCESS, CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED_1)
 
         if self._ha_device:
-            self.save_progress("Connecting to second device")
-            result = self._test_connectivity_to_device(self._ha_device_url, verify)
+            result, message = self._test_connectivity_to_device(self._ha_device_url, verify)
 
-        return result
+            if not result:
+                self.save_progress("Error occurred while connecting to high availability device")
+                self.save_progress(str(message))
+                self.save_progress(CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED_HA_DEVICE)
+            else:
+                self.save_progress(CISCOISE_SUCC_TEST_CONNECTIVITY_PASSED_2)
+
+        return action_result.get_status()
 
     def handle_action(self, param):
 
@@ -775,17 +787,60 @@ class CiscoISEConnector(BaseConnector):
         return result
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
-    import sys
+    import argparse
 
     import pudb
 
     pudb.set_trace()
 
+    argparser = argparse.ArgumentParser()
+
+    argparser.add_argument('input_test_json', help='Input Test JSON file')
+    argparser.add_argument('-u', '--username', help='username', required=False)
+    argparser.add_argument('-p', '--password', help='password', required=False)
+    argparser.add_argument('-v', '--verify', action='store_true', help='verify', required=False, default=False)
+
+    args = argparser.parse_args()
+    session_id = None
+
+    username = args.username
+    password = args.password
+    verify = args.verify
+
+    if username is not None and password is None:
+
+        # User specified a username but not a password, so ask
+        import getpass
+        password = getpass.getpass("Password: ")
+
+    if username and password:
+        login_url = BaseConnector._get_phantom_base_url() + "login"
+        try:
+            print("Accessing the Login page")
+            r = requests.get(login_url, verify=verify, timeout=30)
+            csrftoken = r.cookies['csrftoken']
+
+            data = dict()
+            data['username'] = username
+            data['password'] = password
+            data['csrfmiddlewaretoken'] = csrftoken
+
+            headers = dict()
+            headers['Cookie'] = 'csrftoken=' + csrftoken
+            headers['Referer'] = login_url
+
+            print("Logging into Platform to get the session id")
+            r2 = requests.post(login_url, verify=verify, data=data, headers=headers, timeout=30)
+            session_id = r2.cookies['sessionid']
+        except Exception as e:
+            print("Unable to get session id from the platfrom. Error: " + str(e))
+            sys.exit(1)
+
     if len(sys.argv) < 2:
         print("No test json specified as input")
-        sys.exit(1)
+        sys.exit(0)
 
     with open(sys.argv[1]) as f:
         in_json = f.read()
@@ -794,6 +849,10 @@ if __name__ == "__main__":
 
         connector = CiscoISEConnector()
         connector.print_progress_message = True
+
+        if session_id is not None:
+            in_json['user_session_token'] = session_id
+
         ret_val = connector._handle_action(json.dumps(in_json), None)
         print(json.dumps(json.loads(ret_val), indent=4))
 
