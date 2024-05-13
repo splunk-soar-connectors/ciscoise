@@ -2,7 +2,7 @@
 # Cisco ISE
 
 Publisher: Splunk  
-Connector Version: 3.1.0  
+Connector Version: 3.1.99  
 Product Vendor: Cisco Systems  
 Product Name: Cisco ISE  
 Product Version Supported (regex): "/([2].[67])|([3].[01])/"  
