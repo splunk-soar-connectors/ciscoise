@@ -5,20 +5,20 @@
     "publisher": "Splunk",
     "type": "network security",
     "main_module": "ciscoise_connector.py",
-    "app_version": "3.0.2",
+    "app_version": "3.1.0",
     "utctime_updated": "2022-03-11T04:16:56.000000Z",
     "package_name": "phantom_ciscoise",
     "product_vendor": "Cisco Systems",
     "product_name": "Cisco ISE",
     "product_version_regex": "/([2].[67])|([3].[01])/",
-    "min_phantom_version": "5.1.0",
+    "min_phantom_version": "6.2.0",
     "logo": "logo_cisco.svg",
     "logo_dark": "logo_cisco_dark.svg",
-    "license": "Copyright (c) 2014-2023 Splunk Inc.",
+    "license": "Copyright (c) 2014-2024 Splunk Inc.",
     "python_version": "3",
     "fips_compliant": true,
     "latest_tested_version": [
-        "Cisco ISE version 3.0.0.458, 22th Feb 2022"
+        "Cisco ISE version 3.0.0.458, 29 Apr 2024"
     ],
     "configuration": {
         "device": {
@@ -1921,7 +1921,7 @@
             },
             {
                 "module": "setuptools",
-                "input_file": "wheels/py3/setuptools-69.0.2-py3-none-any.whl"
+                "input_file": "wheels/py3/setuptools-69.2.0-py3-none-any.whl"
             },
             {
                 "module": "xmltodict",
