@@ -77,7 +77,7 @@ class CiscoISEConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def _validate_integers(self, action_result, parameter, key, allow_zero=False):
-        """ This method is to check if the provided input parameter value
+        """This method is to check if the provided input parameter value
         is a non-zero positive integer and returns the integer value of the parameter itself.
         :param action_result: Action result or BaseConnector object
         :param parameter: input parameter
@@ -94,11 +94,14 @@ class CiscoISEConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_INVALID_PARAM.format(key)), None
 
             if parameter < 0:
-                return action_result.set_status(phantom.APP_ERROR,
-                                                "Please provide a valid non-negative integer value in the {} parameter".format(key)), None
+                return (
+                    action_result.set_status(
+                        phantom.APP_ERROR, "Please provide a valid non-negative integer value in the {} parameter".format(key)
+                    ),
+                    None,
+                )
             if not allow_zero and parameter == 0:
-                return action_result.set_status(phantom.APP_ERROR,
-                                                "Please provide non-zero positive integer in {}".format(key)), None
+                return action_result.set_status(phantom.APP_ERROR, "Please provide non-zero positive integer in {}".format(key)), None
 
         return phantom.APP_SUCCESS, parameter
 
@@ -138,12 +141,7 @@ class CiscoISEConnector(BaseConnector):
         try:
             headers = {"Content-Type": "application/json", "ACCEPT": "application/json"}
             resp = request_func(  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
-                url,
-                json=data,
-                verify=verify,
-                headers=headers,
-                auth=auth_method,
-                params=params
+                url, json=data, verify=verify, headers=headers, auth=auth_method, params=params
             )
 
         except Exception as e:
@@ -153,25 +151,16 @@ class CiscoISEConnector(BaseConnector):
         if not (200 <= resp.status_code < 399):
             error_message = resp.text
             if resp.status_code == 401:
-                error_message = "The request has not been applied because it lacks valid authentication credentials" \
-                                " for the target resource."
+                error_message = "The request has not been applied because it lacks valid authentication credentials" " for the target resource."
             elif resp.status_code == 404:
                 error_message = "Resource not found"
             return (
-                action_result.set_status(
-                    phantom.APP_ERROR,
-                    CISCOISE_REST_API_ERROR_CODE,
-                    code=resp.status_code,
-                    message=error_message
-                ),
-                ret_data
+                action_result.set_status(phantom.APP_ERROR, CISCOISE_REST_API_ERROR_CODE, code=resp.status_code, message=error_message),
+                ret_data,
             )
 
         if not resp.text:
-            return (
-                action_result.set_status(phantom.APP_SUCCESS, "Empty response and no information in the header"),
-                None
-            )
+            return (action_result.set_status(phantom.APP_SUCCESS, "Empty response and no information in the header"), None)
 
         ret_data = json.loads(resp.text)
 
@@ -188,10 +177,7 @@ class CiscoISEConnector(BaseConnector):
         verify = config[phantom.APP_JSON_VERIFY]
 
         try:
-            resp = requests.get(  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
-                url,
-                verify=verify,
-                auth=self._auth)
+            resp = requests.get(url, verify=verify, auth=self._auth)  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
         except Exception as e:
             self.debug_print("Exception occurred: {}".format(e))
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_REST_API, e), ret_data
@@ -340,10 +326,7 @@ class CiscoISEConnector(BaseConnector):
             final_data["ERSEndPoint"][attribute] = attribute_value
 
         if (custom_attribute is not None) ^ (custom_attribute_value is not None):
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                "Please specify both custom attribute and custom attribute value"
-            )
+            return action_result.set_status(phantom.APP_ERROR, "Please specify both custom attribute and custom attribute value")
         elif custom_attribute and custom_attribute_value:
             custom_attribute_dict = {"customAttributes": {custom_attribute: custom_attribute_value}}
             final_data["ERSEndPoint"]["customAttributes"] = custom_attribute_dict
@@ -464,7 +447,7 @@ class CiscoISEConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         resource = self._map_resource_type(param["resource"], action_result)
-        ret_val, max_result = self._validate_integers(action_result, param.get("max_results"), 'max results')
+        ret_val, max_result = self._validate_integers(action_result, param.get("max_results"), "max results")
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -577,9 +560,7 @@ class CiscoISEConnector(BaseConnector):
 
         data_dict = {resource_key: {}}
         data_dict[resource_key][key] = value
-        ret_val, resp = self._call_ers_api(
-            endpoint, action_result, data=data_dict, method="put"
-        )
+        ret_val, resp = self._call_ers_api(endpoint, action_result, data=data_dict, method="put")
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -661,7 +642,7 @@ class CiscoISEConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
             data = ret_data["ErsAncPolicy"]
-            data['actions'] = ', '.join(data['actions'])
+            data["actions"] = ", ".join(data["actions"])
             action_result.add_data(data)
 
         action_result.update_summary({"policies_found": total})
@@ -685,12 +666,7 @@ class CiscoISEConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        body = {
-            "ErsAncPolicy": {
-                "name": param["name"],
-                "actions": [param["action_type"]]
-            }
-        }
+        body = {"ErsAncPolicy": {"name": param["name"], "actions": [param["action_type"]]}}
 
         endpoint = f"{ERS_POLICIES}"
 
@@ -699,21 +675,20 @@ class CiscoISEConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        return action_result.set_status(phantom.APP_SUCCESS, 'Policy created')
+        return action_result.set_status(phantom.APP_SUCCESS, "Policy created")
 
     def _test_connectivity_to_device(self, base_url, verify=True):
         try:
             rest_endpoint = "{0}{1}".format(base_url, ACTIVE_LIST_REST)
             self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, base_url)
             resp = requests.get(  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
-                rest_endpoint,
-                auth=self._auth,
-                verify=verify)
+                rest_endpoint, auth=self._auth, verify=verify
+            )
         except Exception as e:
             return False, str(e)
 
         if resp.status_code == 200:
-            return True, ''
+            return True, ""
 
         return False, resp.text
 
@@ -787,7 +762,7 @@ class CiscoISEConnector(BaseConnector):
         return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     import argparse
 
@@ -797,10 +772,10 @@ if __name__ == '__main__':
 
     argparser = argparse.ArgumentParser()
 
-    argparser.add_argument('input_test_json', help='Input Test JSON file')
-    argparser.add_argument('-u', '--username', help='username', required=False)
-    argparser.add_argument('-p', '--password', help='password', required=False)
-    argparser.add_argument('-v', '--verify', action='store_true', help='verify', required=False, default=False)
+    argparser.add_argument("input_test_json", help="Input Test JSON file")
+    argparser.add_argument("-u", "--username", help="username", required=False)
+    argparser.add_argument("-p", "--password", help="password", required=False)
+    argparser.add_argument("-v", "--verify", action="store_true", help="verify", required=False, default=False)
 
     args = argparser.parse_args()
     session_id = None
@@ -813,6 +788,7 @@ if __name__ == '__main__':
 
         # User specified a username but not a password, so ask
         import getpass
+
         password = getpass.getpass("Password: ")
 
     if username and password:
@@ -820,20 +796,20 @@ if __name__ == '__main__':
         try:
             print("Accessing the Login page")
             r = requests.get(login_url, verify=verify, timeout=30)
-            csrftoken = r.cookies['csrftoken']
+            csrftoken = r.cookies["csrftoken"]
 
             data = dict()
-            data['username'] = username
-            data['password'] = password
-            data['csrfmiddlewaretoken'] = csrftoken
+            data["username"] = username
+            data["password"] = password
+            data["csrfmiddlewaretoken"] = csrftoken
 
             headers = dict()
-            headers['Cookie'] = 'csrftoken=' + csrftoken
-            headers['Referer'] = login_url
+            headers["Cookie"] = "csrftoken=" + csrftoken
+            headers["Referer"] = login_url
 
             print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=verify, data=data, headers=headers, timeout=30)
-            session_id = r2.cookies['sessionid']
+            session_id = r2.cookies["sessionid"]
         except Exception as e:
             print("Unable to get session id from the platfrom. Error: " + str(e))
             sys.exit(1)
@@ -851,7 +827,7 @@ if __name__ == '__main__':
         connector.print_progress_message = True
 
         if session_id is not None:
-            in_json['user_session_token'] = session_id
+            in_json["user_session_token"] = session_id
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
         print(json.dumps(json.loads(ret_val), indent=4))

@@ -56,13 +56,9 @@ CISCOISE_ERS_CRED_MISSING = "ERS credentials in asset configuration are required
 DEFAULT_MAX_RESULTS = 100
 
 # Json reply schema
-IS_MAC_QUARAN_RESP_SCHEMA = {
-    "EPS_RESULT": {"type": "dict", "schema": {"status": {"type": "string"}, "userData": {"type": "string"}}}
-}
+IS_MAC_QUARAN_RESP_SCHEMA = {"EPS_RESULT": {"type": "dict", "schema": {"status": {"type": "string"}, "userData": {"type": "string"}}}}
 MAC_SESSION_RESP_SCHEMA = {"sessionParameters": {"type": "dict", "schema": {"acs_server": {"type": "string"}}}}
-ERS_UPDATE_ENDPOINT_SCHEMA = {
-    "updatedField": {"type": "dict", "schema": {"newValue": {"type": "string"}, "oldValue": {"type": "string"}}}
-}
+ERS_UPDATE_ENDPOINT_SCHEMA = {"updatedField": {"type": "dict", "schema": {"newValue": {"type": "string"}, "oldValue": {"type": "string"}}}}
 
 MAP_RESOURCE = {
     "Endpoints": ["endpoint", "ERSEndPoint"],
