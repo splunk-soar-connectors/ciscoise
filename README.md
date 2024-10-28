@@ -36,7 +36,7 @@ This app implements investigative and containment actions on a Cisco ISE device
     group in username/password field.
 -   Also, you can add both MnT Admin and ERS Admin Access groups to a user and use that credentials
     in username/password. The App will use username/password if ERS username/password is not
-    provided
+    provided 
 
 ## Note
 
