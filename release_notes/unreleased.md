@@ -1,1 +1,3 @@
 **Unreleased**
+
+* Update setuptools version, pre-commit updates [PAPP-34894]
