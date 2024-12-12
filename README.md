@@ -2,7 +2,7 @@
 # Cisco ISE
 
 Publisher: Splunk  
-Connector Version: 3.1.0  
+Connector Version: 3.1.1  
 Product Vendor: Cisco Systems  
 Product Name: Cisco ISE  
 Product Version Supported (regex): "/([2].[67])|([3].[01])/"  
@@ -197,8 +197,8 @@ ports used by Splunk SOAR.
 | https        | tcp                | 443  |
 
 
-### Configuration Variables
-The below configuration variables are required for this Connector to operate.  These variables are specified when configuring a Cisco ISE asset in SOAR.
+### Configuration variables
+This table lists the configuration variables required to operate Cisco ISE. These variables are specified when configuring a Cisco ISE asset in Splunk SOAR.
 
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
