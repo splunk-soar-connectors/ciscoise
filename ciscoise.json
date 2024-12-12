@@ -5,13 +5,13 @@
     "publisher": "Splunk",
     "type": "network security",
     "main_module": "ciscoise_connector.py",
-    "app_version": "3.1.0",
-    "utctime_updated": "2022-03-11T04:16:56.000000Z",
+    "app_version": "3.1.1",
+    "utctime_updated": "2024-12-12T20:47:01.000000Z",
     "package_name": "phantom_ciscoise",
     "product_vendor": "Cisco Systems",
     "product_name": "Cisco ISE",
     "product_version_regex": "/([2].[67])|([3].[01])/",
-    "min_phantom_version": "6.2.0",
+    "min_phantom_version": "6.3.0",
     "logo": "logo_cisco.svg",
     "logo_dark": "logo_cisco_dark.svg",
     "license": "Copyright (c) 2014-2024 Splunk Inc.",
@@ -1897,22 +1897,6 @@
             "versions": "EQ(*)"
         }
     ],
-    "pip_dependencies": {
-        "wheel": [
-            {
-                "module": "Cerberus",
-                "input_file": "wheels/py3/Cerberus-1.3.4-py3-none-any.whl"
-            },
-            {
-                "module": "setuptools",
-                "input_file": "wheels/py3/setuptools-59.6.0-py3-none-any.whl"
-            },
-            {
-                "module": "xmltodict",
-                "input_file": "wheels/shared/xmltodict-0.12.0-py2.py3-none-any.whl"
-            }
-        ]
-    },
     "pip39_dependencies": {
         "wheel": [
             {
@@ -1921,7 +1905,7 @@
             },
             {
                 "module": "setuptools",
-                "input_file": "wheels/py3/setuptools-69.2.0-py3-none-any.whl"
+                "input_file": "wheels/py3/setuptools-75.2.0-py3-none-any.whl"
             },
             {
                 "module": "xmltodict",
