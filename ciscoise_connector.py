@@ -48,6 +48,8 @@ class CiscoISEConnector(BaseConnector):
     ACTION_ID_LIST_POLICIES = "list_policies"
     ACTION_ID_CREATE_POLICY = "add_policy"
     ACTION_ID_DELETE_POLICY = "delete_policy"
+    ACTION_ID_LIST_ANC_ENDPOINTS = "list_anc_endpoints"
+    ACTION_ID_GET_ANC_ENDPOINT = "get_anc_endpoint"
 
     def __init__(self):
         # Call the BaseConnectors init first
@@ -700,6 +702,44 @@ class CiscoISEConnector(BaseConnector):
 
         return action_result.get_status()
 
+    def _list_anc_endpoints(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        endpoint = ERS_ENDPOINT_ANC
+
+        mac_filter = param.get("mac_address")
+        if mac_filter is not None:
+            endpoint = ERS_ENDPOINT_ANC + "?filter=name.CONTAINS." + mac_filter
+
+        ret_val, ret_data = self._call_ers_api(endpoint, action_result)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        total = ret_data["SearchResult"]["total"]
+
+        action_result.update_summary({"endpoints_found": total})
+
+        action_result.add_data(ret_data)
+
+        return action_result.set_status(phantom.APP_SUCCESS, CISCOISE_SUCC_LIST_ENDPOINTS.format(total))
+
+    def _get_anc_endpoint(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        endpoint = ERS_ENDPOINT_ANC + "/" + param["endpoint_id"]
+
+        ret_val, ret_data = self._call_ers_api(endpoint, action_result)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(ret_data)
+
+        return action_result.set_status(phantom.APP_SUCCESS, CISCOISE_SUCC_GET_ENDPOINT)
+
     def handle_action(self, param):
         result = None
         action = self.get_action_identifier()
@@ -738,6 +778,10 @@ class CiscoISEConnector(BaseConnector):
             result = self._add_policy(param)
         elif action == self.ACTION_ID_DELETE_POLICY:
             result = self._delete_policy(param)
+        elif action == self.ACTION_ID_LIST_ANC_ENDPOINTS:
+            result = self._list_anc_endpoints(param)
+        elif action == self.ACTION_ID_GET_ANC_ENDPOINT:
+            result = self._get_anc_endpoint(param)
 
         return result
 

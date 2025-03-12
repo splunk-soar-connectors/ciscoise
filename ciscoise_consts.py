@@ -31,6 +31,7 @@ ERS_RESOURCE_REST = ":9060/ers/config/{resource}"
 ERS_ENDPOINT_ANC_APPLY = ":9060/ers/config/ancendpoint/apply"
 ERS_ENDPOINT_ANC_CLEAR = ":9060/ers/config/ancendpoint/clear"
 ERS_POLICIES = ":9060/ers/config/ancpolicy"
+ERS_ENDPOINT_ANC = ":9060/ers/config/ancendpoint"
 
 # Error/Success
 CISCOISE_ERROR_TEST_CONNECTIVITY_FAILED_PRIMARY_DEVICE = "Test connectivity failed for primary device"

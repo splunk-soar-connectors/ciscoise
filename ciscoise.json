@@ -1899,6 +1899,266 @@
                 }
             ],
             "versions": "EQ(*)"
+        },
+        {
+            "action": "list anc endpoints",
+            "description": "List the endpoints with anc configured on the system",
+            "type": "investigate",
+            "identifier": "list_anc_endpoints",
+            "read_only": true,
+            "parameters": {
+                "mac_address": {
+                    "description": "Mac Address to filter on (6 bytes, colon separated)",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "mac address"
+                    ],
+                    "primary": true,
+                    "name": "mac_address"
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "ANC Endpoints"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.mac_address",
+                    "data_type": "string",
+                    "example_values": [
+                        "11:11:11:11:11:11"
+                    ],
+                    "contains": [
+                        "mac address"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SearchResult.resources.*.id",
+                    "data_type": "string",
+                    "column_name": "ISE Endpoint ID",
+                    "column_order": 1,
+                    "example_values": [
+                        "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                    ],
+                    "contains": [
+                        "ise endpoint id",
+                        "ise resource id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SearchResult.resources.*.link.href",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SearchResult.resources.*.link.rel",
+                    "data_type": "string",
+                    "example_values": [
+                        "self"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SearchResult.resources.*.link.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/xml"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SearchResult.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.Endpoints found",
+                    "data_type": "string",
+                    "example_values": [
+                        "9",
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.endpoints_found",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "9 Endpoints found",
+                        "1 Endpoints found"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get anc device info",
+            "description": "Get information about a specific endpoint with assigned anc policy",
+            "type": "investigate",
+            "identifier": "get_anc_endpoint",
+            "read_only": true,
+            "parameters": {
+                "endpoint_id": {
+                    "description": "ISE Endpoint ID for device",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "ise endpoint id",
+                        "ise resource id"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "name": "endpoint_id"
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "ANC Endpoint Info"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.endpoint_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "59985000-712d-11e6-9062-000c29bea319",
+                        "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                    ],
+                    "contains": [
+                        "ise endpoint id",
+                        "ise resource id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ErsAncEndpoint.id",
+                    "data_type": "string",
+                    "column_name": "ISE Endpoint ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                    ],
+                    "contains": [
+                        "ise endpoint id",
+                        "ise resource id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ErsAncEndpoint.policyName",
+                    "data_type": "string",
+                    "column_name": "ANC Policy Name",
+                    "column_order": 1,
+                    "example_values": [
+                        "portbounce"
+                    ],
+                    "contains": [
+                        "anc policy name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ErsAncEndpoint.link.href",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ErsAncEndpoint.link.rel",
+                    "data_type": "string",
+                    "example_values": [
+                        "self"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ErsAncEndpoint.link.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/xml"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ErsAncEndpoint.macAddress",
+                    "data_type": "string",
+                    "column_name": "MAC Address",
+                    "column_order": 2,
+                    "example_values": [
+                        "8C:85:90:17:D6:39"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Endpoint found"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
         }
     ],
     "pip39_dependencies": {
