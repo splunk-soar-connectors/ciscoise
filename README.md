@@ -664,16 +664,10 @@ List the endpoints configured with ANC policies on the system
 Type: **investigate**  
 Read only: **True**
 
-#### Action Parameters
-PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
---------- | -------- | ----------- | ---- | --------
-**mac_address** |  optional  | Mac Address to filter on (6 bytes, colon separated) | string |  `mac address` 
-
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string |  |   success  failed 
-action_result.parameter.mac_address | string |  `mac address`  |   11:11:11:11:11:11 
 action_result.data.\*.SearchResult.resources.\*.id | string |  `ise endpoint id`  `ise resource id`  |   d0337940-a86f-11e7-b6e9-000c29d5f0ea 
 action_result.data.\*.SearchResult.resources.\*.link.href | string |  `url`  |   https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea 
 action_result.data.\*.SearchResult.resources.\*.link.rel | string |  |   self 
