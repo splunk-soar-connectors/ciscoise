@@ -708,10 +708,6 @@ class CiscoISEConnector(BaseConnector):
 
         endpoint = ERS_ENDPOINT_ANC
 
-        mac_filter = param.get("mac_address")
-        if mac_filter is not None:
-            endpoint = ERS_ENDPOINT_ANC + "?filter=name.CONTAINS." + mac_filter
-
         ret_val, ret_data = self._call_ers_api(endpoint, action_result)
 
         if phantom.is_fail(ret_val):

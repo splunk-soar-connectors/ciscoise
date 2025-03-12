@@ -1906,18 +1906,7 @@
             "type": "investigate",
             "identifier": "list_anc_endpoints",
             "read_only": true,
-            "parameters": {
-                "mac_address": {
-                    "description": "Mac Address to filter on (6 bytes, colon separated)",
-                    "data_type": "string",
-                    "order": 0,
-                    "contains": [
-                        "mac address"
-                    ],
-                    "primary": true,
-                    "name": "mac_address"
-                }
-            },
+            "parameters": {},
             "render": {
                 "type": "table",
                 "width": 12,
@@ -1931,16 +1920,6 @@
                     "example_values": [
                         "success",
                         "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.mac_address",
-                    "data_type": "string",
-                    "example_values": [
-                        "11:11:11:11:11:11"
-                    ],
-                    "contains": [
-                        "mac address"
                     ]
                 },
                 {
