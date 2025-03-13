@@ -657,3 +657,51 @@ action_result.summary | string |  |
 action_result.message | string |  |   Policy deleted 
 summary.total_objects | numeric |  |   1 
 summary.total_objects_successful | numeric |  |   1 
+
+## action: 'list anc endpoints'
+List the endpoints configured with ANC policies on the system
+
+Type: **investigate**  
+Read only: **True**
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.data.\*.SearchResult.resources.\*.id | string |  `ise endpoint id`  `ise resource id`  |   d0337940-a86f-11e7-b6e9-000c29d5f0ea 
+action_result.data.\*.SearchResult.resources.\*.link.href | string |  `url`  |   https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea 
+action_result.data.\*.SearchResult.resources.\*.link.rel | string |  |   self 
+action_result.data.\*.SearchResult.resources.\*.link.type | string |  |   application/xml 
+action_result.data.\*.SearchResult.total | numeric |  |   1 
+action_result.summary.Endpoints found | string |  |   9  1 
+action_result.summary.endpoints_found | numeric |  |   1 
+action_result.message | string |  |   9 Endpoints found  1 Endpoints found 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
+## action: 'get device info'
+Get information about a specific endpoint with ANC policy
+
+Type: **investigate**  
+Read only: **True**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**endpoint_id** |  required  | ISE Endpoint ID for device | string |  `ise endpoint id`  `ise resource id` 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.endpoint_id | string |  `ise endpoint id`  `ise resource id`  |   59985000-712d-11e6-9062-000c29bea319  d0337940-a86f-11e7-b6e9-000c29d5f0ea 
+action_result.data.\*.ERSEndPoint.id | string |  `ise endpoint id`  `ise resource id`  |   d0337940-a86f-11e7-b6e9-000c29d5f0ea 
+action_result.data.\*.ERSEndPoint.link.href | string |  `url`  |   https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea 
+action_result.data.\*.ERSEndPoint.link.rel | string |  |   self 
+action_result.data.\*.ERSEndPoint.link.type | string |  |   application/xml 
+action_result.data.\*.ERSEndPoint.macAddress | string |  |   8C:85:90:17:D6:39 
+action_result.data.\*.ERSEndPoint.policyName | string |  |   portbounce 
+action_result.summary | string |  |  
+action_result.message | string |  |   Endpoint found 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
