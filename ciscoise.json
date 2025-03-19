@@ -14,7 +14,7 @@
     "min_phantom_version": "6.3.0",
     "logo": "logo_cisco.svg",
     "logo_dark": "logo_cisco_dark.svg",
-    "license": "Copyright (c) 2014-2024 Splunk Inc.",
+    "license": "Copyright (c) 2014-2025 Splunk Inc.",
     "python_version": "3",
     "fips_compliant": true,
     "latest_tested_version": [
@@ -541,6 +541,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.ph_0",
+                    "data_type": "ph"
                 }
             ],
             "versions": "EQ(*)"
