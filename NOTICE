@@ -1,14 +1,14 @@
 Splunk SOAR Cisco ISE
-Copyright (c) 2014-2024 Splunk Inc.
+Copyright (c) 2014-2025 Splunk Inc.
 
-Third-party Software Attributions:
+Third Party Software Attributions:
 
-Library: Cerberus
+Name: Cerberus
 Version: 1.3.4
+Author: Nicola Iarocci
 License: ISC
-Copyright 2012-2016 Nicola Iarocci
 
-Library: xmltodict
+Name: xmltodict
 Version: 0.12.0
+Author: Martin Blech
 License: MIT
-Copyright 2012 Martin Blech and individual contributors
