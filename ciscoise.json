@@ -1904,16 +1904,12 @@
     "pip39_dependencies": {
         "wheel": [
             {
-                "module": "Cerberus",
-                "input_file": "wheels/py3/Cerberus-1.3.4-py3-none-any.whl"
+                "module": "cerberus",
+                "input_file": "wheels/py3/cerberus-1.3.4-py3-none-any.whl"
             },
             {
                 "module": "setuptools",
                 "input_file": "wheels/py3/setuptools-75.2.0-py3-none-any.whl"
-            },
-            {
-                "module": "xmltodict",
-                "input_file": "wheels/shared/xmltodict-0.12.0-py2.py3-none-any.whl"
             }
         ]
     }
