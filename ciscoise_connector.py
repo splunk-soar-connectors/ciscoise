@@ -703,7 +703,6 @@ class CiscoISEConnector(BaseConnector):
         return action_result.get_status()
 
     def _list_anc_endpoints(self, param):
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         endpoint = ERS_ENDPOINT_ANC
@@ -722,7 +721,6 @@ class CiscoISEConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, CISCOISE_SUCC_LIST_ENDPOINTS.format(total))
 
     def _get_anc_endpoint(self, param):
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         endpoint = ERS_ENDPOINT_ANC + "/" + param["endpoint_id"]
