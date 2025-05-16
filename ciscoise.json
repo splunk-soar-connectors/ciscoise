@@ -2007,7 +2007,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "get anc device info",
+            "action": "anc device info",
             "description": "Get information about a specific endpoint with assigned anc policy",
             "type": "investigate",
             "identifier": "get_anc_endpoint",
