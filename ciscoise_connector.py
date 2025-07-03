@@ -712,7 +712,7 @@ class CiscoISEConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        total = ret_data["SearchResult"]["total"]
+        total = ret_data.get("SearchResult", {}).get("total")
 
         action_result.update_summary({"endpoints_found": total})
 

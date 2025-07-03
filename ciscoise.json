@@ -120,7 +120,7 @@
                     "column_name": "ISE Endpoint ID",
                     "column_order": 1,
                     "example_values": [
-                        "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                        "b0007940-ffff-eeee-bbbb-000c29d5f0ff"
                     ],
                     "contains": [
                         "ise endpoint id",
@@ -131,7 +131,7 @@
                     "data_path": "action_result.data.*.SearchResult.resources.*.link.href",
                     "data_type": "string",
                     "example_values": [
-                        "https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                        "https://10.11.11.11:9060/ers/config/endpoint/b0007940-ffff-eeee-bbbb-000c29d5f0ff"
                     ],
                     "contains": [
                         "url"
@@ -245,8 +245,8 @@
                     "data_path": "action_result.parameter.endpoint_id",
                     "data_type": "string",
                     "example_values": [
-                        "59985000-712d-11e6-9062-000c29bea319",
-                        "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                        "44443c00-2222-1111-bbbb-00505687777f",
+                        "b0007940-ffff-eeee-bbbb-000c29d5f0ff"
                     ],
                     "contains": [
                         "ise endpoint id",
@@ -271,7 +271,7 @@
                     "data_path": "action_result.data.*.ERSEndPoint.groupId",
                     "data_type": "string",
                     "example_values": [
-                        "aa10ae00-8bff-11e6-996c-525400b48521"
+                        "aaaaae00-8888-1111-9999-525400b41111"
                     ]
                 },
                 {
@@ -280,7 +280,7 @@
                     "column_name": "ISE Endpoint ID",
                     "column_order": 2,
                     "example_values": [
-                        "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                        "b0007940-ffff-eeee-bbbb-000c29d5f0ff"
                     ],
                     "contains": [
                         "ise endpoint id",
@@ -299,7 +299,7 @@
                     "data_path": "action_result.data.*.ERSEndPoint.link.href",
                     "data_type": "string",
                     "example_values": [
-                        "https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                        "https://10.11.11.11:9060/ers/config/endpoint/b0007940-ffff-eeee-bbbb-000c29d5f0ff"
                     ],
                     "contains": [
                         "url"
@@ -345,7 +345,7 @@
                     "data_path": "action_result.data.*.ERSEndPoint.profileId",
                     "data_type": "string",
                     "example_values": [
-                        "09663280-8c00-11e6-996c-525400b48521"
+                        "99663000-8888-11e6-9999-525400b48888"
                     ]
                 },
                 {
@@ -483,7 +483,7 @@
                     "data_path": "action_result.parameter.endpoint_id",
                     "data_type": "string",
                     "example_values": [
-                        "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                        "44443c00-2222-1111-bbbb-00505687777f"
                     ],
                     "contains": [
                         "ise endpoint id",
@@ -811,7 +811,7 @@
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "example_values": [
-                        "40963c00-2e02-11e8-ba71-005056872c7f"
+                        "44443c00-2222-1111-bbbb-00505687777f"
                     ],
                     "column_name": "Resource ID",
                     "column_order": 0,
@@ -823,7 +823,7 @@
                     "data_path": "action_result.data.*.link.href",
                     "data_type": "string",
                     "example_values": [
-                        "https://10.1.16.169:9060/ers/config/portal/40963c00-2e02-11e8-ba71-005056872c7f"
+                        "https://10.11.11.11:9060/ers/config/portal/44443c00-2222-1111-bbbb-00505687777f"
                     ],
                     "contains": [
                         "url"
@@ -953,7 +953,7 @@
                     "data_path": "action_result.parameter.resource_id",
                     "data_type": "string",
                     "example_values": [
-                        "2e9cf1c0-30b6-11ea-8f06-ce112ec9f8fa"
+                        "44443c00-2222-1111-bbbb-00505687777f"
                     ],
                     "contains": [
                         "ise resource id"
@@ -979,14 +979,14 @@
                     "data_path": "action_result.data.*.groupId",
                     "data_type": "string",
                     "example_values": [
-                        "aa10ae00-8bff-11e6-996c-525400b48521"
+                        "44443c00-2222-1111-bbbb-00505687777f"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "example_values": [
-                        "d335f970-10e0-11ea-8f06-ce112ec9f8fa"
+                        "44443c00-2222-1111-bbbb-00505687777f"
                     ],
                     "column_name": "ID",
                     "column_order": 0,
@@ -1006,7 +1006,7 @@
                     "data_path": "action_result.data.*.link.href",
                     "data_type": "string",
                     "example_values": [
-                        "https://10.1.16.169:9060/ers/config/endpoint/d335f970-10e0-11ea-8f06-ce112ec9f8fa"
+                        "https://10.11.11.11:9060/ers/config/endpoint/d335f970-10e0-11ea-8f06-ce112ec9f8fa"
                     ],
                     "contains": [
                         "url"
@@ -1050,7 +1050,7 @@
                     "data_path": "action_result.data.*.profileId",
                     "data_type": "string",
                     "example_values": [
-                        "44031480-8c00-11e6-996c-525400b48521"
+                        "d335f970-10e0-11ea-8f06-ce112ec9f8fa"
                     ]
                 },
                 {
@@ -1170,7 +1170,7 @@
                     "data_path": "action_result.parameter.resource_id",
                     "data_type": "string",
                     "example_values": [
-                        "2e9cf1c0-30b6-11ea-8f06-ce112ec9f8fa"
+                        "44443c00-2222-1111-bbbb-00505687777f"
                     ],
                     "contains": [
                         "ise resource id"
@@ -1385,7 +1385,7 @@
                     "data_path": "action_result.parameter.resource_id",
                     "data_type": "string",
                     "example_values": [
-                        "2e9cf1c0-30b6-11ea-8f06-ce112ec9f8fa"
+                        "44443c00-2222-1111-bbbb-00505687777f"
                     ],
                     "contains": [
                         "ise resource id"
@@ -1928,7 +1928,7 @@
                     "column_name": "ISE Endpoint ID",
                     "column_order": 0,
                     "example_values": [
-                        "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                        "b0007940-ffff-eeee-bbbb-000c29d5f0ff"
                     ],
                     "contains": [
                         "ise endpoint id",
@@ -1939,7 +1939,7 @@
                     "data_path": "action_result.data.*.SearchResult.resources.*.link.href",
                     "data_type": "string",
                     "example_values": [
-                        "https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                        "https://10.11.11.11:9060/ers/config/endpoint/b0007940-ffff-eeee-bbbb-000c29d5f0ff"
                     ],
                     "contains": [
                         "url"
@@ -2045,8 +2045,8 @@
                     "data_path": "action_result.parameter.endpoint_id",
                     "data_type": "string",
                     "example_values": [
-                        "59985000-712d-11e6-9062-000c29bea319",
-                        "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                        "44443c00-2222-1111-bbbb-00505687777f",
+                        "b0007940-ffff-eeee-bbbb-000c29d5f0ff"
                     ],
                     "contains": [
                         "ise endpoint id",
@@ -2059,7 +2059,7 @@
                     "column_name": "ISE Endpoint ID",
                     "column_order": 0,
                     "example_values": [
-                        "d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                        "b0007940-ffff-eeee-bbbb-000c29d5f0ff"
                     ],
                     "contains": [
                         "ise endpoint id",
@@ -2082,7 +2082,7 @@
                     "data_path": "action_result.data.*.ErsAncEndpoint.link.href",
                     "data_type": "string",
                     "example_values": [
-                        "https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea"
+                        "https://10.11.11.11:9060/ers/config/endpoint/b0007940-ffff-eeee-bbbb-000c29d5f0ff"
                     ],
                     "contains": [
                         "url"
@@ -2149,10 +2149,6 @@
             {
                 "module": "setuptools",
                 "input_file": "wheels/py3/setuptools-75.2.0-py3-none-any.whl"
-            },
-            {
-                "module": "xmltodict",
-                "input_file": "wheels/shared/xmltodict-0.12.0-py2.py3-none-any.whl"
             }
         ]
     }
