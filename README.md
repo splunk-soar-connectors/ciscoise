@@ -1,7 +1,7 @@
 # Cisco ISE
 
 Publisher: Splunk \
-Connector Version: 3.1.1 \
+Connector Version: 3.2.0 \
 Product Vendor: Cisco Systems \
 Product Name: Cisco ISE \
 Minimum Product Version: 6.3.0
