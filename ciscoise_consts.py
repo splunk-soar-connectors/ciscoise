@@ -28,8 +28,9 @@ IS_MAC_QUARANTINED_REST = "/ise/eps/isQuarantineByMAC"
 MAC_SESSION_DETAILS_REST = "/ise/mnt/Session/MACAddress"
 ERS_ENDPOINT_REST = ":9060/ers/config/endpoint"
 ERS_RESOURCE_REST = ":9060/ers/config/{resource}"
-ERS_ENDPOINT_ANC_APPLY = ":9060/ers/config/ancendpoint/apply"
-ERS_ENDPOINT_ANC_CLEAR = ":9060/ers/config/ancendpoint/clear"
+ERS_ENDPOINT_ANC = ":9060/ers/config/ancendpoint"
+ERS_ENDPOINT_ANC_APPLY = ERS_ENDPOINT_ANC + "/apply"
+ERS_ENDPOINT_ANC_CLEAR = ERS_ENDPOINT_ANC + "/clear"
 ERS_POLICIES = ":9060/ers/config/ancpolicy"
 
 # Error/Success

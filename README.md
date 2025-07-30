@@ -1,7 +1,7 @@
 # Cisco ISE
 
 Publisher: Splunk \
-Connector Version: 3.1.1 \
+Connector Version: 3.2.0 \
 Product Vendor: Cisco Systems \
 Product Name: Cisco ISE \
 Minimum Product Version: 6.3.0
@@ -224,7 +224,9 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [clear policy](#action-clear-policy) - Clear policy on selected Ip address or MAC address \
 [list policies](#action-list-policies) - Lists all the ANC policies available \
 [add policy](#action-add-policy) - Add a new ANC Policy \
-[delete policy](#action-delete-policy) - Delete a policy
+[delete policy](#action-delete-policy) - Delete a policy \
+[list anc endpoints](#action-list-anc-endpoints) - List the endpoints with anc configured on the system \
+[anc device info](#action-anc-device-info) - Get information about a specific endpoint with assigned anc policy
 
 ## action: 'test connectivity'
 
@@ -260,8 +262,8 @@ DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string | | success failed |
 action_result.parameter.mac_address | string | `mac address` | 11:11:11:11:11:11 |
-action_result.data.\*.SearchResult.resources.\*.id | string | `ise endpoint id` `ise resource id` | d0337940-a86f-11e7-b6e9-000c29d5f0ea |
-action_result.data.\*.SearchResult.resources.\*.link.href | string | `url` | https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea |
+action_result.data.\*.SearchResult.resources.\*.id | string | `ise endpoint id` `ise resource id` | b0007940-ffff-eeee-bbbb-000c29d5f0ff |
+action_result.data.\*.SearchResult.resources.\*.link.href | string | `url` | https://10.11.11.11:9060/ers/config/endpoint/b0007940-ffff-eeee-bbbb-000c29d5f0ff |
 action_result.data.\*.SearchResult.resources.\*.link.rel | string | | self |
 action_result.data.\*.SearchResult.resources.\*.link.type | string | | application/xml |
 action_result.data.\*.SearchResult.resources.\*.name | string | | 8C:85:90:17:D6:39 |
@@ -290,20 +292,20 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string | | success failed |
-action_result.parameter.endpoint_id | string | `ise endpoint id` `ise resource id` | 59985000-712d-11e6-9062-000c29bea319 d0337940-a86f-11e7-b6e9-000c29d5f0ea |
+action_result.parameter.endpoint_id | string | `ise endpoint id` `ise resource id` | 44443c00-2222-1111-bbbb-00505687777f b0007940-ffff-eeee-bbbb-000c29d5f0ff |
 action_result.data.\*.ERSEndPoint.customAttributes.customAttributes.ITSecurityBlock | string | | true |
 action_result.data.\*.ERSEndPoint.description | string | | description |
-action_result.data.\*.ERSEndPoint.groupId | string | | aa10ae00-8bff-11e6-996c-525400b48521 |
-action_result.data.\*.ERSEndPoint.id | string | `ise endpoint id` `ise resource id` | d0337940-a86f-11e7-b6e9-000c29d5f0ea |
+action_result.data.\*.ERSEndPoint.groupId | string | | aaaaae00-8888-1111-9999-525400b41111 |
+action_result.data.\*.ERSEndPoint.id | string | `ise endpoint id` `ise resource id` | b0007940-ffff-eeee-bbbb-000c29d5f0ff |
 action_result.data.\*.ERSEndPoint.identityStore | string | | |
 action_result.data.\*.ERSEndPoint.identityStoreId | string | | |
-action_result.data.\*.ERSEndPoint.link.href | string | `url` | https://10.16.0.92:9060/ers/config/endpoint/d0337940-a86f-11e7-b6e9-000c29d5f0ea |
+action_result.data.\*.ERSEndPoint.link.href | string | `url` | https://10.11.11.11:9060/ers/config/endpoint/b0007940-ffff-eeee-bbbb-000c29d5f0ff |
 action_result.data.\*.ERSEndPoint.link.rel | string | | self |
 action_result.data.\*.ERSEndPoint.link.type | string | | application/xml |
 action_result.data.\*.ERSEndPoint.mac | string | | 8C:85:90:17:D6:39 |
 action_result.data.\*.ERSEndPoint.name | string | | 8C:85:90:17:D6:39 |
 action_result.data.\*.ERSEndPoint.portalUser | string | | |
-action_result.data.\*.ERSEndPoint.profileId | string | | 09663280-8c00-11e6-996c-525400b48521 |
+action_result.data.\*.ERSEndPoint.profileId | string | | 99663000-8888-11e6-9999-525400b48888 |
 action_result.data.\*.ERSEndPoint.staticGroupAssignment | boolean | | True False |
 action_result.data.\*.ERSEndPoint.staticProfileAssignment | boolean | | True False |
 action_result.summary | string | | |
@@ -337,7 +339,7 @@ action_result.parameter.attribute | string | | ITSecurityBlock |
 action_result.parameter.attribute_value | string | | True |
 action_result.parameter.custom_attribute | string | | CustomAttribute |
 action_result.parameter.custom_attribute_value | string | | True |
-action_result.parameter.endpoint_id | string | `ise endpoint id` `ise resource id` | d0337940-a86f-11e7-b6e9-000c29d5f0ea |
+action_result.parameter.endpoint_id | string | `ise endpoint id` `ise resource id` | 44443c00-2222-1111-bbbb-00505687777f |
 action_result.data.\*.UpdatedFieldsList.updatedField.\*.field | string | | customAttributes |
 action_result.data.\*.UpdatedFieldsList.updatedField.\*.newValue | string | | {ITSecurityBlock=True} |
 action_result.data.\*.UpdatedFieldsList.updatedField.\*.oldValue | string | | {ITSecurityBlock=False} |
@@ -425,8 +427,8 @@ action_result.status | string | | success failed |
 action_result.parameter.max_results | numeric | | 2 |
 action_result.parameter.resource | string | | Endpoints |
 action_result.data.\*.description | string | | Default portal used by sponsors to create and manage accounts for authorized visitors to securely access the network |
-action_result.data.\*.id | string | `ise resource id` | 40963c00-2e02-11e8-ba71-005056872c7f |
-action_result.data.\*.link.href | string | `url` | https://10.1.16.169:9060/ers/config/portal/40963c00-2e02-11e8-ba71-005056872c7f |
+action_result.data.\*.id | string | `ise resource id` | 44443c00-2222-1111-bbbb-00505687777f |
+action_result.data.\*.link.href | string | `url` | https://10.11.11.11:9060/ers/config/portal/44443c00-2222-1111-bbbb-00505687777f |
 action_result.data.\*.link.rel | string | | self |
 action_result.data.\*.link.type | string | | application/xml |
 action_result.data.\*.name | string | | Sponsor Portal (default) |
@@ -458,20 +460,20 @@ DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 action_result.status | string | | success failed |
 action_result.parameter.key | string | | mac |
 action_result.parameter.resource | string | | Endpoints |
-action_result.parameter.resource_id | string | `ise resource id` | 2e9cf1c0-30b6-11ea-8f06-ce112ec9f8fa |
+action_result.parameter.resource_id | string | `ise resource id` | 44443c00-2222-1111-bbbb-00505687777f |
 action_result.parameter.value | string | | 00:00:00:00:00:00 |
 action_result.data.\*.description | string | | This endpoint for test |
-action_result.data.\*.groupId | string | | aa10ae00-8bff-11e6-996c-525400b48521 |
-action_result.data.\*.id | string | `ise resource id` | d335f970-10e0-11ea-8f06-ce112ec9f8fa |
+action_result.data.\*.groupId | string | | 44443c00-2222-1111-bbbb-00505687777f |
+action_result.data.\*.id | string | `ise resource id` | 44443c00-2222-1111-bbbb-00505687777f |
 action_result.data.\*.identityStore | string | | |
 action_result.data.\*.identityStoreId | string | | |
-action_result.data.\*.link.href | string | `url` | https://10.1.16.169:9060/ers/config/endpoint/d335f970-10e0-11ea-8f06-ce112ec9f8fa |
+action_result.data.\*.link.href | string | `url` | https://10.11.11.11:9060/ers/config/endpoint/d335f970-10e0-11ea-8f06-ce112ec9f8fa |
 action_result.data.\*.link.rel | string | | self |
 action_result.data.\*.link.type | string | | application/xml |
 action_result.data.\*.mac | string | | 00:00:00:00:00:00 |
 action_result.data.\*.name | string | | 00:00:00:00:00:00 |
 action_result.data.\*.portalUser | string | | |
-action_result.data.\*.profileId | string | | 44031480-8c00-11e6-996c-525400b48521 |
+action_result.data.\*.profileId | string | | d335f970-10e0-11ea-8f06-ce112ec9f8fa |
 action_result.data.\*.staticGroupAssignment | boolean | | True False |
 action_result.data.\*.staticProfileAssignment | boolean | | True False |
 action_result.summary.resource_id | string | `ise resource id` | d335f970-10e0-11ea-8f06-ce112ec9f8fa |
@@ -500,7 +502,7 @@ DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string | | success failed |
 action_result.parameter.resource | string | | Endpoints |
-action_result.parameter.resource_id | string | `ise resource id` | 2e9cf1c0-30b6-11ea-8f06-ce112ec9f8fa |
+action_result.parameter.resource_id | string | `ise resource id` | 44443c00-2222-1111-bbbb-00505687777f |
 action_result.data | string | | |
 action_result.summary | string | | |
 action_result.message | string | | Resource deleted successfully |
@@ -557,7 +559,7 @@ DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 action_result.status | string | | success failed |
 action_result.parameter.key | string | | mac |
 action_result.parameter.resource | string | | Endpoints |
-action_result.parameter.resource_id | string | `ise resource id` | 2e9cf1c0-30b6-11ea-8f06-ce112ec9f8fa |
+action_result.parameter.resource_id | string | `ise resource id` | 44443c00-2222-1111-bbbb-00505687777f |
 action_result.parameter.value | string | | 11:11:11:11:11:11 |
 action_result.data | string | | |
 action_result.summary | string | | Resource created successfully |
@@ -696,6 +698,63 @@ action_result.parameter.policy_name | string | `ise policy id` | |
 action_result.data | string | | |
 action_result.summary | string | | |
 action_result.message | string | | Policy deleted |
+summary.total_objects | numeric | | 1 |
+summary.total_objects_successful | numeric | | 1 |
+
+## action: 'list anc endpoints'
+
+List the endpoints with anc configured on the system
+
+Type: **investigate** \
+Read only: **True**
+
+#### Action Parameters
+
+No parameters are required for this action
+
+#### Action Output
+
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string | | success failed |
+action_result.data.\*.SearchResult.resources.\*.id | string | `ise endpoint id` `ise resource id` | b0007940-ffff-eeee-bbbb-000c29d5f0ff |
+action_result.data.\*.SearchResult.resources.\*.link.href | string | `url` | https://10.11.11.11:9060/ers/config/endpoint/b0007940-ffff-eeee-bbbb-000c29d5f0ff |
+action_result.data.\*.SearchResult.resources.\*.link.rel | string | | self |
+action_result.data.\*.SearchResult.resources.\*.link.type | string | | application/xml |
+action_result.data.\*.SearchResult.total | numeric | | 1 |
+action_result.summary.Endpoints found | string | | 9 1 |
+action_result.summary.endpoints_found | numeric | | 1 |
+action_result.message | string | | 9 Endpoints found 1 Endpoints found |
+summary.total_objects | numeric | | 1 |
+summary.total_objects_successful | numeric | | 1 |
+
+## action: 'anc device info'
+
+Get information about a specific endpoint with assigned anc policy
+
+Type: **investigate** \
+Read only: **True**
+
+#### Action Parameters
+
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**endpoint_id** | required | ISE Endpoint ID for device | string | `ise endpoint id` `ise resource id` |
+
+#### Action Output
+
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string | | success failed |
+action_result.parameter.endpoint_id | string | `ise endpoint id` `ise resource id` | 44443c00-2222-1111-bbbb-00505687777f b0007940-ffff-eeee-bbbb-000c29d5f0ff |
+action_result.data.\*.ErsAncEndpoint.id | string | `ise endpoint id` `ise resource id` | b0007940-ffff-eeee-bbbb-000c29d5f0ff |
+action_result.data.\*.ErsAncEndpoint.policyName | string | `anc policy name` | portbounce |
+action_result.data.\*.ErsAncEndpoint.link.href | string | `url` | https://10.11.11.11:9060/ers/config/endpoint/b0007940-ffff-eeee-bbbb-000c29d5f0ff |
+action_result.data.\*.ErsAncEndpoint.link.rel | string | | self |
+action_result.data.\*.ErsAncEndpoint.link.type | string | | application/xml |
+action_result.data.\*.ErsAncEndpoint.macAddress | string | | 8C:85:90:17:D6:39 |
+action_result.summary | string | | |
+action_result.message | string | | Endpoint found |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
