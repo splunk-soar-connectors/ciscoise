@@ -118,7 +118,8 @@ class CiscoISEConnector(BaseConnector):
 
         return make_another_call
 
-    def _call_ers_api(self, endpoint, action_result, data=None, allow_unknown=True, method="get", try_ha_device=False, params=None):
+    # Wrapped by ha_device_wrapper in initialize(), need pylint E0202 to suppress method-hidden warnings
+    def _call_ers_api(self, endpoint, action_result, data=None, allow_unknown=True, method="get", try_ha_device=False, params=None):  # pylint: disable=E0202
         auth_method = self._ers_auth or self._auth
         if not auth_method:
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERS_CRED_MISSING), None
@@ -165,7 +166,8 @@ class CiscoISEConnector(BaseConnector):
 
         return phantom.APP_SUCCESS, ret_data
 
-    def _call_rest_api(self, endpoint, action_result, schema=None, data=None, allow_unknown=True, try_ha_device=False):
+    # Wrapped by ha_device_wrapper in initialize(), need pylint E0202 to suppress method-hidden warnings
+    def _call_rest_api(self, endpoint, action_result, schema=None, data=None, allow_unknown=True, try_ha_device=False):  # pylint: disable=E0202
         url = f"{self._base_url}{endpoint}"
         if try_ha_device:
             url = f"{self._ha_device_url}{endpoint}"
