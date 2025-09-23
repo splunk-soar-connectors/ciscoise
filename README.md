@@ -1,9 +1,9 @@
 # Cisco ISE
 
-Publisher: Splunk \
-Connector Version: 3.2.0 \
-Product Vendor: Cisco Systems \
-Product Name: Cisco ISE \
+Publisher: Splunk <br>
+Connector Version: 3.2.0 <br>
+Product Vendor: Cisco Systems <br>
+Product Name: Cisco ISE <br>
 Minimum Product Version: 6.3.0
 
 This app implements investigative and containment actions on a Cisco ISE device
@@ -209,30 +209,30 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity. This action logs into the device using a REST API call to check the connection and credentials \
-[list endpoints](#action-list-endpoints) - List the endpoints configured on the system \
-[get device info](#action-get-device-info) - Get information about a specific endpoint \
-[update device info](#action-update-device-info) - Update information or attributes for a specific endpoint \
-[list sessions](#action-list-sessions) - List the sessions currently available on the Monitoring node \
-[terminate session](#action-terminate-session) - Terminate sessions \
-[list resources](#action-list-resources) - Lists all the resources configured on the system of a particular resource \
-[get resources](#action-get-resources) - Get the information about resource if resource_id is provided. Fetch the list of resources match with the key-value filter \
-[delete resource](#action-delete-resource) - Delete a resource \
-[create resource](#action-create-resource) - Create a resource \
-[update resource](#action-update-resource) - Update a resource \
-[apply policy](#action-apply-policy) - Apply policy on selected Ip address or MAC address \
-[clear policy](#action-clear-policy) - Clear policy on selected Ip address or MAC address \
-[list policies](#action-list-policies) - Lists all the ANC policies available \
-[add policy](#action-add-policy) - Add a new ANC Policy \
-[delete policy](#action-delete-policy) - Delete a policy \
-[list anc endpoints](#action-list-anc-endpoints) - List the endpoints with anc configured on the system \
+[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity. This action logs into the device using a REST API call to check the connection and credentials <br>
+[list endpoints](#action-list-endpoints) - List the endpoints configured on the system <br>
+[get device info](#action-get-device-info) - Get information about a specific endpoint <br>
+[update device info](#action-update-device-info) - Update information or attributes for a specific endpoint <br>
+[list sessions](#action-list-sessions) - List the sessions currently available on the Monitoring node <br>
+[terminate session](#action-terminate-session) - Terminate sessions <br>
+[list resources](#action-list-resources) - Lists all the resources configured on the system of a particular resource <br>
+[get resources](#action-get-resources) - Get the information about resource if resource_id is provided. Fetch the list of resources match with the key-value filter <br>
+[delete resource](#action-delete-resource) - Delete a resource <br>
+[create resource](#action-create-resource) - Create a resource <br>
+[update resource](#action-update-resource) - Update a resource <br>
+[apply policy](#action-apply-policy) - Apply policy on selected Ip address or MAC address <br>
+[clear policy](#action-clear-policy) - Clear policy on selected Ip address or MAC address <br>
+[list policies](#action-list-policies) - Lists all the ANC policies available <br>
+[add policy](#action-add-policy) - Add a new ANC Policy <br>
+[delete policy](#action-delete-policy) - Delete a policy <br>
+[list anc endpoints](#action-list-anc-endpoints) - List the endpoints with anc configured on the system <br>
 [anc device info](#action-anc-device-info) - Get information about a specific endpoint with assigned anc policy
 
 ## action: 'test connectivity'
 
 Validate the asset configuration for connectivity. This action logs into the device using a REST API call to check the connection and credentials
 
-Type: **test** \
+Type: **test** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -247,7 +247,7 @@ No Output
 
 List the endpoints configured on the system
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -278,7 +278,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get information about a specific endpoint
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -317,7 +317,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Update information or attributes for a specific endpoint
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -353,7 +353,7 @@ action_result.parameter.ph_0 | ph | | |
 
 List the sessions currently available on the Monitoring node
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -384,7 +384,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Terminate sessions
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -409,7 +409,7 @@ summary.total_objects_successful | numeric | | |
 
 Lists all the resources configured on the system of a particular resource
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -441,7 +441,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get the information about resource if resource_id is provided. Fetch the list of resources match with the key-value filter
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -486,7 +486,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Delete a resource
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -513,7 +513,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Create a resource
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -540,7 +540,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Update a resource
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -571,7 +571,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Apply policy on selected Ip address or MAC address
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -598,7 +598,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Clear policy on selected Ip address or MAC address
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -625,7 +625,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Lists all the ANC policies available
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -653,7 +653,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Add a new ANC Policy
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -680,7 +680,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Delete a policy
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -705,7 +705,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List the endpoints with anc configured on the system
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -732,7 +732,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get information about a specific endpoint with assigned anc policy
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
