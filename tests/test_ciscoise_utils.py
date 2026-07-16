@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 
-from ciscoise_utils import encode_path_segment, validate_next_page_href
+from ciscoise_utils import encode_path_segment, validate_next_page_href, validate_page_count
 
 
 def test_encode_path_segment_contains_url_delimiters():
@@ -49,3 +49,10 @@ def test_validate_next_page_href_keeps_same_asset_ers_url():
 def test_validate_next_page_href_rejects_untrusted_urls(href):
     with pytest.raises(ValueError):
         validate_next_page_href(href, ["https://ise.example"])
+
+
+def test_validate_page_count_rejects_another_page_at_limit():
+    validate_page_count(999)
+
+    with pytest.raises(ValueError, match="1000-page safety limit"):
+        validate_page_count(1000)

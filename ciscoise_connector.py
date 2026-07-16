@@ -28,7 +28,7 @@ from requests.auth import HTTPBasicAuth
 
 # THIS Connector imports
 from ciscoise_consts import *
-from ciscoise_utils import encode_path_segment, validate_next_page_href
+from ciscoise_utils import encode_path_segment, validate_next_page_href, validate_page_count
 
 
 class CiscoISEConnector(BaseConnector):
@@ -409,6 +409,7 @@ class CiscoISEConnector(BaseConnector):
     def _paginator(self, endpoint, action_result, limit=None):
         items_list = list()
         params = {}
+        page_count = 0
         if limit:
             params["size"] = min(DEFAULT_MAX_RESULTS, limit)
         else:
@@ -419,6 +420,7 @@ class CiscoISEConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 self.debug_print("Call to ERS API Failed")
                 return None
+            page_count += 1
             items_from_page = items.get("SearchResult", {}).get("resources", [])
 
             items_list.extend(items_from_page)
@@ -434,6 +436,11 @@ class CiscoISEConnector(BaseConnector):
                     self.debug_print("No more records left to retrieve")
                     return items_list
                 else:
+                    try:
+                        validate_page_count(page_count)
+                    except ValueError as exc:
+                        action_result.set_status(phantom.APP_ERROR, str(exc))
+                        return None
                     allowed_base_urls = [self._base_url]
                     if self._ha_device:
                         allowed_base_urls.append(self._ha_device_url)

@@ -16,6 +16,9 @@
 from urllib.parse import quote, unquote, urljoin, urlsplit, urlunsplit
 
 
+DEFAULT_MAX_PAGES = 1000
+
+
 def encode_path_segment(value: object) -> str:
     """Encode an action parameter as exactly one URL path segment."""
     return quote(str(value), safe="")
@@ -56,3 +59,9 @@ def validate_next_page_href(href: object, allowed_base_urls: list[str]) -> str:
         raise ValueError("Cisco ISE nextPage URL is outside the ERS configuration API")
 
     return urlunsplit(("", "", parsed.path, parsed.query, ""))
+
+
+def validate_page_count(page_count: int, max_pages: int = DEFAULT_MAX_PAGES) -> None:
+    """Reject another upstream-driven request after the connector safety limit."""
+    if page_count >= max_pages:
+        raise ValueError(f"Cisco ISE pagination exceeded the {max_pages}-page safety limit")
