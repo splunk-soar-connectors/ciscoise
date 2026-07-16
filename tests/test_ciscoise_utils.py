@@ -12,9 +12,8 @@
 # and limitations under the License.
 
 import json
+import unittest
 from pathlib import Path
-
-import pytest
 
 from ciscoise_utils import (
     build_ers_update,
@@ -38,80 +37,72 @@ class FakeResponse:
         return iter(self._chunks)
 
 
-def test_encode_path_segment_contains_url_delimiters():
-    assert encode_path_segment("../adminuser?#") == "..%2Fadminuser%3F%23"
+class TestCiscoISEUtils(unittest.TestCase):
+    def test_encode_path_segment_contains_url_delimiters(self):
+        self.assertEqual(encode_path_segment("../adminuser?#"), "..%2Fadminuser%3F%23")
 
+    def test_tls_verification_is_enabled_by_default(self):
+        manifest = json.loads((Path(__file__).parents[1] / "ciscoise.json").read_text())
 
-def test_tls_verification_is_enabled_by_default():
-    manifest = json.loads((Path(__file__).parents[1] / "ciscoise.json").read_text())
+        self.assertIs(manifest["configuration"]["verify_server_cert"]["default"], True)
 
-    assert manifest["configuration"]["verify_server_cert"]["default"] is True
+    def test_validate_next_page_href_keeps_same_asset_ers_url(self):
+        endpoint = validate_next_page_href(
+            "https://ise.example:9060/ers/config/endpoint?page=2",
+            ["https://ise.example"],
+        )
 
+        self.assertEqual(endpoint, "/ers/config/endpoint?page=2")
 
-def test_validate_next_page_href_keeps_same_asset_ers_url():
-    endpoint = validate_next_page_href(
-        "https://ise.example:9060/ers/config/endpoint?page=2",
-        ["https://ise.example"],
-    )
+    def test_validate_next_page_href_rejects_untrusted_urls(self):
+        hrefs = [
+            "https://ise.example:9060@attacker.example/ers/config/endpoint?page=2",
+            "//attacker.example/ers/config/endpoint?page=2",
+            "https://ise.example:9060/ers/config/../adminuser",
+        ]
+        for href in hrefs:
+            with self.subTest(href=href), self.assertRaises(ValueError):
+                validate_next_page_href(href, ["https://ise.example"])
 
-    assert endpoint == "/ers/config/endpoint?page=2"
+    def test_validate_page_count_rejects_another_page_at_limit(self):
+        validate_page_count(999)
 
+        with self.assertRaisesRegex(ValueError, "1000-page safety limit"):
+            validate_page_count(1000)
 
-@pytest.mark.parametrize(
-    "href",
-    [
-        "https://ise.example:9060@attacker.example/ers/config/endpoint?page=2",
-        "//attacker.example/ers/config/endpoint?page=2",
-        "https://ise.example:9060/ers/config/../adminuser",
-    ],
-)
-def test_validate_next_page_href_rejects_untrusted_urls(href):
-    with pytest.raises(ValueError):
-        validate_next_page_href(href, ["https://ise.example"])
+    def test_read_bounded_xml_response_rejects_oversized_body(self):
+        response = FakeResponse([b"<root/>"])
 
+        with self.assertRaisesRegex(ValueError, "6-byte limit"):
+            read_bounded_xml_response(response, max_bytes=6)
 
-def test_validate_page_count_rejects_another_page_at_limit():
-    validate_page_count(999)
+    def test_validate_xml_document_rejects_entity_declarations(self):
+        with self.assertRaisesRegex(ValueError, "prohibited DTD"):
+            validate_xml_document('<!DOCTYPE root [<!ENTITY x "value">]><root attr="&x;"/>')
 
-    with pytest.raises(ValueError, match="1000-page safety limit"):
-        validate_page_count(1000)
-
-
-def test_read_bounded_xml_response_rejects_oversized_body():
-    response = FakeResponse([b"<root/>"])
-
-    with pytest.raises(ValueError, match="6-byte limit"):
-        read_bounded_xml_response(response, max_bytes=6)
-
-
-def test_validate_xml_document_rejects_entity_declarations():
-    with pytest.raises(ValueError, match="prohibited DTD"):
-        validate_xml_document('<!DOCTYPE root [<!ENTITY x "value">]><root attr="&x;"/>')
-
-
-def test_build_ers_update_preserves_quarantine_state_and_strips_link():
-    current = {
-        "ERSEndPoint": {
-            "description": "old",
-            "groupId": "blocked-list",
-            "staticGroupAssignment": True,
-            "link": {"href": "https://ise.example/resource"},
-            "customAttributes": {"customAttributes": {"owner": "soc"}},
+    def test_build_ers_update_preserves_quarantine_state_and_strips_link(self):
+        current = {
+            "ERSEndPoint": {
+                "description": "old",
+                "groupId": "blocked-list",
+                "staticGroupAssignment": True,
+                "link": {"href": "https://ise.example/resource"},
+                "customAttributes": {"customAttributes": {"owner": "soc"}},
+            }
         }
-    }
 
-    payload = build_ers_update(
-        current,
-        "ERSEndPoint",
-        {"description": "new"},
-        ("case", "1234"),
-    )
+        payload = build_ers_update(
+            current,
+            "ERSEndPoint",
+            {"description": "new"},
+            ("case", "1234"),
+        )
 
-    assert payload["ERSEndPoint"]["groupId"] == "blocked-list"
-    assert payload["ERSEndPoint"]["staticGroupAssignment"] is True
-    assert "link" not in payload["ERSEndPoint"]
-    assert payload["ERSEndPoint"]["customAttributes"]["customAttributes"] == {
-        "owner": "soc",
-        "case": "1234",
-    }
-    assert current["ERSEndPoint"]["description"] == "old"
+        self.assertEqual(payload["ERSEndPoint"]["groupId"], "blocked-list")
+        self.assertIs(payload["ERSEndPoint"]["staticGroupAssignment"], True)
+        self.assertNotIn("link", payload["ERSEndPoint"])
+        self.assertEqual(
+            payload["ERSEndPoint"]["customAttributes"]["customAttributes"],
+            {"owner": "soc", "case": "1234"},
+        )
+        self.assertEqual(current["ERSEndPoint"]["description"], "old")
