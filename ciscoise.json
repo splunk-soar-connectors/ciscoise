@@ -58,7 +58,7 @@
             "data_type": "boolean",
             "description": "Verify server certificate",
             "order": 6,
-            "default": false
+            "default": true
         }
     },
     "actions": [

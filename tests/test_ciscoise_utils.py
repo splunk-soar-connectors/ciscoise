@@ -11,8 +11,17 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 
+import json
+from pathlib import Path
+
 from ciscoise_utils import encode_path_segment
 
 
 def test_encode_path_segment_contains_url_delimiters():
     assert encode_path_segment("../adminuser?#") == "..%2Fadminuser%3F%23"
+
+
+def test_tls_verification_is_enabled_by_default():
+    manifest = json.loads((Path(__file__).parents[1] / "ciscoise.json").read_text())
+
+    assert manifest["configuration"]["verify_server_cert"]["default"] is True
