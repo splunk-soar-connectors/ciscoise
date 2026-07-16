@@ -13,10 +13,13 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 
+import re
 from urllib.parse import quote, unquote, urljoin, urlsplit, urlunsplit
 
 
 DEFAULT_MAX_PAGES = 1000
+MAX_XML_RESPONSE_BYTES = 20 * 1024 * 1024
+UNSAFE_XML_DECLARATION = re.compile(r"<!\s*(?:DOCTYPE|ENTITY)\b", re.IGNORECASE)
 
 
 def encode_path_segment(value: object) -> str:
@@ -65,3 +68,36 @@ def validate_page_count(page_count: int, max_pages: int = DEFAULT_MAX_PAGES) -> 
     """Reject another upstream-driven request after the connector safety limit."""
     if page_count >= max_pages:
         raise ValueError(f"Cisco ISE pagination exceeded the {max_pages}-page safety limit")
+
+
+def read_bounded_xml_response(response: object, max_bytes: int = MAX_XML_RESPONSE_BYTES) -> str:
+    """Read an HTTP response without accepting an unbounded XML document."""
+    content_length = getattr(response, "headers", {}).get("Content-Length")
+    if content_length:
+        try:
+            if int(content_length) > max_bytes:
+                raise ValueError(f"Cisco ISE XML response exceeds the {max_bytes}-byte limit")
+        except ValueError as exc:
+            if "exceeds" in str(exc):
+                raise
+
+    chunks: list[bytes] = []
+    total = 0
+    for chunk in response.iter_content(chunk_size=64 * 1024, decode_unicode=False):
+        if not chunk:
+            continue
+        if isinstance(chunk, str):
+            chunk = chunk.encode(getattr(response, "encoding", None) or "utf-8")
+        total += len(chunk)
+        if total > max_bytes:
+            raise ValueError(f"Cisco ISE XML response exceeds the {max_bytes}-byte limit")
+        chunks.append(chunk)
+
+    encoding = getattr(response, "encoding", None) or "utf-8"
+    return b"".join(chunks).decode(encoding, errors="replace")
+
+
+def validate_xml_document(xml: str) -> None:
+    """Reject XML declarations that can define or expand external entities."""
+    if UNSAFE_XML_DECLARATION.search(xml):
+        raise ValueError("Cisco ISE XML response contains a prohibited DTD or entity declaration")

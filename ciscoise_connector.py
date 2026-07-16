@@ -28,7 +28,13 @@ from requests.auth import HTTPBasicAuth
 
 # THIS Connector imports
 from ciscoise_consts import *
-from ciscoise_utils import encode_path_segment, validate_next_page_href, validate_page_count
+from ciscoise_utils import (
+    encode_path_segment,
+    read_bounded_xml_response,
+    validate_next_page_href,
+    validate_page_count,
+    validate_xml_document,
+)
 
 
 class CiscoISEConnector(BaseConnector):
@@ -179,7 +185,9 @@ class CiscoISEConnector(BaseConnector):
         verify = config[phantom.APP_JSON_VERIFY]
 
         try:
-            resp = requests.get(url, verify=verify, auth=self._auth)  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
+            resp = requests.get(  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
+                url, verify=verify, auth=self._auth, stream=True
+            )
         except Exception as e:
             self.debug_print(f"Exception occurred: {e}")
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_REST_API, e), ret_data
@@ -195,11 +203,11 @@ class CiscoISEConnector(BaseConnector):
                 ret_data,
             )
 
-        action_result.add_debug_data(resp.text)
-        xml = resp.text
-
         try:
-            response_dict = xmltodict.parse(xml)
+            xml = read_bounded_xml_response(resp)
+            validate_xml_document(xml)
+            action_result.add_debug_data(xml)
+            response_dict = xmltodict.parse(xml, disable_entities=True)
         except Exception as e:
             self.debug_print(f"Exception occurred: {e}")
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_UNABLE_TO_PARSE_REPLY, e), ret_data

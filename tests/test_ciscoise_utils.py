@@ -16,7 +16,25 @@ from pathlib import Path
 
 import pytest
 
-from ciscoise_utils import encode_path_segment, validate_next_page_href, validate_page_count
+from ciscoise_utils import (
+    encode_path_segment,
+    read_bounded_xml_response,
+    validate_next_page_href,
+    validate_page_count,
+    validate_xml_document,
+)
+
+
+class FakeResponse:
+    def __init__(self, chunks, *, content_length=None):
+        self._chunks = chunks
+        self.encoding = "utf-8"
+        self.headers = {}
+        if content_length is not None:
+            self.headers["Content-Length"] = str(content_length)
+
+    def iter_content(self, **_kwargs):
+        return iter(self._chunks)
 
 
 def test_encode_path_segment_contains_url_delimiters():
@@ -56,3 +74,15 @@ def test_validate_page_count_rejects_another_page_at_limit():
 
     with pytest.raises(ValueError, match="1000-page safety limit"):
         validate_page_count(1000)
+
+
+def test_read_bounded_xml_response_rejects_oversized_body():
+    response = FakeResponse([b"<root/>"])
+
+    with pytest.raises(ValueError, match="6-byte limit"):
+        read_bounded_xml_response(response, max_bytes=6)
+
+
+def test_validate_xml_document_rejects_entity_declarations():
+    with pytest.raises(ValueError, match="prohibited DTD"):
+        validate_xml_document('<!DOCTYPE root [<!ENTITY x "value">]><root attr="&x;"/>')
