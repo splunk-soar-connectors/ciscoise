@@ -1,6 +1,6 @@
 # File: ciscoise_connector.py
 #
-# Copyright (c) 2014-2025 Splunk Inc.
+# Copyright (c) 2014-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,6 +28,14 @@ from requests.auth import HTTPBasicAuth
 
 # THIS Connector imports
 from ciscoise_consts import *
+from ciscoise_utils import (
+    build_ers_update,
+    encode_path_segment,
+    read_bounded_xml_response,
+    validate_next_page_href,
+    validate_page_count,
+    validate_xml_document,
+)
 
 
 class CiscoISEConnector(BaseConnector):
@@ -178,7 +186,9 @@ class CiscoISEConnector(BaseConnector):
         verify = config[phantom.APP_JSON_VERIFY]
 
         try:
-            resp = requests.get(url, verify=verify, auth=self._auth)  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
+            resp = requests.get(  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
+                url, verify=verify, auth=self._auth, stream=True
+            )
         except Exception as e:
             self.debug_print(f"Exception occurred: {e}")
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_REST_API, e), ret_data
@@ -194,11 +204,11 @@ class CiscoISEConnector(BaseConnector):
                 ret_data,
             )
 
-        action_result.add_debug_data(resp.text)
-        xml = resp.text
-
         try:
-            response_dict = xmltodict.parse(xml)
+            xml = read_bounded_xml_response(resp)
+            validate_xml_document(xml)
+            action_result.add_debug_data(xml)
+            response_dict = xmltodict.parse(xml, disable_entities=True)
         except Exception as e:
             self.debug_print(f"Exception occurred: {e}")
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_UNABLE_TO_PARSE_REPLY, e), ret_data
@@ -291,7 +301,7 @@ class CiscoISEConnector(BaseConnector):
     def _get_endpoint(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = ERS_ENDPOINT_REST + "/" + param["endpoint_id"]
+        endpoint = ERS_ENDPOINT_REST + "/" + encode_path_segment(param["endpoint_id"])
 
         ret_val, ret_data = self._call_ers_api(endpoint, action_result)
 
@@ -305,27 +315,33 @@ class CiscoISEConnector(BaseConnector):
     def _update_endpoint(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = ERS_ENDPOINT_REST + "/" + param["endpoint_id"]
+        endpoint = ERS_ENDPOINT_REST + "/" + encode_path_segment(param["endpoint_id"])
         attribute = param.get("attribute", None)
         attribute_value = param.get("attribute_value", None)
         custom_attribute = param.get("custom_attribute", None)
         custom_attribute_value = param.get("custom_attribute_value", None)
 
-        final_data = {"ERSEndPoint": {}}
-
         if not (attribute or custom_attribute or attribute_value or custom_attribute_value):
             return action_result.set_status(phantom.APP_ERROR, "Please specify attribute or custom attribute")
 
+        updates = {}
         if (attribute is not None) ^ (attribute_value is not None):
             return action_result.set_status(phantom.APP_ERROR, "Please specify both attribute and attribute value")
         elif attribute and attribute_value:
-            final_data["ERSEndPoint"][attribute] = attribute_value
+            updates[attribute] = attribute_value
 
         if (custom_attribute is not None) ^ (custom_attribute_value is not None):
             return action_result.set_status(phantom.APP_ERROR, "Please specify both custom attribute and custom attribute value")
-        elif custom_attribute and custom_attribute_value:
-            custom_attribute_dict = {"customAttributes": {custom_attribute: custom_attribute_value}}
-            final_data["ERSEndPoint"]["customAttributes"] = custom_attribute_dict
+
+        ret_val, current_data = self._call_ers_api(endpoint, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        try:
+            custom_update = (custom_attribute, custom_attribute_value) if custom_attribute and custom_attribute_value else None
+            final_data = build_ers_update(current_data, "ERSEndPoint", updates, custom_update)
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, str(exc))
 
         ret_val, ret_data = self._call_ers_api(endpoint, action_result, data=final_data, method="put")
         action_result.add_data(ret_data)
@@ -408,6 +424,7 @@ class CiscoISEConnector(BaseConnector):
     def _paginator(self, endpoint, action_result, limit=None):
         items_list = list()
         params = {}
+        page_count = 0
         if limit:
             params["size"] = min(DEFAULT_MAX_RESULTS, limit)
         else:
@@ -418,6 +435,7 @@ class CiscoISEConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 self.debug_print("Call to ERS API Failed")
                 return None
+            page_count += 1
             items_from_page = items.get("SearchResult", {}).get("resources", [])
 
             items_list.extend(items_from_page)
@@ -433,7 +451,19 @@ class CiscoISEConnector(BaseConnector):
                     self.debug_print("No more records left to retrieve")
                     return items_list
                 else:
-                    endpoint = next_page_dict.get("href").replace(self._base_url, "")
+                    try:
+                        validate_page_count(page_count)
+                    except ValueError as exc:
+                        action_result.set_status(phantom.APP_ERROR, str(exc))
+                        return None
+                    allowed_base_urls = [self._base_url]
+                    if self._ha_device:
+                        allowed_base_urls.append(self._ha_device_url)
+                    try:
+                        endpoint = validate_next_page_href(next_page_dict.get("href"), allowed_base_urls)
+                    except ValueError as exc:
+                        action_result.set_status(phantom.APP_ERROR, str(exc))
+                        return None
                     self.debug_print("Next page available")
 
     def _list_resources(self, param):
@@ -491,7 +521,7 @@ class CiscoISEConnector(BaseConnector):
 
             return action_result.set_status(phantom.APP_SUCCESS)
 
-        endpoint = f"{ERS_RESOURCE_REST.format(resource=resource)}/{resource_id}"
+        endpoint = f"{ERS_RESOURCE_REST.format(resource=resource)}/{encode_path_segment(resource_id)}"
 
         ret_val, resp = self._call_ers_api(endpoint, action_result)
         if phantom.is_fail(ret_val):
@@ -510,7 +540,7 @@ class CiscoISEConnector(BaseConnector):
         resource = MAP_RESOURCE[param["resource"]][0]
         resource_id = param["resource_id"]
 
-        endpoint = f"{ERS_RESOURCE_REST.format(resource=resource)}/{resource_id}"
+        endpoint = f"{ERS_RESOURCE_REST.format(resource=resource)}/{encode_path_segment(resource_id)}"
 
         ret_val, resp = self._call_ers_api(endpoint, action_result, method="delete")
         if phantom.is_fail(ret_val):
@@ -544,13 +574,22 @@ class CiscoISEConnector(BaseConnector):
         key = param["key"]
         value = param["value"]
 
-        endpoint = f"{ERS_RESOURCE_REST.format(resource=resource)}/{resource_id}"
+        endpoint = f"{ERS_RESOURCE_REST.format(resource=resource)}/{encode_path_segment(resource_id)}"
 
-        data_dict = {resource_key: {}}
-        data_dict[resource_key][key] = value
+        ret_val, current_data = self._call_ers_api(endpoint, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        try:
+            data_dict = build_ers_update(current_data, resource_key, {key: value})
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, str(exc))
+
         ret_val, resp = self._call_ers_api(endpoint, action_result, data=data_dict, method="put")
         if phantom.is_fail(ret_val):
             return action_result.get_status()
+
+        action_result.add_data(resp)
 
         return action_result.set_status(phantom.APP_SUCCESS, "Resource updated successfully")
 
@@ -639,7 +678,7 @@ class CiscoISEConnector(BaseConnector):
     def _delete_policy(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = f"{ERS_POLICIES}/{param['policy_name']}"
+        endpoint = f"{ERS_POLICIES}/{encode_path_segment(param['policy_name'])}"
 
         ret_val, ret_data = self._call_ers_api(endpoint, action_result, method="delete")
 
@@ -725,7 +764,7 @@ class CiscoISEConnector(BaseConnector):
     def _get_anc_endpoint(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = ERS_ENDPOINT_ANC + "/" + param["endpoint_id"]
+        endpoint = ERS_ENDPOINT_ANC + "/" + encode_path_segment(param["endpoint_id"])
 
         ret_val, ret_data = self._call_ers_api(endpoint, action_result)
 
