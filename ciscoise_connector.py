@@ -28,6 +28,7 @@ from requests.auth import HTTPBasicAuth
 
 # THIS Connector imports
 from ciscoise_consts import *
+from ciscoise_utils import encode_path_segment
 
 
 class CiscoISEConnector(BaseConnector):
@@ -291,7 +292,7 @@ class CiscoISEConnector(BaseConnector):
     def _get_endpoint(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = ERS_ENDPOINT_REST + "/" + param["endpoint_id"]
+        endpoint = ERS_ENDPOINT_REST + "/" + encode_path_segment(param["endpoint_id"])
 
         ret_val, ret_data = self._call_ers_api(endpoint, action_result)
 
@@ -305,7 +306,7 @@ class CiscoISEConnector(BaseConnector):
     def _update_endpoint(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = ERS_ENDPOINT_REST + "/" + param["endpoint_id"]
+        endpoint = ERS_ENDPOINT_REST + "/" + encode_path_segment(param["endpoint_id"])
         attribute = param.get("attribute", None)
         attribute_value = param.get("attribute_value", None)
         custom_attribute = param.get("custom_attribute", None)
@@ -491,7 +492,7 @@ class CiscoISEConnector(BaseConnector):
 
             return action_result.set_status(phantom.APP_SUCCESS)
 
-        endpoint = f"{ERS_RESOURCE_REST.format(resource=resource)}/{resource_id}"
+        endpoint = f"{ERS_RESOURCE_REST.format(resource=resource)}/{encode_path_segment(resource_id)}"
 
         ret_val, resp = self._call_ers_api(endpoint, action_result)
         if phantom.is_fail(ret_val):
@@ -510,7 +511,7 @@ class CiscoISEConnector(BaseConnector):
         resource = MAP_RESOURCE[param["resource"]][0]
         resource_id = param["resource_id"]
 
-        endpoint = f"{ERS_RESOURCE_REST.format(resource=resource)}/{resource_id}"
+        endpoint = f"{ERS_RESOURCE_REST.format(resource=resource)}/{encode_path_segment(resource_id)}"
 
         ret_val, resp = self._call_ers_api(endpoint, action_result, method="delete")
         if phantom.is_fail(ret_val):
@@ -544,7 +545,7 @@ class CiscoISEConnector(BaseConnector):
         key = param["key"]
         value = param["value"]
 
-        endpoint = f"{ERS_RESOURCE_REST.format(resource=resource)}/{resource_id}"
+        endpoint = f"{ERS_RESOURCE_REST.format(resource=resource)}/{encode_path_segment(resource_id)}"
 
         data_dict = {resource_key: {}}
         data_dict[resource_key][key] = value
@@ -639,7 +640,7 @@ class CiscoISEConnector(BaseConnector):
     def _delete_policy(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = f"{ERS_POLICIES}/{param['policy_name']}"
+        endpoint = f"{ERS_POLICIES}/{encode_path_segment(param['policy_name'])}"
 
         ret_val, ret_data = self._call_ers_api(endpoint, action_result, method="delete")
 
@@ -725,7 +726,7 @@ class CiscoISEConnector(BaseConnector):
     def _get_anc_endpoint(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = ERS_ENDPOINT_ANC + "/" + param["endpoint_id"]
+        endpoint = ERS_ENDPOINT_ANC + "/" + encode_path_segment(param["endpoint_id"])
 
         ret_val, ret_data = self._call_ers_api(endpoint, action_result)
 
