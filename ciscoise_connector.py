@@ -28,7 +28,7 @@ from requests.auth import HTTPBasicAuth
 
 # THIS Connector imports
 from ciscoise_consts import *
-from ciscoise_utils import encode_path_segment
+from ciscoise_utils import encode_path_segment, validate_next_page_href
 
 
 class CiscoISEConnector(BaseConnector):
@@ -434,7 +434,14 @@ class CiscoISEConnector(BaseConnector):
                     self.debug_print("No more records left to retrieve")
                     return items_list
                 else:
-                    endpoint = next_page_dict.get("href").replace(self._base_url, "")
+                    allowed_base_urls = [self._base_url]
+                    if self._ha_device:
+                        allowed_base_urls.append(self._ha_device_url)
+                    try:
+                        endpoint = validate_next_page_href(next_page_dict.get("href"), allowed_base_urls)
+                    except ValueError as exc:
+                        action_result.set_status(phantom.APP_ERROR, str(exc))
+                        return None
                     self.debug_print("Next page available")
 
     def _list_resources(self, param):

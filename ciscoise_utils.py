@@ -13,9 +13,46 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 
-from urllib.parse import quote
+from urllib.parse import quote, unquote, urljoin, urlsplit, urlunsplit
 
 
 def encode_path_segment(value: object) -> str:
     """Encode an action parameter as exactly one URL path segment."""
     return quote(str(value), safe="")
+
+
+def validate_next_page_href(href: object, allowed_base_urls: list[str]) -> str:
+    """Return a relative ERS endpoint after validating an upstream continuation URL."""
+    if not isinstance(href, str) or not href.strip():
+        raise ValueError("Cisco ISE returned an invalid nextPage URL")
+
+    allowed_origins: set[tuple[str, str, int]] = set()
+    join_base = ""
+    for base_url in allowed_base_urls:
+        parsed_base = urlsplit(base_url)
+        if not parsed_base.scheme or not parsed_base.hostname:
+            continue
+        allowed_origins.add((parsed_base.scheme.casefold(), parsed_base.hostname.casefold(), 9060))
+        if not join_base:
+            host = f"[{parsed_base.hostname}]" if ":" in parsed_base.hostname else parsed_base.hostname
+            join_base = f"{parsed_base.scheme}://{host}:9060/"
+
+    if not join_base:
+        raise ValueError("Cisco ISE asset URL is invalid")
+
+    parsed = urlsplit(urljoin(join_base, href))
+    try:
+        origin = (parsed.scheme.casefold(), (parsed.hostname or "").casefold(), parsed.port or 0)
+    except ValueError as exc:
+        raise ValueError("Cisco ISE returned an invalid nextPage URL") from exc
+
+    if parsed.username is not None or parsed.password is not None or origin not in allowed_origins:
+        raise ValueError("Cisco ISE nextPage URL points outside the configured asset")
+    if parsed.fragment:
+        raise ValueError("Cisco ISE returned an invalid nextPage URL")
+
+    decoded_segments = unquote(parsed.path).split("/")
+    if not parsed.path.startswith("/ers/config/") or any(segment in {".", ".."} for segment in decoded_segments):
+        raise ValueError("Cisco ISE nextPage URL is outside the ERS configuration API")
+
+    return urlunsplit(("", "", parsed.path, parsed.query, ""))

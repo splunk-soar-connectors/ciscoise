@@ -14,7 +14,9 @@
 import json
 from pathlib import Path
 
-from ciscoise_utils import encode_path_segment
+import pytest
+
+from ciscoise_utils import encode_path_segment, validate_next_page_href
 
 
 def test_encode_path_segment_contains_url_delimiters():
@@ -25,3 +27,25 @@ def test_tls_verification_is_enabled_by_default():
     manifest = json.loads((Path(__file__).parents[1] / "ciscoise.json").read_text())
 
     assert manifest["configuration"]["verify_server_cert"]["default"] is True
+
+
+def test_validate_next_page_href_keeps_same_asset_ers_url():
+    endpoint = validate_next_page_href(
+        "https://ise.example:9060/ers/config/endpoint?page=2",
+        ["https://ise.example"],
+    )
+
+    assert endpoint == "/ers/config/endpoint?page=2"
+
+
+@pytest.mark.parametrize(
+    "href",
+    [
+        "https://ise.example:9060@attacker.example/ers/config/endpoint?page=2",
+        "//attacker.example/ers/config/endpoint?page=2",
+        "https://ise.example:9060/ers/config/../adminuser",
+    ],
+)
+def test_validate_next_page_href_rejects_untrusted_urls(href):
+    with pytest.raises(ValueError):
+        validate_next_page_href(href, ["https://ise.example"])
