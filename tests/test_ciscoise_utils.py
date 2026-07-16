@@ -17,6 +17,7 @@ from pathlib import Path
 import pytest
 
 from ciscoise_utils import (
+    build_ers_update,
     encode_path_segment,
     read_bounded_xml_response,
     validate_next_page_href,
@@ -86,3 +87,31 @@ def test_read_bounded_xml_response_rejects_oversized_body():
 def test_validate_xml_document_rejects_entity_declarations():
     with pytest.raises(ValueError, match="prohibited DTD"):
         validate_xml_document('<!DOCTYPE root [<!ENTITY x "value">]><root attr="&x;"/>')
+
+
+def test_build_ers_update_preserves_quarantine_state_and_strips_link():
+    current = {
+        "ERSEndPoint": {
+            "description": "old",
+            "groupId": "blocked-list",
+            "staticGroupAssignment": True,
+            "link": {"href": "https://ise.example/resource"},
+            "customAttributes": {"customAttributes": {"owner": "soc"}},
+        }
+    }
+
+    payload = build_ers_update(
+        current,
+        "ERSEndPoint",
+        {"description": "new"},
+        ("case", "1234"),
+    )
+
+    assert payload["ERSEndPoint"]["groupId"] == "blocked-list"
+    assert payload["ERSEndPoint"]["staticGroupAssignment"] is True
+    assert "link" not in payload["ERSEndPoint"]
+    assert payload["ERSEndPoint"]["customAttributes"]["customAttributes"] == {
+        "owner": "soc",
+        "case": "1234",
+    }
+    assert current["ERSEndPoint"]["description"] == "old"

@@ -14,6 +14,7 @@
 # and limitations under the License.
 
 import re
+from copy import deepcopy
 from urllib.parse import quote, unquote, urljoin, urlsplit, urlunsplit
 
 
@@ -101,3 +102,30 @@ def validate_xml_document(xml: str) -> None:
     """Reject XML declarations that can define or expand external entities."""
     if UNSAFE_XML_DECLARATION.search(xml):
         raise ValueError("Cisco ISE XML response contains a prohibited DTD or entity declaration")
+
+
+def build_ers_update(
+    current_response: object,
+    resource_key: str,
+    updates: dict[str, object],
+    custom_attribute: tuple[str, object] | None = None,
+) -> dict[str, dict[str, object]]:
+    """Merge requested changes into a full ERS object for replace-style PUT APIs."""
+    if not isinstance(current_response, dict) or not isinstance(current_response.get(resource_key), dict):
+        raise ValueError(f"Cisco ISE response is missing the {resource_key} resource")
+
+    resource = deepcopy(current_response[resource_key])
+    resource.pop("link", None)
+    resource.update(updates)
+
+    if custom_attribute:
+        name, value = custom_attribute
+        custom_wrapper = resource.setdefault("customAttributes", {})
+        if not isinstance(custom_wrapper, dict):
+            raise ValueError("Cisco ISE response contains invalid custom attributes")
+        custom_values = custom_wrapper.setdefault("customAttributes", {})
+        if not isinstance(custom_values, dict):
+            raise ValueError("Cisco ISE response contains invalid custom attributes")
+        custom_values[name] = value
+
+    return {resource_key: resource}

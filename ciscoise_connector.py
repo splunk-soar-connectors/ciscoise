@@ -29,6 +29,7 @@ from requests.auth import HTTPBasicAuth
 # THIS Connector imports
 from ciscoise_consts import *
 from ciscoise_utils import (
+    build_ers_update,
     encode_path_segment,
     read_bounded_xml_response,
     validate_next_page_href,
@@ -320,21 +321,27 @@ class CiscoISEConnector(BaseConnector):
         custom_attribute = param.get("custom_attribute", None)
         custom_attribute_value = param.get("custom_attribute_value", None)
 
-        final_data = {"ERSEndPoint": {}}
-
         if not (attribute or custom_attribute or attribute_value or custom_attribute_value):
             return action_result.set_status(phantom.APP_ERROR, "Please specify attribute or custom attribute")
 
+        updates = {}
         if (attribute is not None) ^ (attribute_value is not None):
             return action_result.set_status(phantom.APP_ERROR, "Please specify both attribute and attribute value")
         elif attribute and attribute_value:
-            final_data["ERSEndPoint"][attribute] = attribute_value
+            updates[attribute] = attribute_value
 
         if (custom_attribute is not None) ^ (custom_attribute_value is not None):
             return action_result.set_status(phantom.APP_ERROR, "Please specify both custom attribute and custom attribute value")
-        elif custom_attribute and custom_attribute_value:
-            custom_attribute_dict = {"customAttributes": {custom_attribute: custom_attribute_value}}
-            final_data["ERSEndPoint"]["customAttributes"] = custom_attribute_dict
+
+        ret_val, current_data = self._call_ers_api(endpoint, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        try:
+            custom_update = (custom_attribute, custom_attribute_value) if custom_attribute and custom_attribute_value else None
+            final_data = build_ers_update(current_data, "ERSEndPoint", updates, custom_update)
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, str(exc))
 
         ret_val, ret_data = self._call_ers_api(endpoint, action_result, data=final_data, method="put")
         action_result.add_data(ret_data)
@@ -569,11 +576,20 @@ class CiscoISEConnector(BaseConnector):
 
         endpoint = f"{ERS_RESOURCE_REST.format(resource=resource)}/{encode_path_segment(resource_id)}"
 
-        data_dict = {resource_key: {}}
-        data_dict[resource_key][key] = value
+        ret_val, current_data = self._call_ers_api(endpoint, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        try:
+            data_dict = build_ers_update(current_data, resource_key, {key: value})
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, str(exc))
+
         ret_val, resp = self._call_ers_api(endpoint, action_result, data=data_dict, method="put")
         if phantom.is_fail(ret_val):
             return action_result.get_status()
+
+        action_result.add_data(resp)
 
         return action_result.set_status(phantom.APP_SUCCESS, "Resource updated successfully")
 

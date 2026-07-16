@@ -5,3 +5,4 @@
 - Restricted ERS pagination links to the configured Cisco ISE asset and API path.
 - Added an unconditional page limit to prevent unbounded ERS pagination.
 - Rejected oversized XML responses and documents containing DTD or entity declarations.
+- Preserved existing ERS resource fields during updates to avoid clearing endpoint quarantine or other configuration.
