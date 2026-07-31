@@ -20,6 +20,10 @@ from urllib.parse import quote, unquote, urljoin, urlsplit, urlunsplit
 
 
 DEFAULT_MAX_PAGES = 1000
+DEFAULT_MAX_TOTAL_RESULTS = 10_000
+MAX_ERS_ACCUMULATED_BYTES = 20 * 1024 * 1024
+MAX_ERS_RESOURCE_BYTES = 1024 * 1024
+MAX_ERS_RESPONSE_BYTES = 5 * 1024 * 1024
 MAX_XML_RESPONSE_BYTES = 20 * 1024 * 1024
 UNSAFE_XML_DECLARATION = re.compile(r"<!\s*(?:DOCTYPE|ENTITY)\b", re.IGNORECASE)
 
@@ -71,7 +75,8 @@ def validate_next_page_href(href: object, allowed_base_urls: list[str]) -> str:
     if not parsed.path.startswith("/ers/config/") or any(segment in {".", ".."} for segment in decoded_segments):
         raise ValueError("Cisco ISE nextPage URL is outside the ERS configuration API")
 
-    return urlunsplit(("", "", parsed.path, parsed.query, ""))
+    relative_target = urlunsplit(("", "", parsed.path, parsed.query, ""))
+    return f":9060{relative_target}"
 
 
 def validate_page_count(page_count: int, max_pages: int = DEFAULT_MAX_PAGES) -> None:
@@ -80,13 +85,13 @@ def validate_page_count(page_count: int, max_pages: int = DEFAULT_MAX_PAGES) -> 
         raise ValueError(f"Cisco ISE pagination exceeded the {max_pages}-page safety limit")
 
 
-def read_bounded_xml_response(response: object, max_bytes: int = MAX_XML_RESPONSE_BYTES) -> str:
-    """Read an HTTP response without accepting an unbounded XML document."""
+def read_bounded_response(response: object, max_bytes: int, response_kind: str) -> str:
+    """Read an HTTP response without accepting an unbounded body."""
     content_length = getattr(response, "headers", {}).get("Content-Length")
     if content_length:
         try:
             if int(content_length) > max_bytes:
-                raise ValueError(f"Cisco ISE XML response exceeds the {max_bytes}-byte limit")
+                raise ValueError(f"Cisco ISE {response_kind} response exceeds the {max_bytes}-byte limit")
         except ValueError as exc:
             if "exceeds" in str(exc):
                 raise
@@ -100,11 +105,21 @@ def read_bounded_xml_response(response: object, max_bytes: int = MAX_XML_RESPONS
             chunk = chunk.encode(getattr(response, "encoding", None) or "utf-8")
         total += len(chunk)
         if total > max_bytes:
-            raise ValueError(f"Cisco ISE XML response exceeds the {max_bytes}-byte limit")
+            raise ValueError(f"Cisco ISE {response_kind} response exceeds the {max_bytes}-byte limit")
         chunks.append(chunk)
 
     encoding = getattr(response, "encoding", None) or "utf-8"
     return b"".join(chunks).decode(encoding, errors="replace")
+
+
+def read_bounded_ers_response(response: object) -> str:
+    """Read a bounded ERS JSON response body."""
+    return read_bounded_response(response, MAX_ERS_RESPONSE_BYTES, "ERS")
+
+
+def read_bounded_xml_response(response: object) -> str:
+    """Read a bounded MnT XML response body."""
+    return read_bounded_response(response, MAX_XML_RESPONSE_BYTES, "MnT")
 
 
 def validate_xml_document(xml: str) -> None:

@@ -29,8 +29,12 @@ from requests.auth import HTTPBasicAuth
 # THIS Connector imports
 from ciscoise_consts import *
 from ciscoise_utils import (
+    DEFAULT_MAX_TOTAL_RESULTS,
+    MAX_ERS_ACCUMULATED_BYTES,
+    MAX_ERS_RESOURCE_BYTES,
     build_ers_update,
     encode_ers_resource_id,
+    read_bounded_ers_response,
     read_bounded_xml_response,
     validate_next_page_href,
     validate_page_count,
@@ -148,16 +152,29 @@ class CiscoISEConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_REST_API, e), ret_data
         try:
             headers = {"Content-Type": "application/json", "ACCEPT": "application/json"}
-            resp = request_func(  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
-                url, json=data, verify=verify, headers=headers, auth=auth_method, params=params
+            resp = request_func(
+                url,
+                json=data,
+                verify=verify,
+                headers=headers,
+                auth=auth_method,
+                params=params,
+                stream=True,
+                timeout=(10, 60),
             )
 
         except Exception as e:
             self.debug_print(f"Exception occurred: {e}")
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_REST_API, e), ret_data
 
+        try:
+            response_text = read_bounded_ers_response(resp)
+        except Exception as e:
+            self.debug_print(f"Exception occurred: {e}")
+            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_REST_API, e), ret_data
+
         if not (200 <= resp.status_code < 399):
-            error_message = resp.text
+            error_message = response_text[:4096]
             if resp.status_code == 401:
                 error_message = "The request has not been applied because it lacks valid authentication credentials for the target resource."
             elif resp.status_code == 404:
@@ -167,10 +184,14 @@ class CiscoISEConnector(BaseConnector):
                 ret_data,
             )
 
-        if not resp.text:
+        if not response_text:
             return (action_result.set_status(phantom.APP_SUCCESS, "Empty response and no information in the header"), None)
 
-        ret_data = json.loads(resp.text)
+        try:
+            ret_data = json.loads(response_text)
+        except Exception as e:
+            self.debug_print(f"Exception occurred: {e}")
+            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_UNABLE_TO_PARSE_REPLY, e), None
 
         return phantom.APP_SUCCESS, ret_data
 
@@ -431,6 +452,14 @@ class CiscoISEConnector(BaseConnector):
         items_list = list()
         params = {}
         page_count = 0
+        accumulated_bytes = 0
+        seen_endpoints = {endpoint}
+        if limit is not None and limit > DEFAULT_MAX_TOTAL_RESULTS:
+            action_result.set_status(
+                phantom.APP_ERROR,
+                f"Cisco ISE result limit cannot exceed {DEFAULT_MAX_TOTAL_RESULTS}",
+            )
+            return None
         if limit:
             params["size"] = min(DEFAULT_MAX_RESULTS, limit)
         else:
@@ -442,16 +471,38 @@ class CiscoISEConnector(BaseConnector):
                 self.debug_print("Call to ERS API Failed")
                 return None
             page_count += 1
-            items_from_page = items.get("SearchResult", {}).get("resources", [])
+            if not isinstance(items, dict) or not isinstance(items.get("SearchResult"), dict):
+                action_result.set_status(phantom.APP_ERROR, "Cisco ISE returned an invalid paginated response")
+                return None
+            items_from_page = items["SearchResult"].get("resources", [])
+            if not isinstance(items_from_page, list) or len(items_from_page) > params["size"]:
+                action_result.set_status(phantom.APP_ERROR, "Cisco ISE returned too many resources in one page")
+                return None
 
-            items_list.extend(items_from_page)
+            remaining = (limit if limit is not None else DEFAULT_MAX_TOTAL_RESULTS) - len(items_list)
+            retained_items = items_from_page[:remaining]
+            for item in retained_items:
+                try:
+                    item_bytes = len(json.dumps(item, ensure_ascii=False).encode("utf-8"))
+                except (TypeError, ValueError):
+                    action_result.set_status(phantom.APP_ERROR, "Cisco ISE returned an invalid resource object")
+                    return None
+                if item_bytes > MAX_ERS_RESOURCE_BYTES:
+                    action_result.set_status(phantom.APP_ERROR, "Cisco ISE returned an oversized resource object")
+                    return None
+                accumulated_bytes += item_bytes
+                if accumulated_bytes > MAX_ERS_ACCUMULATED_BYTES:
+                    action_result.set_status(phantom.APP_ERROR, "Cisco ISE resources exceeded the cumulative size limit")
+                    return None
+            items_list.extend(retained_items)
             self.debug_print(f"Retrieved {len(items_from_page)} records from the endpoint {endpoint}")
 
             next_page_dict = items.get("SearchResult", {}).get("nextPage")
 
-            if limit and len(items_list) >= limit:
+            result_limit = limit if limit is not None else DEFAULT_MAX_TOTAL_RESULTS
+            if len(items_list) >= result_limit:
                 self.debug_print("Maximum limit reached")
-                return items_list[:limit]
+                return items_list[:result_limit]
             else:
                 if not next_page_dict:
                     self.debug_print("No more records left to retrieve")
@@ -470,6 +521,10 @@ class CiscoISEConnector(BaseConnector):
                     except ValueError as exc:
                         action_result.set_status(phantom.APP_ERROR, str(exc))
                         return None
+                    if endpoint in seen_endpoints:
+                        action_result.set_status(phantom.APP_ERROR, "Cisco ISE returned a repeated nextPage URL")
+                        return None
+                    seen_endpoints.add(endpoint)
                     self.debug_print("Next page available")
 
     def _list_resources(self, param):
