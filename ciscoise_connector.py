@@ -207,12 +207,16 @@ class CiscoISEConnector(BaseConnector):
         verify = config[phantom.APP_JSON_VERIFY]
 
         try:
-            resp = requests.get(  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
-                url, verify=verify, auth=self._auth, stream=True
-            )
+            resp = requests.get(url, verify=verify, auth=self._auth, stream=True, timeout=(10, 60))
         except Exception as e:
             self.debug_print(f"Exception occurred: {e}")
             return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_REST_API, e), ret_data
+
+        try:
+            xml = read_bounded_xml_response(resp)
+        except Exception as e:
+            self.debug_print(f"Exception occurred: {e}")
+            return action_result.set_status(phantom.APP_ERROR, CISCOISE_ERROR_UNABLE_TO_PARSE_REPLY, e), ret_data
 
         if resp.status_code != 200:
             return (
@@ -220,13 +224,12 @@ class CiscoISEConnector(BaseConnector):
                     phantom.APP_ERROR,
                     CISCOISE_REST_API_ERROR_CODE,
                     code=resp.status_code,
-                    message=resp.text,
+                    message=xml[:4096],
                 ),
                 ret_data,
             )
 
         try:
-            xml = read_bounded_xml_response(resp)
             validate_xml_document(xml)
             action_result.add_debug_data(xml)
             response_dict = xmltodict.parse(xml, disable_entities=True)
@@ -778,16 +781,15 @@ class CiscoISEConnector(BaseConnector):
         try:
             rest_endpoint = f"{base_url}{ACTIVE_LIST_REST}"
             self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, base_url)
-            resp = requests.get(  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
-                rest_endpoint, auth=self._auth, verify=verify
-            )
+            resp = requests.get(rest_endpoint, auth=self._auth, verify=verify, stream=True, timeout=(10, 60))
+            response_text = read_bounded_xml_response(resp)
         except Exception as e:
             return False, str(e)
 
         if resp.status_code == 200:
             return True, ""
 
-        return False, resp.text
+        return False, response_text[:4096]
 
     def _test_connectivity(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
