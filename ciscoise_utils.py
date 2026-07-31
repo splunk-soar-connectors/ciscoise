@@ -14,6 +14,7 @@
 # and limitations under the License.
 
 import re
+import uuid
 from copy import deepcopy
 from urllib.parse import quote, unquote, urljoin, urlsplit, urlunsplit
 
@@ -23,9 +24,17 @@ MAX_XML_RESPONSE_BYTES = 20 * 1024 * 1024
 UNSAFE_XML_DECLARATION = re.compile(r"<!\s*(?:DOCTYPE|ENTITY)\b", re.IGNORECASE)
 
 
-def encode_path_segment(value: object) -> str:
-    """Encode an action parameter as exactly one URL path segment."""
-    return quote(str(value), safe="")
+def encode_ers_resource_id(value: object) -> str:
+    """Validate and encode a Cisco ISE ERS UUID as one URL path segment."""
+    if not isinstance(value, str):
+        raise ValueError("Cisco ISE resource identifiers must be strings")
+    try:
+        parsed = uuid.UUID(value)
+    except (ValueError, AttributeError) as exc:
+        raise ValueError("Cisco ISE resource identifiers must be UUIDs") from exc
+    if str(parsed) != value.casefold():
+        raise ValueError("Cisco ISE resource identifiers must use canonical UUID syntax")
+    return quote(value, safe="")
 
 
 def validate_next_page_href(href: object, allowed_base_urls: list[str]) -> str:

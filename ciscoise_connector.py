@@ -30,7 +30,7 @@ from requests.auth import HTTPBasicAuth
 from ciscoise_consts import *
 from ciscoise_utils import (
     build_ers_update,
-    encode_path_segment,
+    encode_ers_resource_id,
     read_bounded_xml_response,
     validate_next_page_href,
     validate_page_count,
@@ -301,7 +301,10 @@ class CiscoISEConnector(BaseConnector):
     def _get_endpoint(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = ERS_ENDPOINT_REST + "/" + encode_path_segment(param["endpoint_id"])
+        try:
+            endpoint = ERS_ENDPOINT_REST + "/" + encode_ers_resource_id(param["endpoint_id"])
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, str(exc))
 
         ret_val, ret_data = self._call_ers_api(endpoint, action_result)
 
@@ -315,7 +318,10 @@ class CiscoISEConnector(BaseConnector):
     def _update_endpoint(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = ERS_ENDPOINT_REST + "/" + encode_path_segment(param["endpoint_id"])
+        try:
+            endpoint = ERS_ENDPOINT_REST + "/" + encode_ers_resource_id(param["endpoint_id"])
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, str(exc))
         attribute = param.get("attribute", None)
         attribute_value = param.get("attribute_value", None)
         custom_attribute = param.get("custom_attribute", None)
@@ -521,7 +527,10 @@ class CiscoISEConnector(BaseConnector):
 
             return action_result.set_status(phantom.APP_SUCCESS)
 
-        endpoint = f"{ERS_RESOURCE_REST.format(resource=resource)}/{encode_path_segment(resource_id)}"
+        try:
+            endpoint = f"{ERS_RESOURCE_REST.format(resource=resource)}/{encode_ers_resource_id(resource_id)}"
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, str(exc))
 
         ret_val, resp = self._call_ers_api(endpoint, action_result)
         if phantom.is_fail(ret_val):
@@ -540,7 +549,10 @@ class CiscoISEConnector(BaseConnector):
         resource = MAP_RESOURCE[param["resource"]][0]
         resource_id = param["resource_id"]
 
-        endpoint = f"{ERS_RESOURCE_REST.format(resource=resource)}/{encode_path_segment(resource_id)}"
+        try:
+            endpoint = f"{ERS_RESOURCE_REST.format(resource=resource)}/{encode_ers_resource_id(resource_id)}"
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, str(exc))
 
         ret_val, resp = self._call_ers_api(endpoint, action_result, method="delete")
         if phantom.is_fail(ret_val):
@@ -574,7 +586,10 @@ class CiscoISEConnector(BaseConnector):
         key = param["key"]
         value = param["value"]
 
-        endpoint = f"{ERS_RESOURCE_REST.format(resource=resource)}/{encode_path_segment(resource_id)}"
+        try:
+            endpoint = f"{ERS_RESOURCE_REST.format(resource=resource)}/{encode_ers_resource_id(resource_id)}"
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, str(exc))
 
         ret_val, current_data = self._call_ers_api(endpoint, action_result)
         if phantom.is_fail(ret_val):
@@ -678,7 +693,10 @@ class CiscoISEConnector(BaseConnector):
     def _delete_policy(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = f"{ERS_POLICIES}/{encode_path_segment(param['policy_name'])}"
+        try:
+            endpoint = f"{ERS_POLICIES}/{encode_ers_resource_id(param['policy_name'])}"
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, str(exc))
 
         ret_val, ret_data = self._call_ers_api(endpoint, action_result, method="delete")
 
@@ -764,7 +782,10 @@ class CiscoISEConnector(BaseConnector):
     def _get_anc_endpoint(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = ERS_ENDPOINT_ANC + "/" + encode_path_segment(param["endpoint_id"])
+        try:
+            endpoint = ERS_ENDPOINT_ANC + "/" + encode_ers_resource_id(param["endpoint_id"])
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, str(exc))
 
         ret_val, ret_data = self._call_ers_api(endpoint, action_result)
 
